@@ -55,7 +55,7 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["overview", "introduction", "cli"]
+      "pages": ["overview", "introduction", "cli", "development"]
     },
     {
       "group": "Essentials",

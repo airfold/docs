@@ -1,0 +1,156 @@
+---
+title: 'Airfold CLI'
+description: 'Also known as `af`.'
+---
+
+The CLI to Airfold is the `af` command, which accepts a variety of commands such as `af push` or `af source`.
+
+To view a list of the commands available in your current Airfold version, run `af` with no additional arguments.
+
+To get specific help for any specific command, use the `--help` option with the relevant command. For example, to see help about the `pipe` command you can run `af pipe --help`.
+
+Here's a brief overview of all the available commands, arguments, and flags:
+
+## Airfold CLI
+
+<ResponseField name="config" type="Command">
+  Configure Airfold CLI. This command has no additional arguments or flags.
+</ResponseField>
+
+<ResponseField name="diff" type="Command">
+  Diff between local and remote objects. This command has no additional arguments or flags.
+</ResponseField>
+
+<ResponseField name="doctor" type="Command">
+  Check your system for potential problems.
+  <Expandable title="Flags">
+    <ResponseField name="--fix" type="Flag">
+      Fix issues automatically.
+    </ResponseField>
+    <ResponseField name="--list-checks" type="Flag">
+      List available checks.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="fmt" type="Command">
+  Format local object files.
+  <Expandable title="Flags">
+    <ResponseField name="--dry-run" type="Flag">
+      Show execution plan without executing it.
+    </ResponseField>
+    <ResponseField name="--overwrite" type="Flag">
+      Overwrite existing local file(s) without confirmation.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="generate" type="Command">
+  Generate events.
+  <Expandable title="Subcommands">
+    <ResponseField name="events" type="Subcommand">
+      Generate events based on a template or file.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="temp_name" type="Argument" required>
+          Event template name or path to file.
+        </ResponseField>
+        <ResponseField name="--send" type="Flag">
+          Source to send events to.
+        </ResponseField>
+        <ResponseField name="--limit" type="Flag">
+          Limit amount of events. Default: -1
+        </ResponseField>
+        <ResponseField name="--eps" type="Flag">
+          Send events per second. Default: 1
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="graph" type="Command">
+  Dump graph of runtime objects in JSON format to file or stdout. This command has no additional arguments or flags.
+</ResponseField>
+
+<ResponseField name="pipe" type="Command">
+  Pipe commands.
+  <Expandable title="Subcommands">
+    <ResponseField name="data" type="Subcommand">
+      Get pipe data.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="name" type="Argument" required>
+          Pipe name.
+        </ResponseField>
+        <ResponseField name="--format" type="Flag">
+          Output data format. Options: json, ndjson. Default: ndjson.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="delete" type="Subcommand">
+      Delete pipe.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="name" type="Argument" required>
+          Pipe name.
+        </ResponseField>
+        <ResponseField name="--force" type="Flag">
+          Force delete/overwrite even if data will be lost.
+        </ResponseField>
+        <ResponseField name="--dry-run" type="Flag">
+          Show execution plan without executing it.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="ls" type="Subcommand">
+      List pipes. This subcommand has no additional arguments or flags.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pull" type="Command">
+  Pull objects from the runtime database.
+  <Expandable title="Arguments">
+    <ResponseField name="path" type="Argument">
+      Target directory to create files in, ('-' will dump to stdout). Default: None
+    </ResponseField>
+
+
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="push" type="Command">
+  Push object(s) into the runtime database.
+  <Expandable title="Arguments and Flags">
+    <ResponseField name="path" type="Argument">
+      Target directory to read files from, ('-' will read from stdin). Default: None
+    </ResponseField>
+    <ResponseField name="--dry-run" type="Flag">
+      Show execution plan without executing it.
+    </ResponseField>
+    <ResponseField name="--force" type="Flag">
+      Force delete/overwrite even if data will be lost.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="source" type="Command">
+  Source commands.
+  <Expandable title="Subcommands">
+    <ResponseField name="delete" type="Subcommand">
+      Delete source.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="name" type="Argument" required>
+          Source name.
+        </ResponseField>
+        <ResponseField name="--force" type="Flag">
+          Force delete/overwrite even if data will be lost.
+        </ResponseField>
+        <ResponseField name="--dry-run" type="Flag">
+          Show execution plan without executing it.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="ls" type="Subcommand">
+      List sources. This subcommand has no additional arguments or flags.
+    </ResponseField>
+  </Expandable>
+</ResponseField>

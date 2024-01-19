@@ -6,7 +6,7 @@ icon: "rectangle-vertical-history"
 
 Pipes contain one or more SQL queries (Nodes) that are executed sequentially.
 
-The final node's schema determines the pipe's schema. Pipes result in either a published pipe or a materialized pipe.
+Pipes result in either a published pipe or a materialized pipe.
 
 <Tip>
 Use Pipes to build features over your data!
@@ -18,6 +18,8 @@ A node is a container for a single SQL `SELECT` statement.
 Nodes live within pipes and are executed sequentially in the order they are defined in the pipe.
 
 Each node can read data from sources, published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe.
+
+The schema of the last node in the pipe determines the pipe's schema.
 
 <Tip>
 ### Best Practices for Nodes

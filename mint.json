@@ -52,7 +52,7 @@
           "group": "Workspace",
           "icon": "folder-tree",
           "pages": [
-            "workspace/workspace",
+            "workspace/workspaces",
             "workspace/pipes",
             "workspace/sources",
             "workspace/tokens"

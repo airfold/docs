@@ -1,0 +1,52 @@
+---
+title: 'What is a Workspace?'
+sidebarTitle: 'Workspace'
+description: 'Overview of the `workspace`'
+icon: "files"
+---
+
+A Workspace in Airfold is an area that contains a set of resources such as Sources, Pipes, Nodes, API Endpoints, and Auth Tokens.
+
+It's easy to invite other users to your Workspace and set appropriate permissions for each user.
+
+## Why use Workspaces?
+Workspaces allow you to separate different projects, use cases, and dev/staging/production environments for the things you work on in Airfold.
+
+## How to organize Workspaces?
+How to organize your Workspaces in Airfold is up to you. Common patterns include a separate Workspace per project, or per team.
+
+<Tip>
+Workspaces are often used to give a team, or a project, its own space to work in.
+</Tip>
+
+## Creating Workspaces
+Creating multiple Workspaces in Airfold is easy. Upon creating a Workspace, you can start building immediately, no need to wait for infrastructure or configure anything.
+
+## Workspace Files
+A workspace file is a YAML file that describes a resource in Airfold, and collectively, workspace files are the source code of your Airfold workspace.
+And like any source code, engineers can apply the same principles they already know and love:
+
+- **Version control** - Push workspace files to a Git repository for version control and more efficient collaboration with your team.
+- **A single source of truth** - The workspace files in the main branch of your repository are the single source of truth for your workspace. Use `git pull` to sync your local workspace with the latest changes from the main branch.
+- **CI / CD** - Incorporate your CI workflows, run tests, use Airfold CLI's `af push` to deploy changes to your workspace, and more.
+- **Pull Requests** - Use pull requests to review changes to your workspace before merging them into the main branch *(which can trigger a CI with `af push` to deploy changes to your workspace)*.
+
+Workspace files are not tied to a specific workspace, and can be deployed to any workspace. This allows you to easily create new workspaces from existing ones, or to apply changes to multiple workspaces at once.
+
+## Workspace File Structure
+There are two types of workspace files **pipes** and **sources**.
+
+Here's an example of a workspace structure:
+```bash
+/.airfold/config.yaml
+/pipes
+  /trends_per_country.yaml
+  /sales_metrics.yaml
+/sources
+  /events.yaml
+  /sales.yaml
+  /sales_metrics_mv.yaml
+/endpoints
+  /country_trends.yaml
+  /sales_over_time.yaml
+```

@@ -1,0 +1,162 @@
+---
+title: 'Pipe'
+description: 'The `pipe` entity'
+icon: "rectangle-vertical-history"
+---
+
+Pipes contain one or more SQL queries (Nodes) that are executed sequentially.
+
+The final node's schema determines the pipe's schema. Pipes result in either a published pipe or a materialized pipe.
+
+<Tip>
+Use Pipes to build features over your data!
+</Tip>
+
+## What is a Node?
+A node is a container for a single SQL `SELECT` statement.
+
+Nodes live within pipes and are executed sequentially in the order they are defined in the pipe.
+
+Each node can read data from sources, published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe.
+
+<Tip>
+### Best Practices for Nodes
+Use nodes to break down complex queries into smaller, more manageable, sequential steps. Then chain Nodes together to build the logic incrementally.
+
+Each Node can be developed & tested individually. This makes it much easier to build complex query logic in Airfold as you avoid creating large monolithic queries with many sub-queries.
+</Tip>
+
+## The 3 types of Pipes
+#### Draft pipes
+These are the starting point for all pipes, similar to database views in functionality.
+
+They cannot be referenced by other pipes using the `FROM` clause.
+
+Draft pipes are temporary and primarily used for development. Once finalized, a draft pipe can be transitioned into either a published or a materialized pipe, but not both.
+
+#### Published pipes
+This creates an API endpoint that serves the result of your pipe, the result is accessible in JSON, NDJSON, CSV, and Parquet formats.
+
+To publish a draft pipe, assign an endpoint name to the `publish` field.
+
+Published pipes can parameterizing their SQL using Jinja2 via the `params` field.
+
+Unlike draft pipes, published pipes can be accessed (via `FROM`) by other pipes.
+
+#### Materialized pipes
+Differing from the batch nature of draft and published pipes, materialized pipes stand out for their ability to incrementally transform data as it is ingested and append their results to a designated source.
+
+To materialize a draft pipe, set the `to` field to the name of the target source.
+
+Although materialized pipes themselves cannot be accessed (via `FROM`) by other pipes, the source they write to is accessible like any other source.
+
+<Tip>
+### Supercharge your pipes!
+Published pipes are batch and compute their results on read, thus they're not suited for intensive data transformations.
+
+Instead, a common pattern is to front a materialized pipe with a published pipe. The materialized pipe incrementally transforms the data as it is ingested and writes it to its source, allowing the published pipe to instantly acceess the already transformed data from the source on read.
+</Tip>
+
+### Sample Pipes
+
+<CodeGroup>
+
+```yaml draft_pipe.yaml
+description: 'Load logs and get errors'
+nodes:
+    - load:
+        description: Loading logs
+        sql: select timestamp, level, file, message from logs
+    - error:
+        description: Getting errors
+        sql: select message from load where level = 'error'
+```
+
+```yaml published_pipe.yaml
+description: 'Get errors based on level'
+nodes:
+    - load:
+        description: Loading logs
+        sql: select timestamp, level, file, message from logs
+    - error:
+        description: Getting errors
+        sql: select message from load where level = '{{ level }}'
+publish: level
+params:
+    - name: level
+      type: String
+      default: error
+```
+
+```yaml materialized_pipe.yaml
+description: 'Aggregate logs by level'
+nodes:
+    - load:
+        description: Loading logs
+        sql: select timestamp, level, file, message from logs
+    - error:
+        description: Aggregating logs by level
+        sql: |
+            select
+                level,
+                countState() as count
+            from load
+            group by level
+to: logs_by_level
+```
+
+</CodeGroup>
+
+<br />
+
+<Note>
+Note the materialized pipe example uses `countState()` instead of `count()`.
+
+This is because Airfold uses [ClickHouse](https://clickhouse.com/) under the hood which requires appending `State` to aggregate functions when used in a materialized pipe.
+
+Fortunately, Airfold does it automatically when materializing a draft pipe.
+
+Learn more about [Materialization in ClickHouse](https://clickhouse.com/blog/using-materialized-views-in-clickhouse#speed-up-aggregations-using-materialized-views), about the [`*State` combinator](https://clickhouse.com/docs/en/sql-reference/aggregate-functions/combinators#-state).
+</Note>
+
+## Properties
+
+<ResponseField name="description" type="string">
+  A brief description of the pipe's purpose or functionality. Optional.
+</ResponseField>
+<ResponseField name="nodes" type="Node[]" required>
+  The sequence of nodes within the pipe. Each node represents a stage in data processing.
+  <Expandable title="Node">
+    <ResponseField name="[name]" type="Node" required>
+      An identifier for the node.
+      <Expandable title="Properties">
+        <ResponseField name="description" type="string">
+          A brief description of the node's role or function. Optional.
+        </ResponseField>
+        <ResponseField name="sql" type="string" required>
+          The SQL query associated with the node. It can only retrieve data (via `FROM`) from sources, published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe. It supports Jinja2 templating for dynamic SQL parameterization via the `params` field e.g. `{{ param }}`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="to" type="string">
+  Specifies the target source for appending the incremental results. When set, it converts the pipe into a materialized pipe. This option cannot be used with `publish` and requires the final node's schema to match the provided source schema. Optional.
+</ResponseField>
+<ResponseField name="publish" type="string">
+  The endpoint name where the results are published, turning the pipe into a published pipe. This option cannot be used with `to`. Optional.
+</ResponseField>
+<ResponseField name="params" type="Param[]">
+  A list of parameters for parameterizing node SQL queries through Jinja2 templating e.g. `{{ param }}`. These parameters are passed via the API and can be used to dynamically alter the pipe's behavior. Optional.
+  <Expandable title="Param">
+    <ResponseField name="name" type="string" required>
+      The name of the parameter.
+    </ResponseField>
+    <ResponseField name="type" type="string" required>
+      The ClickHouse data type of the parameter (e.g., UInt8, String). See [ClickHouse types](https://clickhouse.com/docs/en/sql-reference/data-types).
+    </ResponseField>
+    <ResponseField name="default" type="string">
+      The default value of the parameter. Parameters with defaults are optional in the API. Optional.
+    </ResponseField>
+  </Expandable>
+</ResponseField>

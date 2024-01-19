@@ -29,20 +29,10 @@
     "name": "Home",
     "url": "https://www.airfold.co/"
   },
-  "tabs": [
-    {
-      "name": "API Reference",
-      "url": "api-reference"
-    }
-  ],
+
   "anchors": [
     {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://docs.airfold.co"
-    },
-    {
-      "name": "Site",
+      "name": "Home",
       "icon": "house-blank",
       "url": "https://www.airfold.co/"
     },
@@ -55,34 +45,29 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["overview", "introduction", "cli", "quickstart", "development"]
-    },
-    {
-      "group": "Essentials",
       "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation"
+        "overview",
+        "introduction",
+        {
+          "group": "Workspace",
+          "icon": "folder-tree",
+          "pages": [
+            "workspace/workspace",
+            "workspace/pipes",
+            "workspace/sources",
+            "workspace/tokens"
+          ]
+        },
+        "quickstart_cli"
       ]
     },
     {
-      "group": "API Documentation",
-      "pages": ["api-reference/introduction"]
-    },
-    {
-      "group": "Endpoint Examples",
-      "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
-      ]
+      "group": "Reference",
+      "pages": ["cli"]
     }
   ],
   "footerSocials": {
-    "twitter": "https://twitter.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
+    "linkedin": "https://www.linkedin.com/company/airfold",
+    "github": "https://github.com/airfold"
   }
 }

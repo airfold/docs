@@ -1,0 +1,83 @@
+---
+title: 'Source'
+description: 'The `source` entity'
+icon: "database"
+---
+
+Sources make it easy to bring your data into Airfold. Sources are akin to tables in a database. They store data according to a defined schema.
+
+All the workspace data lives inside sources, which can be queried, filtered, aggregated, and joined using SQL.
+
+Data is ingested into sources directly through Airfold's Ingest API or by a materialized pipe.
+
+Additionally, Sources can be enhanced into AI Sources for transforming unstructured data into structured formats, unlocking powerful analytical potential.
+
+### Sample Sources
+
+<CodeGroup>
+```yaml source.yaml
+description: "Error logs from a web server"
+cols:
+  ts: DateTime
+  file: String
+  error: String
+settings: |
+  MergeTree()
+  PARTITION BY toYear(ts)
+  ORDER BY (ts, file)
+```
+
+```yaml source_ai.yaml
+description: "Error logs from a web server"
+message: |-
+  Output a description of the following error {error}.
+cols:
+  ts: DateTime
+  file: String
+  error: String
+added_cols:
+  error_description: String
+settings: |
+  MergeTree()
+  PARTITION BY toYear(ts)
+  ORDER BY (ts, file)
+```
+</CodeGroup>
+
+<br />
+
+<Note>
+The `added_cols` field specifies which columns the AI source needs to fill, and the `message` field specifies how to fill them, using the columns from the source in curly braces.
+</Note>
+
+## The `_errors` table
+Every source has an associated `{source_name}_errors` source table, which contains all errors that occurred during ingestion, for example, if a row failed to be ingested due to schema mismatch.
+
+This way, the whole ingestion process is not interrupted by a single error, and the error can be reviewed and fixed later.
+
+The `{source_name}_errors` is treated like any other source, and can be queried, filtered, and joined with other sources, for example, to find the most common errors:
+
+```sql
+SELECT error, count() AS count
+FROM source_errors
+GROUP BY error
+ORDER BY count DESC
+```
+
+## Properties
+
+<ResponseField name="description" type="string">
+  A brief overview of the Source's content or purpose. Optional.
+</ResponseField>
+<ResponseField name="cols" type="{name: type}" required>
+  Defines the schema of the Source as a list of columns where each column name is a key and its data type is the value (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types)).
+</ResponseField>
+<ResponseField name="settings" type="string | {key: value} | array">
+  [ClickHouse table configuration](https://clickhouse.com/docs/en/sql-reference/statements/create/table) for the Source, which can include `ORDER BY`, `PARTITION BY`, Table Engine, etc. The settings can be a String, a key-value pair, or an array comprising either or both. Optional.
+</ResponseField>
+<ResponseField name="message" type="string">
+  A message for the AI from which it would derive the columns in `added_cols`. The message should use the Source's `cols` within curly braces e.g. `{col}`. This field is mandatory if `added_cols` is present, transforming the Source into an AI Source.
+</ResponseField>
+<ResponseField name="added_cols" type="{name: type}">
+  Specifies additional columns to be filled by the AI, based on the `message` field's instructions. This field is mandatory if `message` is present, transforming the Source into an AI Source.
+</ResponseField>

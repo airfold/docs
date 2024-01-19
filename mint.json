@@ -58,6 +58,7 @@
             "workspace/tokens"
           ]
         },
+        "ingest",
         "quickstart_cli"
       ]
     },

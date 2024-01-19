@@ -51,16 +51,16 @@ The `added_cols` field specifies which columns the AI source needs to fill, and 
 </Note>
 
 ## The `_errors` table
-Every source has an associated `{source_name}_errors` source table, which contains all errors that occurred during ingestion, for example, if a row failed to be ingested due to schema mismatch.
+Every Workspace has an associated `_errors` source table, which contains all errors that occurred during ingestion, for example, if a row failed to be ingested due to schema mismatch.
 
 This way, the whole ingestion process is not interrupted by a single error, and the error can be reviewed and fixed later.
 
-The `{source_name}_errors` is treated like any other source, and can be queried, filtered, and joined with other sources, for example, to find the most common errors:
+The `_errors` is treated like any other source, and can be queried, filtered, and joined with other sources, for example, to find the most common errors by source:
 
 ```sql
-SELECT error, count() AS count
-FROM source_errors
-GROUP BY error
+SELECT source, COUNT(*) AS count
+FROM _errors
+GROUP BY source
 ORDER BY count DESC
 ```
 

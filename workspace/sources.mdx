@@ -50,7 +50,7 @@ settings: |
 The `added_cols` field specifies which columns the AI source needs to fill, and the `message` field specifies how to fill them, using the columns from the source in curly braces.
 </Note>
 
-## The `_errors` table
+## The `_errors` Table
 Every Workspace has an associated `_errors` source table, which contains all errors that occurred during ingestion, for example, if a row failed to be ingested due to schema mismatch.
 
 This way, the whole ingestion process is not interrupted by a single error, and the error can be reviewed and fixed later.

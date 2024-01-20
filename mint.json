@@ -29,6 +29,12 @@
     "name": "Home",
     "url": "https://www.airfold.co/"
   },
+  "tabs": [
+    {
+      "name": "API References",
+      "url": "api-reference"
+    }
+  ],
 
   "anchors": [
     {
@@ -65,6 +71,37 @@
     {
       "group": "Reference",
       "pages": ["reference/cli"]
+    },
+    {
+      "group": "API Documentation",
+      "pages": ["api-reference/introduction"]
+    },
+    {
+      "group": "Ingest",
+      "pages": ["api-reference/ingest/ingest", "api-reference/ingest/schema"]
+    },
+    {
+      "group": "Pipes",
+      "pages": [
+        "api-reference/pipes/ephemeral",
+        "api-reference/pipes/delete",
+        "api-reference/pipes/read_draft",
+        "api-reference/pipes/read_published",
+        "api-reference/pipes/materialize"
+      ]
+    },
+    {
+      "group": "Sources",
+      "pages": [
+        "api-reference/sources/infer_ai",
+        "api-reference/sources/delete",
+        "api-reference/sources/infer",
+        "api-reference/sources/validate"
+      ]
+    },
+    {
+      "group": "Diagnostic",
+      "pages": ["api-reference/diagnostic/list", "api-reference/diagnostic/run"]
     }
   ],
   "footerSocials": {

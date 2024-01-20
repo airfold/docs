@@ -1,94 +1,2126 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
+    "title": "Airfold API",
     "version": "1.0.0"
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "airfold.ssid"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "InvalidRequest": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message"
+          }
+        }
+      },
+      "TableMapping": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project Id"
+          },
+          "databaseId": {
+            "type": "string",
+            "description": "Database Id"
+          },
+          "tableId": {
+            "type": "string",
+            "description": "Table Id"
+          },
+          "sourceName": {
+            "type": "string",
+            "description": "Source name"
+          },
+          "tableSchema": {
+            "type": "string",
+            "description": "Table SQL schema"
+          }
+        }
+      },
+      "UserPermissions": {
+        "type": "object",
+        "properties": {
+          "orgId": {
+            "type": "string",
+            "description": "Organization id for permissions"
+          },
+          "userPerms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
+        }
+      },
+      "Permission": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "Effect": {
+            "type": "string",
+            "description": "Allow | Deny"
+          },
+          "Action": {
+            "type": "string",
+            "description": "Action name"
+          },
+          "Resource": {
+            "type": "string",
+            "description": "Resource mask/match string"
+          }
+        },
+        "required": ["Effect", "Action", "Resource"]
+      },
+      "Organization": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Organization id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Organization name"
+          }
+        },
+        "required": ["id", "name"]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "User id"
+          },
+          "fname": {
+            "type": "string",
+            "description": "User first name"
+          },
+          "lname": {
+            "type": "string",
+            "description": "User last name"
+          },
+          "email": {
+            "type": "string",
+            "description": "User email"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "Path to user image",
+            "nullable": true
+          },
+          "fullName": {
+            "type": "string",
+            "description": "User full name (fname + lname)"
+          },
+          "organizations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Organization"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserPermissions"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "fname",
+          "lname",
+          "email",
+          "avatar",
+          "fullName",
+          "organization",
+          "permissions"
+        ]
+      },
+      "ProjectProfile": {
+        "type": "object",
+        "properties": {
+          "orgId": {
+            "type": "string",
+            "description": "Organization id"
+          },
+          "projectId": {
+            "type": "string",
+            "description": "Project id"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
+        },
+        "required": ["orgId", "projectId", "permissions"]
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": ["user"]
+      },
+      "ChangeOwner": {
+        "type": "object",
+        "required": ["owner"],
+        "properties": {
+          "owner": {
+            "type": "string",
+            "description": "New owner email"
+          }
+        }
+      },
+      "CreateOrg": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Organization name"
+          }
+        }
+      },
+      "OrgInList": {
+        "type": "object",
+        "required": ["id", "name", "role", "isOwner", "ownerEmail"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Organization id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Organization name"
+          },
+          "role": {
+            "type": "string",
+            "description": "User role in organization"
+          },
+          "isOwner": {
+            "type": "boolean",
+            "description": "Organization owner status"
+          },
+          "ownerEmail": {
+            "type": "string",
+            "description": "Organization owner email"
+          }
+        }
+      },
+      "OrgMember": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Member email address"
+          },
+          "role": {
+            "type": "string",
+            "description": "Member role"
+          },
+          "isOwner": {
+            "type": "boolean",
+            "description": "Member is the organization owner"
+          }
+        },
+        "required": ["email", "role"]
+      },
+      "UpdateOrg": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "New organization name"
+          }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Project id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Project name"
+          }
+        }
+      },
+      "ProjectCreate": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Project name"
+          }
+        }
+      },
+      "ProjectKeyCreate": {
+        "type": "object",
+        "required": ["name", "role"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Key name"
+          },
+          "role": {
+            "type": "string",
+            "description": "Key role"
+          }
+        }
+      },
+      "ProjectStatus": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Project id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Project name"
+          }
+        }
+      },
+      "ProjectStatusFull": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Project id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Project name"
+          },
+          "orgId": {
+            "type": "string",
+            "description": "Organization id"
+          },
+          "orgName": {
+            "type": "string",
+            "description": "Organization name"
+          }
+        }
+      },
+      "ProjectKey": {
+        "type": "object",
+        "required": ["projectId", "name", "key", "role", "permissions"],
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "description": "Project id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Project key name"
+          },
+          "key": {
+            "type": "string",
+            "description": "Project API key"
+          },
+          "role": {
+            "type": "string",
+            "description": "Project key role"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Project key creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Project key creation timestamp"
+          },
+          "lastUsedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Project key creation timestamp"
+          }
+        }
+      },
+      "ProjectKeyUpdate": {
+        "type": "object",
+        "required": ["role"],
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "Key role"
+          }
+        }
+      },
+      "ExecutionPlan": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "description": "Command with arguments"
+        }
+      },
+      "DoctorIssue": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Issue id"
+          },
+          "description": {
+            "type": "string",
+            "description": "Issue description"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["error", "warning"],
+            "default": "error",
+            "description": "Severity of the issue"
+          }
+        },
+        "description": "Issue information"
+      },
+      "DoctorFixResult": {
+        "type": "object",
+        "properties": {
+          "issue": {
+            "$ref": "#/components/schemas/DoctorIssue"
+          },
+          "message": {
+            "type": "string",
+            "description": "Fix description message"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["fixed", "failed"]
+          }
+        },
+        "description": "Fix result"
+      },
+      "DoctorRunResponse": {
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/DoctorIssue"
+            },
+            {
+              "$ref": "#/components/schemas/DoctorFixResult"
+            }
+          ]
+        }
+      },
+      "ProjectPullResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "description": "Object content"
+        }
+      },
+      "ProjectGraph": {
+        "type": "object"
+      }
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
+      "url": "http://localhost:3000/dev",
+      "description": "Development server"
+    },
     {
-      "bearerAuth": []
+      "url": "https://api.airfold.co",
+      "description": "Production server"
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
+    "/v1/events/{source_name}": {
+      "post": {
+        "operationId": "sendEvents",
+        "tags": ["Events"],
+        "summary": "Post event(s) for ingestion into source.",
+        "description": "Post event(s) for ingestion into source.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
+            "in": "path",
+            "name": "source_name",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
+            },
+            "description": "Source name",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Source not found"
+          },
+          "413": {
+            "description": "Message too big"
+          }
+        }
+      },
+      "get": {
+        "operationId": "getSourceSchema",
+        "tags": ["Events"],
+        "summary": "Get source data schema.",
+        "description": "Get source data schema.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name",
+            "required": true
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableMapping"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Source not found"
+          },
+          "413": {
+            "description": "Message too big"
+          }
+        }
+      }
+    },
+    "/v1/auth/identity": {
+      "get": {
+        "operationId": "getIdentity",
+        "tags": ["Auth"],
+        "summary": "Returns current user data",
+        "description": "Checks if user is authorized and returns user identity",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserProfile"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProjectProfile"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/web/auth/identity": {
+      "get": {
+        "operationId": "getIdentityWeb",
+        "tags": ["Web"],
+        "summary": "Returns current user data",
+        "description": "Checks if user is authorized and returns user identity",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserProfile"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ProjectProfile"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/web/auth/logout": {
+      "get": {
+        "operationId": "logout",
+        "tags": ["Web"],
+        "summary": "Logs out the current user,",
+        "description": "Logs out the current user,",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/members": {
+      "post": {
+        "operationId": "addOrgMember",
+        "tags": ["Organizations"],
+        "summary": "Add or update organization member.",
+        "description": "Add or update organization member.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrgMember"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Plant"
+                    "$ref": "#/components/schemas/OrgMember"
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrgMembers",
+        "tags": ["Organizations"],
+        "summary": "List organization members.",
+        "description": "List organization members.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrgMember"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      }
+    },
+    "/web/{org_id}/members": {
+      "post": {
+        "operationId": "addOrgMemberWeb",
+        "tags": ["Web"],
+        "summary": "Add or update organization member.",
+        "description": "Add or update organization member.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrgMember"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrgMember"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrgMembersWeb",
+        "tags": ["Web"],
+        "summary": "List organization members.",
+        "description": "List organization members.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrgMember"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/owner": {
+      "put": {
+        "operationId": "changeOwner",
+        "tags": ["Organizations"],
+        "summary": "Change organization owner.",
+        "description": "Change organization owner.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeOwner"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeOwner"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request data or new owner is not an Admin"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/web/{org_id}/owner": {
+      "put": {
+        "operationId": "changeOwnerWeb",
+        "tags": ["Web"],
+        "summary": "Change organization owner.",
+        "description": "Change organization owner.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeOwner"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeOwner"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request data or new owner is not an Admin"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/v1/organizations": {
+      "post": {
+        "operationId": "createOrg",
+        "tags": ["Organizations"],
+        "summary": "Create new organization.",
+        "description": "Create new organization.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrg"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrganizations",
+        "tags": ["Organizations"],
+        "summary": "Returns list of organizations.",
+        "description": "Returns list of organizations the current user is member of.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrgInList"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/organizations": {
+      "post": {
+        "operationId": "createOrgWeb",
+        "tags": ["Web"],
+        "summary": "Create new organization.",
+        "description": "Create new organization.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrg"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrganizationsWeb",
+        "tags": ["Web"],
+        "summary": "Returns list of organizations.",
+        "description": "Returns list of organizations the current user is member of.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrgInList"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}": {
+      "delete": {
+        "operationId": "deleteOrg",
+        "tags": ["Organizations"],
+        "summary": "Delete organization.",
+        "description": "Delete organization.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Organization not found"
+          }
+        }
+      },
+      "post": {
+        "operationId": "updateOrg",
+        "tags": ["Organizations"],
+        "summary": "Change organization name.",
+        "description": "Change organization name.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrg"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      }
+    },
+    "/web/{org_id}": {
+      "delete": {
+        "operationId": "deleteOrgWeb",
+        "tags": ["Web"],
+        "summary": "Delete organization.",
+        "description": "Delete organization.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Organization not found"
+          }
+        }
+      },
+      "post": {
+        "operationId": "updateOrgWeb",
+        "tags": ["Web"],
+        "summary": "Change organization name.",
+        "description": "Change organization name.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOrg"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Organization"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/members/{member_email}": {
+      "delete": {
+        "operationId": "deleteOrgMember",
+        "tags": ["Organizations"],
+        "summary": "Delete organization member.",
+        "description": "Delete organization member.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "member_email",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Member email",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          },
+          "404": {
+            "description": "Member not found."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/members/{member_email}": {
+      "delete": {
+        "operationId": "deleteOrgMemberWeb",
+        "tags": ["Web"],
+        "summary": "Delete organization member.",
+        "description": "Delete organization member.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "member_email",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Member email",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          },
+          "404": {
+            "description": "Member not found."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects": {
+      "post": {
+        "operationId": "createProject",
+        "tags": ["Projects"],
+        "summary": "Creates a new project",
+        "description": "Creates a new project in the organization",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for project creation",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/Project"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listProjects",
+        "tags": ["Projects"],
+        "summary": "Returns list of projects in organization.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "description": "Returns list of projects in organization.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectStatus"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/projects": {
+      "post": {
+        "operationId": "createProjectWeb",
+        "tags": ["Web"],
+        "summary": "Creates a new project",
+        "description": "Creates a new project in the organization",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for project creation",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/Project"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listProjectsWeb",
+        "tags": ["Web"],
+        "summary": "Returns list of projects in organization.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "description": "Returns list of projects in organization.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectStatus"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/keys": {
+      "post": {
+        "operationId": "createProjectKey",
+        "tags": ["Projects"],
+        "summary": "Creates a new project key",
+        "description": "Creates a new project key",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for project key",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectKeyCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectKey"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or missing request parameter"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Role not found"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listProjectKeys",
+        "tags": ["Projects"],
+        "summary": "Returns a list of project API keys.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "description": "Returns a list of project API keys.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectKey"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/projects/{proj_id}/keys": {
+      "post": {
+        "operationId": "createProjectKeyWeb",
+        "tags": ["Web"],
+        "summary": "Creates a new project key",
+        "description": "Creates a new project key",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for project key",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectKeyCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectKey"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or missing request parameter"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Role not found"
+          }
+        }
+      },
+      "get": {
+        "operationId": "listProjectKeysWeb",
+        "tags": ["Web"],
+        "summary": "Returns a list of project API keys.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "description": "Returns a list of project API keys.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectKey"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}": {
+      "delete": {
+        "operationId": "deleteProject",
+        "tags": ["Projects"],
+        "summary": "Delete project by id",
+        "description": "Deletes project by id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          },
+          "404": {
+            "description": "Project not found or user doesn't have access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRequest"
                 }
               }
             }
           }
         }
       },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
+      "get": {
+        "operationId": "getProject",
+        "tags": ["Projects"],
+        "summary": "Returns project status and properties.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
           },
-          "required": true
-        },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "description": "Returns project status and properties.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/ProjectStatus"
                 }
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/projects/{proj_id}": {
+      "delete": {
+        "operationId": "deleteProjectWeb",
+        "tags": ["Web"],
+        "summary": "Delete project by id",
+        "description": "Deletes project by id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          },
+          "404": {
+            "description": "Project not found or user doesn't have access.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/InvalidRequest"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getProjectWeb",
+        "tags": ["Web"],
+        "summary": "Returns project status and properties.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "description": "Returns project status and properties.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectStatus"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/keys/{key_name}": {
+      "delete": {
+        "operationId": "deleteProjectKey",
+        "tags": ["Projects"],
+        "summary": "Delete project key",
+        "description": "Deletes project key",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "key_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Key name",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          },
+          "404": {
+            "description": "Project key not found or user doesn't have access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRequest"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateProjectKey",
+        "tags": ["Projects"],
+        "summary": "Update project key",
+        "description": "Update project key",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "key_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Key name",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for project key update",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectKeyUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          },
+          "404": {
+            "description": "Project key not found or user doesn't have access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRequest"
                 }
               }
             }
@@ -96,100 +2128,1945 @@
         }
       }
     },
-    "/plants/{id}": {
+    "/web/{org_id}/projects/{proj_id}/keys/{key_name}": {
       "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+        "operationId": "deleteProjectKeyWeb",
+        "tags": ["Web"],
+        "summary": "Delete project key",
+        "description": "Deletes project key",
         "parameters": [
           {
-            "name": "id",
             "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
+            "name": "org_id",
             "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "key_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Key name",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "cookieAuth": []
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "OK"
           },
-          "400": {
-            "description": "unexpected error",
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          },
+          "404": {
+            "description": "Project key not found or user doesn't have access.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/InvalidRequest"
                 }
               }
             }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateProjectKeyWeb",
+        "tags": ["Web"],
+        "summary": "Update project key",
+        "description": "Update project key",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "key_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Key name",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for project key update",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectKeyUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Authorization information is missing or invalid."
+          },
+          "404": {
+            "description": "Project key not found or user doesn't have access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidRequest"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/keys": {
+      "get": {
+        "operationId": "listAllProjectKeys",
+        "tags": ["Projects"],
+        "summary": "Returns a list of all projects API keys.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "description": "Returns a list of all projects API keys.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectKey"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/projects/keys": {
+      "get": {
+        "operationId": "listAllProjectKeysWeb",
+        "tags": ["Web"],
+        "summary": "Returns a list of all projects API keys.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "description": "Returns a list of all projects API keys.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectKey"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/projects": {
+      "get": {
+        "operationId": "listAllProjects",
+        "tags": ["Projects"],
+        "summary": "Returns list of all projects.",
+        "description": "Returns list of all projects.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectStatusFull"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/projects": {
+      "get": {
+        "operationId": "listAllProjectsWeb",
+        "tags": ["Web"],
+        "summary": "Returns list of all projects.",
+        "description": "Returns list of all projects.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectStatusFull"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/pull": {
+      "get": {
+        "operationId": "pullProject",
+        "tags": ["Projects"],
+        "summary": "Pull objects from project.",
+        "description": "Pull objects from project.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectPullResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/pull": {
+      "get": {
+        "operationId": "pullProjectBare",
+        "tags": ["Projects"],
+        "summary": "Pull objects from project.",
+        "description": "Pull objects from project.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectPullResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/push": {
+      "post": {
+        "operationId": "pushProject",
+        "tags": ["Projects"],
+        "summary": "Push objects to project.",
+        "description": "Push objects to project.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name for a single object. Cannot be used with multiple objects.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Get execution plan without executing it"
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Force delete/overwrite even if data will be lost."
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for project push",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "description": "Object to push in JSON format"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "description": "List of objects to push in JSON format"
+                    }
+                  }
+                ]
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "type": "string",
+                "description": "Object(s) to push in YAML format"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/push": {
+      "post": {
+        "operationId": "pushProjectBare",
+        "tags": ["Projects"],
+        "summary": "Push objects to project.",
+        "description": "Push objects to project.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Name for a single object. Cannot be used with multiple objects.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Get execution plan without executing it"
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Force delete/overwrite even if data will be lost."
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for project push",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "description": "Object to push in JSON format"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "description": "List of objects to push in JSON format"
+                    }
+                  }
+                ]
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "type": "string",
+                "description": "Object(s) to push in YAML format"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/graph": {
+      "get": {
+        "operationId": "graphProject",
+        "tags": ["Projects"],
+        "summary": "Fetch project graph.",
+        "description": "Fetch project graph.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Project graph"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/graph": {
+      "get": {
+        "operationId": "graphProjectBare",
+        "tags": ["Projects"],
+        "summary": "Fetch project graph.",
+        "description": "Fetch project graph.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Project graph"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/sources/{src_name}": {
+      "delete": {
+        "operationId": "deleteSource",
+        "tags": ["Projects", "Sources"],
+        "summary": "Delete data source by name.",
+        "description": "Delete data source by name.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "src_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Get execution plan without executing it"
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Force delete/overwrite even if data will be lost."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project or source not found"
+          }
+        }
+      }
+    },
+    "/v1/sources/{src_name}": {
+      "delete": {
+        "operationId": "deleteSourceBare",
+        "tags": ["Sources"],
+        "summary": "Delete data source by name.",
+        "description": "Delete data source by name.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "src_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Get execution plan without executing it"
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Force delete/overwrite even if data will be lost."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project or source not found"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/pipes/{pipe_name}": {
+      "delete": {
+        "operationId": "deletePipe",
+        "tags": ["Projects", "Pipes"],
+        "summary": "Delete pipe by name.",
+        "description": "Delete pipe by name.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "pipe_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pipe name",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Get execution plan without executing it"
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Force delete/overwrite even if data will be lost."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project or pipe not found"
+          }
+        }
+      }
+    },
+    "/v1/pipes/{pipe_name_format}": {
+      "delete": {
+        "operationId": "deletePipeBare",
+        "tags": ["Pipes"],
+        "summary": "Delete pipe by name.",
+        "description": "Delete pipe by name.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipe_name_format",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pipe name",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Get execution plan without executing it"
+          },
+          {
+            "in": "query",
+            "name": "force",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Force delete/overwrite even if data will be lost."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project or pipe not found"
+          }
+        }
+      },
+      "get": {
+        "operationId": "getPipe",
+        "tags": ["Pipes"],
+        "summary": "Returns data from a published pipe.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipe_name_format",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pipe name",
+            "required": true
+          }
+        ],
+        "description": "Returns data from a published pipe.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Access denied."
+          },
+          "404": {
+            "description": "Endpoint not found or cannot process format."
+          }
+        }
+      }
+    },
+    "/v1/run/{pipe_name_format}": {
+      "get": {
+        "operationId": "runPipe",
+        "tags": ["Pipes"],
+        "summary": "Returns data from existing draft pipe.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipe_name_format",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pipe name",
+            "required": true
+          }
+        ],
+        "description": "Returns data from existing draft pipe.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      },
+      "post": {
+        "operationId": "runPipe",
+        "tags": ["Pipes"],
+        "summary": "Create a pipe/source config and return the resulting data.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipe_name_format",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pipe name",
+            "required": true
+          }
+        ],
+        "description": "Create a pipe/source config and return the resulting data.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for project push",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "description": "Object to push in JSON format"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "description": "List of objects to push in JSON format"
+                    }
+                  }
+                ]
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "type": "string",
+                "description": "Object(s) to push in YAML format"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/schemas": {
+      "post": {
+        "operationId": "inferSchema",
+        "tags": ["Sources"],
+        "summary": "Infer source schema.",
+        "description": "Infer source schema.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "description": "Data to infer schema from",
+          "content": {
+            "application/x-ndjson": {
+              "schema": {
+                "type": "object"
+              }
+            },
+            "application/csv": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/schemas": {
+      "post": {
+        "operationId": "inferSchemaBare",
+        "tags": ["Sources"],
+        "summary": "Infer source schema.",
+        "description": "Infer source schema.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Data to infer schema from",
+          "content": {
+            "application/x-ndjson": {
+              "schema": {
+                "type": "object"
+              }
+            },
+            "application/csv": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/schemas/validate": {
+      "post": {
+        "operationId": "validateSchema",
+        "tags": ["Sources"],
+        "summary": "Validate source schema.",
+        "description": "Validate source schema.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "schema",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Should be a valid JSON or YAML format"
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "default": "json",
+              "enum": ["json", "yaml"]
+            },
+            "description": "Format of the schema"
+          }
+        ],
+        "requestBody": {
+          "description": "Data to validate schema against",
+          "content": {
+            "application/x-ndjson": {
+              "schema": {
+                "type": "object"
+              }
+            },
+            "application/csv": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/schemas/validate": {
+      "post": {
+        "operationId": "validateSchemaBare",
+        "tags": ["Sources"],
+        "summary": "Validate schema.",
+        "description": "Validate schema.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "schema",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Should be a valid JSON or YAML format"
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "default": "json",
+              "enum": ["json", "yaml"]
+            },
+            "description": "Format of the schema"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Data to validate schema against. Optional but content-type must be set.",
+          "content": {
+            "application/x-ndjson": {
+              "schema": {
+                "type": "object"
+              }
+            },
+            "application/csv": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/pipes/{pipe_name}/materialize": {
+      "get": {
+        "operationId": "materializePipe",
+        "tags": ["Pipes"],
+        "summary": "Get materialized pipe from draft.",
+        "description": "Get materialized pipe from draft.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "pipe_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pipe name",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/pipes/{pipe_name_format}/materialize": {
+      "get": {
+        "operationId": "materializePipeBare",
+        "tags": ["Pipes"],
+        "summary": "Get materialized pipe from draft.",
+        "description": "Get materialized pipe from draft.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipe_name_format",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pipe name",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found or pipe not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/schemas/ai-data-inference": {
+      "post": {
+        "operationId": "aiInferenceSchema",
+        "tags": ["Sources"],
+        "summary": "Get resulting row samples after ingestion into AI-source.",
+        "description": "Get resulting row samples after ingestion into AI-source.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "schema",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Should be a valid JSON or YAML format"
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "default": "json",
+              "enum": ["json", "yaml"]
+            },
+            "description": "Format of the schema"
+          }
+        ],
+        "requestBody": {
+          "description": "Data samples to infer what will be ingested",
+          "content": {
+            "application/x-ndjson": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/schemas/ai-data-inference": {
+      "post": {
+        "operationId": "aiInferenceBare",
+        "tags": ["Sources"],
+        "summary": "Get resulting row samples after ingestion into AI-source.",
+        "description": "Get resulting row samples after ingestion into AI-source.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "schema",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Should be a valid JSON or YAML format"
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "default": "json",
+              "enum": ["json", "yaml"]
+            },
+            "description": "Format of the schema"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Data samples to infer what will be ingested",
+          "content": {
+            "application/x-ndjson": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/projects/{proj_id}/doctor": {
+      "get": {
+        "operationId": "listDoctorChecks",
+        "tags": ["Diagnostic"],
+        "summary": "List available diagnostic checks.",
+        "description": "List available diagnostic checks.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "List of available checks"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      },
+      "post": {
+        "operationId": "runDoctor",
+        "tags": ["Diagnostic"],
+        "summary": "Run diagnostic checks.",
+        "description": "Run diagnostic checks.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "proj_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Project id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "fix",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Fix issues if possible"
+          },
+          {
+            "in": "query",
+            "name": "checks",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Checks to run"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoctorRunResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/doctor": {
+      "get": {
+        "operationId": "listDoctorChecksBare",
+        "tags": ["Diagnostic"],
+        "summary": "List available diagnostic checks.",
+        "description": "List available diagnostic checks.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "List of available checks"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      },
+      "post": {
+        "operationId": "runDoctorBare",
+        "tags": ["Diagnostic"],
+        "summary": "Run diagnostic checks.",
+        "description": "Run diagnostic checks.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fix",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Fix issues if possible"
+          },
+          {
+            "in": "query",
+            "name": "checks",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Checks to run"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DoctorRunResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
           }
         }
       }
     }
   },
-  "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
-      }
-    }
-  }
+  "tags": []
 }

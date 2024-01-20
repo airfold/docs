@@ -55,7 +55,6 @@
     },
     {
       "group": "Workspace",
-      "icon": "folder-tree",
       "pages": [
         "workspace/workspaces",
         "workspace/pipes",

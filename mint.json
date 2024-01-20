@@ -51,7 +51,7 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["overview", "introduction", "ingest", "quickstart_cli"]
+      "pages": ["overview", "introduction", "quickstart_cli", "ingest"]
     },
     {
       "group": "Workspace",

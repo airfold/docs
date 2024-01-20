@@ -51,21 +51,16 @@
   "navigation": [
     {
       "group": "Get Started",
+      "pages": ["overview", "introduction", "ingest", "quickstart_cli"]
+    },
+    {
+      "group": "Workspace",
+      "icon": "folder-tree",
       "pages": [
-        "overview",
-        "introduction",
-        {
-          "group": "Workspace",
-          "icon": "folder-tree",
-          "pages": [
-            "workspace/workspaces",
-            "workspace/pipes",
-            "workspace/sources",
-            "workspace/tokens"
-          ]
-        },
-        "ingest",
-        "quickstart_cli"
+        "workspace/workspaces",
+        "workspace/pipes",
+        "workspace/sources",
+        "workspace/tokens"
       ]
     },
     {

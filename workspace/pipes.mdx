@@ -9,7 +9,7 @@ Pipes contain one or more SQL queries (Nodes) that are executed sequentially.
 Pipes result in either a published pipe or a materialized pipe.
 
 <Tip>
-Use Pipes to build features over your data!
+Use pipes to build features over your data!
 </Tip>
 
 ## What is a Node?
@@ -17,18 +17,18 @@ A node is a container for a single SQL `SELECT` statement.
 
 Nodes live within pipes and are executed sequentially in the order they are defined in the pipe.
 
-Each node can read data from sources, published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe.
+Each node can read data from [sources](/workspace/sources), published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe.
 
 The schema of the last node in the pipe determines the pipe's schema.
 
 <Tip>
 ### Best Practices for Nodes
-Use nodes to break down complex queries into smaller, more manageable, sequential steps. Then chain Nodes together to build the logic incrementally.
+Use nodes to break down complex queries into smaller, more manageable, sequential steps. Then chain nodes together to build the logic incrementally.
 
-Each Node can be developed & tested individually. This makes it much easier to build complex query logic in Airfold as you avoid creating large monolithic queries with many sub-queries.
+Each node can be developed & tested individually. This makes it much easier to build complex query logic in Airfold as you avoid creating large monolithic queries with many sub-queries.
 </Tip>
 
-## The 3 types of Pipes
+## The 3 Types of Pipes
 #### Draft pipes
 These are the starting point for all pipes, similar to database views in functionality.
 
@@ -136,7 +136,7 @@ Learn more about [Materialization in ClickHouse](https://clickhouse.com/blog/usi
           A brief description of the node's role or function. Optional.
         </ResponseField>
         <ResponseField name="sql" type="string" required>
-          The SQL query associated with the node. It can only retrieve data (via `FROM`) from sources, published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe. It supports Jinja2 templating for dynamic SQL parameterization via the `params` field e.g. `{{ param }}`.
+          The SQL query associated with the node. It can only retrieve data (via `FROM`) from [sources](/workspace/sources), published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe. It supports Jinja2 templating for dynamic SQL parameterization via the `params` field e.g. `{{ param }}`.
         </ResponseField>
       </Expandable>
     </ResponseField>

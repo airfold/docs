@@ -4,4 +4,21 @@ description: 'Send thousands of events per sec without worrying about batching o
 icon: 'file-import'
 ---
 
-Work in progress.
+The Ingest API makes it easy to bring your data into Airfold - send events in real-time as they happen, don't worry about batching or scheduling, the Ingest API can handle thousands of events/sec.<br/>
+
+Find the [Ingest API reference here](/api-reference/ingest/ingest) and try it out live!
+
+<Tip>
+### Create [sources](/workspace/sources) automatically!
+If the target source doesn't exist, it will be created automatically by inferring the schema from the ingested events.<br />
+However, it's recommended to be explicit and create the source beforehand to ensure the schema is well optimized for your use case.
+</Tip>
+
+## Supported formats
+The Ingest API supports the following formats:
+- NDJSON
+- CSV
+- Parquet
+
+## Rate limits
+The Ingest API is rate limited to 1000 events/sec per source. If you need to ingest more events, please [contact us](https://www.airfold.co).

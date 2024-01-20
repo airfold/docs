@@ -4,13 +4,13 @@ description: 'Bring your data into Airfold.'
 icon: "database"
 ---
 
-Sources make it easy to bring your data into Airfold. Sources are akin to tables in a database. They store data according to a defined schema.
+sources make it easy to bring your data into Airfold. sources are akin to tables in a database. They store data according to a defined schema.
 
 All the workspace data lives inside sources, which can be queried, filtered, aggregated, and joined using SQL.
 
-Data is ingested into sources directly through Airfold's Ingest API or by a materialized pipe.
+Data is ingested into sources directly through Airfold's Ingest API or by a [materialized pipe](/workspace/pipes).
 
-Additionally, Sources can be enhanced into AI Sources for transforming unstructured data into structured formats, unlocking powerful analytical potential.
+Additionally, sources can be enhanced into AI sources for transforming unstructured data into structured formats, unlocking powerful analytical potential.
 
 ### Sample Sources
 
@@ -67,17 +67,17 @@ ORDER BY count DESC
 ## Properties
 
 <ResponseField name="description" type="string">
-  A brief overview of the Source's content or purpose. Optional.
+  A brief overview of the source's content or purpose. Optional.
 </ResponseField>
 <ResponseField name="cols" type="{name: type}" required>
-  Defines the schema of the Source as a list of columns where each column name is a key and its data type is the value (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types)).
+  Defines the schema of the source as a list of columns where each column name is a key and its data type is the value (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types)).
 </ResponseField>
 <ResponseField name="settings" type="string | {key: value} | array">
-  [ClickHouse table configuration](https://clickhouse.com/docs/en/sql-reference/statements/create/table) for the Source, which can include `ORDER BY`, `PARTITION BY`, Table Engine, etc. The settings can be a String, a key-value pair, or an array comprising either or both. Optional.
+  [ClickHouse table configuration](https://clickhouse.com/docs/en/sql-reference/statements/create/table) for the source, which can include `ORDER BY`, `PARTITION BY`, Table Engine, etc. The settings can be a String, a key-value pair, or an array comprising either or both. Optional.
 </ResponseField>
 <ResponseField name="message" type="string">
-  A message for the AI from which it would derive the columns in `added_cols`. The message should use the Source's `cols` within curly braces e.g. `{col}`. This field is mandatory if `added_cols` is present, transforming the Source into an AI Source.
+  A message for the AI from which it would derive the columns in `added_cols`. The message should use the source's `cols` within curly braces e.g. `{col}`. This field is mandatory if `added_cols` is present, transforming the source into an AI source.
 </ResponseField>
 <ResponseField name="added_cols" type="{name: type}">
-  Specifies additional columns to be filled by the AI, based on the `message` field's instructions. This field is mandatory if `message` is present, transforming the Source into an AI Source.
+  Specifies additional columns to be filled by the AI, based on the `message` field's instructions. This field is mandatory if `message` is present, transforming the source into an AI source.
 </ResponseField>

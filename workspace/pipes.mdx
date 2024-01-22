@@ -121,6 +121,14 @@ Fortunately, Airfold does it automatically when materializing a draft pipe.
 Learn more about [Materialization in ClickHouse](https://clickhouse.com/blog/using-materialized-views-in-clickhouse#speed-up-aggregations-using-materialized-views), about the [`*State` combinator](https://clickhouse.com/docs/en/sql-reference/aggregate-functions/combinators#-state).
 </Note>
 
+### Push a Pipe
+Push pipes to your [workspace](/workspace/workspaces) using the [CLI `af push`](/reference/cli) or the [`/push` API](/api-reference/workspace/push).<br />
+For example, to push the draft pipe above:
+```bash
+af push draft_pipe.yaml
+```
+
+
 ## Properties
 
 <ResponseField name="description" type="string">

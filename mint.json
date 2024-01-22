@@ -75,6 +75,14 @@
       "pages": ["api-reference/ingest/ingest", "api-reference/ingest/schema"]
     },
     {
+      "group": "Workspace",
+      "pages": [
+        "api-reference/workspace/push",
+        "api-reference/workspace/pull",
+        "api-reference/workspace/graph"
+      ]
+    },
+    {
       "group": "Pipes",
       "pages": [
         "api-reference/pipes/ephemeral",

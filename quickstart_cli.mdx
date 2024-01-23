@@ -1,7 +1,186 @@
 ---
 title: 'Quickstart (CLI)'
-description: 'Quickstart with Airfold CLI.'
+description: 'This section covers ingesting, querying and publishing data using the Airfold CLI.'
 icon: 'code'
 ---
 
-Work in progress.
+## Use-case
+In this guide, we'll develop an API to identify the top 10 most searched products on an e-commerce platform.
+
+We'll process e-commerce events to track user interactions like item views, cart additions, and checkout completions. Our dataset, a 50-million-row CSV file, captures these activities.
+
+Our steps include:
+* Ingesting the dataset.
+* Executing queries to filter, aggregate, and refine the data into a top 10 list.
+* Exposing the top 10 results through an HTTP API.
+
+## Create a [Workspace](/workspace/workspaces)
+Before we begin, we need to create a workspace to store our data and resources, as well as a token to authenticate our CLI.
+
+1. Go to [Airfold](https://www.app.airfold.co) and create a new workspace.
+2. Copy an Admin token from the workspace's **Token** page.
+
+The token should look like this: `af6eab8fcd902e4cbfb63ba174469989cd`.
+
+## Setup the [CLI](/reference/cli)
+<Note>
+The CLI requires Python 3.6 or higher.
+</Note>
+
+1. Install the CLI using `pip install airfold-cli`.
+2. Run `af config` and paste your token when prompted.
+```
+$ af config
+Configuring for API URL: https://api.airfold.co
+? Api key: <your token>
+```
+
+To see a list of available commands just run `af`.
+
+## Create a [Source](/workspace/sources)
+To create a source, a YAML file defining the source is required.<br />
+Let's generate a source by inferring the schema from a CSV file:
+```bash
+$ af source create https://airfold.s3.amazonaws.com/events.csv
+```
+
+The CLI will infer the schema from the CSV file and generate a YAML file with the following contents:
+```yaml events.yaml
+description: "Events from an e-commerce platform"
+cols:
+  date: DateTime
+  product_id: String
+  user_id: String
+  event: String
+  quantity: Int32
+settings: |
+  MergeTree()
+  PARTITION BY toYYYYMM(date)
+  ORDER BY (date, product_id)
+```
+
+Push the source to your workspace:
+```bash
+$ af push events.yaml
+```
+
+List the sources in your workspace to confirm that the source was created:
+```bash
+$ af source ls
+- events: 0 rows | 0 bytes | 0 errors | created 1 min ago | updated 1 min ago
+```
+
+## [Ingest Data](/ingest)
+Now that we have a source, we can ingest data into it.
+
+Let's ingest the CSV file we used to generate the source:
+```bash
+$ af source append https://airfold.s3.amazonaws.com/events.csv
+```
+
+## Create a [Pipe](/workspace/pipe)
+All the SQL queries in Airfold are written inside `pipes`.<br />
+Pipes are a sequenece of one or more SQL queries (Nodes) that are executed in order, each of those SQL queries is called a Node, and each Node is simply a `SELECT` statement.
+
+<Tip>
+Use pipes to build features over your data!
+</Tip>
+
+Let's create a pipe to identify the top 10 most searched products:
+```yaml top10.yaml
+nodes:
+  - name: search_events
+    query: SELECT * FROM events WHERE event = 'search'
+  - name: aggregate_by_product
+    query: SELECT product_id, count() AS total FROM search_events GROUP BY product_id
+  - name: top10
+    query: SELECT * FROM aggregate_by_product LIMIT 10
+```
+
+Push the pipe to your workspace:
+```bash
+$ af push top10.yaml
+```
+
+List the pipes in your workspace to confirm that the pipe was created:
+```bash
+$ af pipe ls
+- top10: draft | created 1 min ago | updated 1 min ago
+```
+
+## Publish the Results
+We've pushed the pipe to our workspace, but we have not yet published an endpoint from it.<br />
+To publish the pipe, we need to turn it into a published pipe.<br />
+To do so, we need to set the `publish` field to the name of the endpoint we want to publish:
+```yaml top10.yaml
+nodes:
+  - name: search_events
+    query: SELECT * FROM events WHERE event = 'search'
+  - name: aggregate_by_product
+    query: SELECT product_id, count() AS total FROM search_events GROUP BY product_id
+  - name: top10
+    query: SELECT * FROM aggregate_by_product LIMIT 10
+publish: top10
+```
+
+Push the pipe to your workspace:
+```bash
+$ af push top10.yaml
+```
+
+List the pipes in your workspace to confirm that the pipe was created:
+```bash
+$ af pipe ls
+- top10: published | created 1 min ago | updated 1 min ago
+```
+
+Query the results using the [API](/reference/api):
+```bash
+$ curl --request GET \
+  --url https://api.airfold.co/v1/pipes/top10 \
+  --header 'Authorization: <authorization>'
+
+[{
+    "product_id": "6c28b658-1aaa-11eb-8cb5-acde48001122",
+    "total": 33
+}, {
+    "product_id": "6b50e868-1aaa-11eb-a226-acde48001122",
+    "total": 32
+}, {
+    "product_id": "6c482f92-1aaa-11eb-b193-acde48001122",
+    "total": 31
+}, {
+    "product_id": "6aaacc1c-1aaa-11eb-b4d1-acde48001122",
+    "total": 31
+}, {
+    "product_id": "6c0357be-1aaa-11eb-8e3f-acde48001122",
+    "total": 31
+}, {
+    "product_id": "6bc78434-1aaa-11eb-8a21-acde48001122",
+    "total": 31
+}, {
+    "product_id": "6c29f858-1aaa-11eb-bd1a-acde48001122",
+    "total": 31
+}, {
+    "product_id": "6c02518c-1aaa-11eb-9307-acde48001122",
+    "total": 31
+}, {
+    "product_id": "6c5b3222-1aaa-11eb-950e-acde48001122",
+    "total": 30
+}, {
+    "product_id": "6b0fcb8a-1aaa-11eb-bc59-acde48001122",
+    "total": 30
+}]
+```
+
+Or using the [CLI](/reference/cli):
+```bash
+$ af pipe data top10
+
+[...]
+```
+
+## Next Steps
+Congratulations! You've successfully ingested, queried, and published data in Airfold.<br />
+Now that you've learned the basics, you can explore [workspaces](/workspace/workspaces), [sources](/workspace/sources), [pipes](/workspace/pipes), and [tokens](/workspace/tokens).<br />
+Or, check the reference of the [API](/reference/api) and the [CLI](/reference/cli) to learn more about how to interact with Airfold.

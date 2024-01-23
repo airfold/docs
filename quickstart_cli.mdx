@@ -24,7 +24,7 @@ The token should look like this: `af6eab8fcd902e4cbfb63ba174469989cd`.
 
 ## Setup the [CLI](/reference/cli)
 <Note>
-The CLI requires Python 3.6 or higher.
+The CLI requires Python 3.10 or higher.
 </Note>
 
 1. Install the CLI using `pip install airfold-cli`.
@@ -46,7 +46,6 @@ $ af source create https://airfold.s3.amazonaws.com/events.csv
 
 The CLI will infer the schema from the CSV file and generate a YAML file with the following contents:
 ```yaml events.yaml
-description: "Events from an e-commerce platform"
 cols:
   date: DateTime
   product_id: String
@@ -75,7 +74,7 @@ Now that we have a source, we can ingest data into it.
 
 Let's ingest the CSV file we used to generate the source:
 ```bash
-$ af source append https://airfold.s3.amazonaws.com/events.csv
+$ af source append events https://airfold.s3.amazonaws.com/events.csv
 ```
 
 ## Create a [Pipe](/workspace/pipe)
@@ -137,7 +136,7 @@ $ af pipe ls
 Query the results using the [API](/reference/api):
 ```bash
 $ curl --request GET \
-  --url https://api.airfold.co/v1/pipes/top10 \
+  --url https://api.airfold.co/v1/pipes/top10.ndjson \
   --header 'Authorization: <authorization>'
 
 [{
@@ -175,7 +174,7 @@ $ curl --request GET \
 
 Or using the [CLI](/reference/cli):
 ```bash
-$ af pipe data top10
+$ af pipe query top10.ndjson
 
 [...]
 ```

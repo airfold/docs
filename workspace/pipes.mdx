@@ -116,7 +116,7 @@ Note the materialized pipe example uses `countState()` instead of `count()`.
 
 This is because Airfold uses [ClickHouse](https://clickhouse.com/) under the hood which requires appending `State` to aggregate functions when used in a materialized pipe.
 
-Fortunately, Airfold does it automatically when materializing a draft pipe.
+Fortunately, Airfold does it automatically when materializing a draft pipe using `af materialize <pipe_name>`.
 
 Learn more about [Materialization in ClickHouse](https://clickhouse.com/blog/using-materialized-views-in-clickhouse#speed-up-aggregations-using-materialized-views), about the [`*State` combinator](https://clickhouse.com/docs/en/sql-reference/aggregate-functions/combinators#-state).
 </Note>

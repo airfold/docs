@@ -21,13 +21,13 @@
   },
   "topbarLinks": [
     {
-      "name": "Support",
-      "url": "mailto:julian@airfold.co"
+      "name": "Join our Slack",
+      "url": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw"
     }
   ],
   "topbarCtaButton": {
-    "name": "Home",
-    "url": "https://www.airfold.co/"
+    "name": "Try for free",
+    "url": "https://api.airfold.co/auth/google?state=https%3A%2F%2Fapp.airfold.co"
   },
   "tabs": [
     {
@@ -38,9 +38,19 @@
 
   "anchors": [
     {
+      "name": "Join our Slack!",
+      "icon": "slack",
+      "url": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw"
+    },
+    {
       "name": "Home",
       "icon": "house-blank",
       "url": "https://www.airfold.co/"
+    },
+    {
+      "name": "Workshop",
+      "icon": "rocket",
+      "url": "https://www.airfold.co/workshop"
     },
     {
       "name": "Blog",
@@ -107,7 +117,10 @@
     }
   ],
   "footerSocials": {
+    "slack": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw",
+    "twitter": "https://twitter.com/airfoldco",
     "linkedin": "https://www.linkedin.com/company/airfold",
-    "github": "https://github.com/airfold"
+    "github": "https://github.com/airfold",
+    "website": "https://www.airfold.co/"
   }
 }

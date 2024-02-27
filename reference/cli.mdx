@@ -12,6 +12,9 @@ To view a list of the commands available in your current Airfold version, run `a
 To get specific help for any command, use the `--help` option with the relevant command.<br />
 For example, to see help about the `pipe` command you can run `af pipe --help`.
 
+The CLI utilizes an advanced Python framework for a dynamic and user-friendly output.<br />
+When output is redirected, we use the JSON format for its ease of data handling.
+
 Here's a brief overview of all the available commands, arguments, and flags:
 
 ## Properties
@@ -78,17 +81,6 @@ Here's a brief overview of all the available commands, arguments, and flags:
 <ResponseField name="pipe" type="Command">
   Pipe commands.
   <Expandable title="Subcommands">
-    <ResponseField name="data" type="Subcommand">
-      Get pipe data.
-      <Expandable title="Arguments and Flags">
-        <ResponseField name="name" type="Argument" required>
-          Pipe name.
-        </ResponseField>
-        <ResponseField name="--format" type="Flag">
-          Output data format. Options: json, ndjson. Default: ndjson.
-        </ResponseField>
-      </Expandable>
-    </ResponseField>
     <ResponseField name="delete" type="Subcommand">
       Delete pipe.
       <Expandable title="Arguments and Flags">
@@ -106,6 +98,20 @@ Here's a brief overview of all the available commands, arguments, and flags:
     <ResponseField name="ls" type="Subcommand">
       List pipes.
     </ResponseField>
+    <ResponseField name="query" type="Subcommand">
+      Query pipe data.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="name" type="Argument" required>
+          Pipe name.
+        </ResponseField>
+        <ResponseField name="--format" type="Flag">
+          Output data format. Options: json, ndjson. Default: ndjson.
+        </ResponseField>
+        <ResponseField name="--param" type="Flag">
+          Set pipe parameters in the form of `name=value`. Can be repeated.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -115,8 +121,6 @@ Here's a brief overview of all the available commands, arguments, and flags:
     <ResponseField name="path" type="Argument">
       Target directory to create files in, ('-' will dump to stdout). Default: None
     </ResponseField>
-
-
   </Expandable>
 </ResponseField>
 
@@ -138,22 +142,45 @@ Here's a brief overview of all the available commands, arguments, and flags:
 <ResponseField name="source" type="Command">
   Source commands.
   <Expandable title="Subcommands">
+    <ResponseField name="append" type="Subcommand">
+      Append data to source.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="name" type="Argument" required>
+          Source name.
+        </ResponseField>
+        <ResponseField name="path" type="Argument" required>
+          Path to a local file(s) or URL(s).
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
     <ResponseField name="delete" type="Subcommand">
       Delete source.
       <Expandable title="Arguments and Flags">
         <ResponseField name="name" type="Argument" required>
           Source name.
         </ResponseField>
-        <ResponseField name="--force" type="Flag">
-          Force delete/overwrite even if data will be lost.
-        </ResponseField>
         <ResponseField name="--dry-run" type="Flag">
           Show execution plan without executing it.
+        </ResponseField>
+        <ResponseField name="--force" type="Flag">
+          Force delete/overwrite even if data will be lost.
         </ResponseField>
       </Expandable>
     </ResponseField>
     <ResponseField name="ls" type="Subcommand">
       List sources.
     </ResponseField>
+    <ResponseField name="truncate" type="Subcommand">
+      Truncate source (delete all data).
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="name" type="Argument" required>
+          Source name.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
   </Expandable>
+</ResponseField>
+
+<ResponseField name="verbose" type="Global Flag">
+  Set verbosity level, can be repeated.
 </ResponseField>

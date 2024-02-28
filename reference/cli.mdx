@@ -142,6 +142,20 @@ Here's a brief overview of all the available commands, arguments, and flags:
 <ResponseField name="source" type="Command">
   Source commands.
   <Expandable title="Subcommands">
+    <ResponseField name="ls" type="Subcommand">
+      List sources.
+    </ResponseField>
+    <ResponseField name="create" type="Subcommand">
+      Create source.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="path" type="Argument" required>
+          Path to a local object file(s) or URL(s). Default: None.
+        </ResponseField>
+        <ResponseField name="--out" type="Flag">
+          New source output path, ex.: `sources/src1.yaml`. Default: None.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
     <ResponseField name="append" type="Subcommand">
       Append data to source.
       <Expandable title="Arguments and Flags">
@@ -166,9 +180,6 @@ Here's a brief overview of all the available commands, arguments, and flags:
           Force delete/overwrite even if data will be lost.
         </ResponseField>
       </Expandable>
-    </ResponseField>
-    <ResponseField name="ls" type="Subcommand">
-      List sources.
     </ResponseField>
     <ResponseField name="truncate" type="Subcommand">
       Truncate source (delete all data).

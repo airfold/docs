@@ -875,8 +875,8 @@
         "tags": [
           "Auth"
         ],
-        "summary": "Returns current user data",
-        "description": "Checks if user is authorized and returns user identity",
+        "summary": "Returns current user data.",
+        "description": "Checks if user is authorized and returns user identity.",
         "security": [
           {
             "bearerAuth": []
@@ -912,8 +912,8 @@
         "tags": [
           "Web"
         ],
-        "summary": "Returns current user data",
-        "description": "Checks if user is authorized and returns user identity",
+        "summary": "Returns current user data.",
+        "description": "Checks if user is authorized and returns user identity.",
         "security": [
           {
             "cookieAuth": []
@@ -949,8 +949,8 @@
         "tags": [
           "Web"
         ],
-        "summary": "Logs out the current user,",
-        "description": "Logs out the current user,",
+        "summary": "Logs out the current user.",
+        "description": "Logs out the current user.",
         "security": [
           {
             "cookieAuth": []
@@ -1727,8 +1727,8 @@
         "tags": [
           "Projects"
         ],
-        "summary": "Creates a new project",
-        "description": "Creates a new project in the organization",
+        "summary": "Creates a new project.",
+        "description": "Creates a new project in the organization.",
         "security": [
           {
             "bearerAuth": []
@@ -1828,8 +1828,8 @@
         "tags": [
           "Web"
         ],
-        "summary": "Creates a new project",
-        "description": "Creates a new project in the organization",
+        "summary": "Creates a new project.",
+        "description": "Creates a new project in the organization.",
         "security": [
           {
             "cookieAuth": []
@@ -1929,8 +1929,8 @@
         "tags": [
           "Projects"
         ],
-        "summary": "Creates a new project key",
-        "description": "Creates a new project key",
+        "summary": "Creates a new project key.",
+        "description": "Creates a new project key.",
         "security": [
           {
             "bearerAuth": []
@@ -2049,8 +2049,8 @@
         "tags": [
           "Web"
         ],
-        "summary": "Creates a new project key",
-        "description": "Creates a new project key",
+        "summary": "Creates a new project key.",
+        "description": "Creates a new project key.",
         "security": [
           {
             "cookieAuth": []
@@ -2169,8 +2169,8 @@
         "tags": [
           "Projects"
         ],
-        "summary": "Delete project by id",
-        "description": "Deletes project by id",
+        "summary": "Delete project by id.",
+        "description": "Deletes project by id.",
         "parameters": [
           {
             "in": "path",
@@ -2270,8 +2270,8 @@
         "tags": [
           "Web"
         ],
-        "summary": "Delete project by id",
-        "description": "Deletes project by id",
+        "summary": "Delete project by id.",
+        "description": "Deletes project by id.",
         "parameters": [
           {
             "in": "path",
@@ -2371,8 +2371,8 @@
         "tags": [
           "Projects"
         ],
-        "summary": "Delete project key",
-        "description": "Deletes project key",
+        "summary": "Delete project key.",
+        "description": "Deletes project key.",
         "parameters": [
           {
             "in": "path",
@@ -2431,8 +2431,8 @@
         "tags": [
           "Projects"
         ],
-        "summary": "Update project key",
-        "description": "Update project key",
+        "summary": "Update project key.",
+        "description": "Update project key.",
         "parameters": [
           {
             "in": "path",
@@ -2503,8 +2503,8 @@
         "tags": [
           "Web"
         ],
-        "summary": "Delete project key",
-        "description": "Deletes project key",
+        "summary": "Delete project key.",
+        "description": "Deletes project key.",
         "parameters": [
           {
             "in": "path",
@@ -2563,8 +2563,8 @@
         "tags": [
           "Web"
         ],
-        "summary": "Update project key",
-        "description": "Update project key",
+        "summary": "Update project key.",
+        "description": "Update project key.",
         "parameters": [
           {
             "in": "path",
@@ -3920,8 +3920,8 @@
         "tags": [
           "Sources"
         ],
-        "summary": "Validate schema.",
-        "description": "Validate schema.",
+        "summary": "Validate source schema.",
+        "description": "Validate source schema.",
         "parameters": [
           {
             "in": "query",

@@ -83,7 +83,11 @@
             "description": "Resource mask/match string"
           }
         },
-        "required": ["Effect", "Action", "Resource"]
+        "required": [
+          "Effect",
+          "Action",
+          "Resource"
+        ]
       },
       "Organization": {
         "type": "object",
@@ -98,7 +102,10 @@
             "description": "Organization name"
           }
         },
-        "required": ["id", "name"]
+        "required": [
+          "id",
+          "name"
+        ]
       },
       "User": {
         "type": "object",
@@ -170,7 +177,11 @@
             }
           }
         },
-        "required": ["orgId", "projectId", "permissions"]
+        "required": [
+          "orgId",
+          "projectId",
+          "permissions"
+        ]
       },
       "UserProfile": {
         "type": "object",
@@ -179,11 +190,15 @@
             "$ref": "#/components/schemas/User"
           }
         },
-        "required": ["user"]
+        "required": [
+          "user"
+        ]
       },
       "ChangeOwner": {
         "type": "object",
-        "required": ["owner"],
+        "required": [
+          "owner"
+        ],
         "properties": {
           "owner": {
             "type": "string",
@@ -193,7 +208,9 @@
       },
       "CreateOrg": {
         "type": "object",
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -203,7 +220,13 @@
       },
       "OrgInList": {
         "type": "object",
-        "required": ["id", "name", "role", "isOwner", "ownerEmail"],
+        "required": [
+          "id",
+          "name",
+          "role",
+          "isOwner",
+          "ownerEmail"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -243,7 +266,10 @@
             "description": "Member is the organization owner"
           }
         },
-        "required": ["email", "role"]
+        "required": [
+          "email",
+          "role"
+        ]
       },
       "UpdateOrg": {
         "type": "object",
@@ -256,7 +282,10 @@
       },
       "Project": {
         "type": "object",
-        "required": ["id", "name"],
+        "required": [
+          "id",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -270,7 +299,9 @@
       },
       "ProjectCreate": {
         "type": "object",
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -280,7 +311,10 @@
       },
       "ProjectKeyCreate": {
         "type": "object",
-        "required": ["name", "role"],
+        "required": [
+          "name",
+          "role"
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -294,7 +328,10 @@
       },
       "ProjectStatus": {
         "type": "object",
-        "required": ["id", "name"],
+        "required": [
+          "id",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -308,7 +345,10 @@
       },
       "ProjectStatusFull": {
         "type": "object",
-        "required": ["id", "name"],
+        "required": [
+          "id",
+          "name"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -330,7 +370,13 @@
       },
       "ProjectKey": {
         "type": "object",
-        "required": ["projectId", "name", "key", "role", "permissions"],
+        "required": [
+          "projectId",
+          "name",
+          "key",
+          "role",
+          "permissions"
+        ],
         "properties": {
           "projectId": {
             "type": "string",
@@ -373,7 +419,9 @@
       },
       "ProjectKeyUpdate": {
         "type": "object",
-        "required": ["role"],
+        "required": [
+          "role"
+        ],
         "properties": {
           "role": {
             "type": "string",
@@ -401,7 +449,10 @@
           },
           "severity": {
             "type": "string",
-            "enum": ["error", "warning"],
+            "enum": [
+              "error",
+              "warning"
+            ],
             "default": "error",
             "description": "Severity of the issue"
           }
@@ -420,7 +471,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["fixed", "failed"]
+            "enum": [
+              "fixed",
+              "failed"
+            ]
           }
         },
         "description": "Fix result"
@@ -447,6 +501,251 @@
       },
       "ProjectGraph": {
         "type": "object"
+      },
+      "PipeParam": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Param name"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "int",
+              "float",
+              "string",
+              "date",
+              "bool",
+              "datetime"
+            ],
+            "description": "Param type"
+          },
+          "default": {
+            "type": "string",
+            "description": "Default value, optional"
+          }
+        },
+        "required": [
+          "name",
+          "type"
+        ]
+      },
+      "PipeNode": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Node name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Node description"
+          },
+          "sql": {
+            "type": "string",
+            "description": "Node query"
+          }
+        },
+        "required": [
+          "name",
+          "sql"
+        ]
+      },
+      "PipeFile": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Pipe name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Pipe description"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/components/schemas/PipeNode"
+              }
+            }
+          },
+          "to": {
+            "type": "string",
+            "description": "Target source"
+          },
+          "publish": {
+            "type": "string",
+            "description": "Endpoint name"
+          },
+          "params": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PipeParam"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "nodes"
+        ]
+      },
+      "SourceFile": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Source name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Source description"
+          },
+          "cols": {
+            "type": "object",
+            "description": "Table schema",
+            "additionalProperties": {
+              "type": "string",
+              "description": "Column type and definition"
+            }
+          },
+          "settings": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "cols"
+        ]
+      },
+      "BaseSourceStats": {
+        "type": "object",
+        "properties": {
+          "compressed_bytes": {
+            "type": "integer",
+            "default": 0,
+            "description": "Total size of compressed data in bytes."
+          },
+          "uncompressed_bytes": {
+            "type": "integer",
+            "default": 0,
+            "description": "Total size of uncompressed data in bytes."
+          },
+          "bytes_on_disk": {
+            "type": "integer",
+            "default": 0,
+            "description": "Total size of all the data in bytes."
+          },
+          "rows": {
+            "type": "integer",
+            "default": 0,
+            "description": "The number of rows."
+          },
+          "errors": {
+            "type": "integer",
+            "default": 0,
+            "description": "The number of errors."
+          }
+        },
+        "required": [
+          "compressed_bytes",
+          "uncompressed_bytes",
+          "bytes_on_disk",
+          "rows",
+          "errors"
+        ]
+      },
+      "BaseRunningTotalSourceStats": {
+        "type": "object",
+        "properties": {
+          "compressed_bytes_rt": {
+            "type": "integer",
+            "default": 0,
+            "description": "Running total size of compressed data in bytes."
+          },
+          "uncompressed_bytes_rt": {
+            "type": "integer",
+            "default": 0,
+            "description": "Running total size of uncompressed data in bytes."
+          },
+          "bytes_on_disk_rt": {
+            "type": "integer",
+            "default": 0,
+            "description": "Running total size of all the data in bytes."
+          },
+          "rows_rt": {
+            "type": "integer",
+            "default": 0,
+            "description": "Running total number of rows."
+          },
+          "errors_rt": {
+            "type": "integer",
+            "default": 0,
+            "description": "Running total number of errors."
+          }
+        },
+        "required": [
+          "compressed_bytes_rt",
+          "uncompressed_bytes_rt",
+          "bytes_on_disk_rt",
+          "rows_rt",
+          "errors_rt"
+        ]
+      },
+      "SourceStatsBin": {
+        "type": "object",
+        "properties": {
+          "ts": {
+            "type": "string",
+            "description": "Timestamp of the bin."
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseSourceStats"
+          },
+          {
+            "$ref": "#/components/schemas/BaseRunningTotalSourceStats"
+          }
+        ]
+      },
+      "SourceStats": {
+        "type": "object",
+        "properties": {
+          "bins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceStatsBin"
+            }
+          }
+        },
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseSourceStats"
+          }
+        ]
       }
     }
   },
@@ -464,7 +763,9 @@
     "/v1/events/{source_name}": {
       "post": {
         "operationId": "sendEvents",
-        "tags": ["Events"],
+        "tags": [
+          "Events"
+        ],
         "summary": "Post event(s) for ingestion into source.",
         "description": "Post event(s) for ingestion into source.",
         "security": [
@@ -518,7 +819,9 @@
       },
       "get": {
         "operationId": "getSourceSchema",
-        "tags": ["Events"],
+        "tags": [
+          "Events"
+        ],
         "summary": "Get source data schema.",
         "description": "Get source data schema.",
         "security": [
@@ -569,7 +872,9 @@
     "/v1/auth/identity": {
       "get": {
         "operationId": "getIdentity",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Returns current user data",
         "description": "Checks if user is authorized and returns user identity",
         "security": [
@@ -604,7 +909,9 @@
     "/web/auth/identity": {
       "get": {
         "operationId": "getIdentityWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Returns current user data",
         "description": "Checks if user is authorized and returns user identity",
         "security": [
@@ -639,7 +946,9 @@
     "/web/auth/logout": {
       "get": {
         "operationId": "logout",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Logs out the current user,",
         "description": "Logs out the current user,",
         "security": [
@@ -657,7 +966,9 @@
     "/v1/{org_id}/members": {
       "post": {
         "operationId": "addOrgMember",
-        "tags": ["Organizations"],
+        "tags": [
+          "Organizations"
+        ],
         "summary": "Add or update organization member.",
         "description": "Add or update organization member.",
         "security": [
@@ -712,7 +1023,9 @@
       },
       "get": {
         "operationId": "listOrgMembers",
-        "tags": ["Organizations"],
+        "tags": [
+          "Organizations"
+        ],
         "summary": "List organization members.",
         "description": "List organization members.",
         "security": [
@@ -757,7 +1070,9 @@
     "/web/{org_id}/members": {
       "post": {
         "operationId": "addOrgMemberWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Add or update organization member.",
         "description": "Add or update organization member.",
         "security": [
@@ -812,7 +1127,9 @@
       },
       "get": {
         "operationId": "listOrgMembersWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "List organization members.",
         "description": "List organization members.",
         "security": [
@@ -857,7 +1174,9 @@
     "/v1/{org_id}/owner": {
       "put": {
         "operationId": "changeOwner",
-        "tags": ["Organizations"],
+        "tags": [
+          "Organizations"
+        ],
         "summary": "Change organization owner.",
         "description": "Change organization owner.",
         "security": [
@@ -914,7 +1233,9 @@
     "/web/{org_id}/owner": {
       "put": {
         "operationId": "changeOwnerWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Change organization owner.",
         "description": "Change organization owner.",
         "security": [
@@ -971,7 +1292,9 @@
     "/v1/organizations": {
       "post": {
         "operationId": "createOrg",
-        "tags": ["Organizations"],
+        "tags": [
+          "Organizations"
+        ],
         "summary": "Create new organization.",
         "description": "Create new organization.",
         "security": [
@@ -1012,7 +1335,9 @@
       },
       "get": {
         "operationId": "listOrganizations",
-        "tags": ["Organizations"],
+        "tags": [
+          "Organizations"
+        ],
         "summary": "Returns list of organizations.",
         "description": "Returns list of organizations the current user is member of.",
         "security": [
@@ -1043,7 +1368,9 @@
     "/web/organizations": {
       "post": {
         "operationId": "createOrgWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Create new organization.",
         "description": "Create new organization.",
         "security": [
@@ -1084,7 +1411,9 @@
       },
       "get": {
         "operationId": "listOrganizationsWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Returns list of organizations.",
         "description": "Returns list of organizations the current user is member of.",
         "security": [
@@ -1115,7 +1444,9 @@
     "/v1/{org_id}": {
       "delete": {
         "operationId": "deleteOrg",
-        "tags": ["Organizations"],
+        "tags": [
+          "Organizations"
+        ],
         "summary": "Delete organization.",
         "description": "Delete organization.",
         "security": [
@@ -1151,7 +1482,9 @@
       },
       "post": {
         "operationId": "updateOrg",
-        "tags": ["Organizations"],
+        "tags": [
+          "Organizations"
+        ],
         "summary": "Change organization name.",
         "description": "Change organization name.",
         "security": [
@@ -1205,7 +1538,9 @@
     "/web/{org_id}": {
       "delete": {
         "operationId": "deleteOrgWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Delete organization.",
         "description": "Delete organization.",
         "security": [
@@ -1241,7 +1576,9 @@
       },
       "post": {
         "operationId": "updateOrgWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Change organization name.",
         "description": "Change organization name.",
         "security": [
@@ -1295,7 +1632,9 @@
     "/v1/{org_id}/members/{member_email}": {
       "delete": {
         "operationId": "deleteOrgMember",
-        "tags": ["Organizations"],
+        "tags": [
+          "Organizations"
+        ],
         "summary": "Delete organization member.",
         "description": "Delete organization member.",
         "parameters": [
@@ -1339,7 +1678,9 @@
     "/web/{org_id}/members/{member_email}": {
       "delete": {
         "operationId": "deleteOrgMemberWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Delete organization member.",
         "description": "Delete organization member.",
         "parameters": [
@@ -1383,7 +1724,9 @@
     "/v1/{org_id}/projects": {
       "post": {
         "operationId": "createProject",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Creates a new project",
         "description": "Creates a new project in the organization",
         "security": [
@@ -1438,7 +1781,9 @@
       },
       "get": {
         "operationId": "listProjects",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Returns list of projects in organization.",
         "parameters": [
           {
@@ -1480,7 +1825,9 @@
     "/web/{org_id}/projects": {
       "post": {
         "operationId": "createProjectWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Creates a new project",
         "description": "Creates a new project in the organization",
         "security": [
@@ -1535,7 +1882,9 @@
       },
       "get": {
         "operationId": "listProjectsWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Returns list of projects in organization.",
         "parameters": [
           {
@@ -1577,7 +1926,9 @@
     "/v1/{org_id}/projects/{proj_id}/keys": {
       "post": {
         "operationId": "createProjectKey",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Creates a new project key",
         "description": "Creates a new project key",
         "security": [
@@ -1642,7 +1993,9 @@
       },
       "get": {
         "operationId": "listProjectKeys",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Returns a list of project API keys.",
         "parameters": [
           {
@@ -1693,7 +2046,9 @@
     "/web/{org_id}/projects/{proj_id}/keys": {
       "post": {
         "operationId": "createProjectKeyWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Creates a new project key",
         "description": "Creates a new project key",
         "security": [
@@ -1758,7 +2113,9 @@
       },
       "get": {
         "operationId": "listProjectKeysWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Returns a list of project API keys.",
         "parameters": [
           {
@@ -1809,7 +2166,9 @@
     "/v1/{org_id}/projects/{proj_id}": {
       "delete": {
         "operationId": "deleteProject",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Delete project by id",
         "description": "Deletes project by id",
         "parameters": [
@@ -1858,7 +2217,9 @@
       },
       "get": {
         "operationId": "getProject",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Returns project status and properties.",
         "parameters": [
           {
@@ -1906,7 +2267,9 @@
     "/web/{org_id}/projects/{proj_id}": {
       "delete": {
         "operationId": "deleteProjectWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Delete project by id",
         "description": "Deletes project by id",
         "parameters": [
@@ -1955,7 +2318,9 @@
       },
       "get": {
         "operationId": "getProjectWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Returns project status and properties.",
         "parameters": [
           {
@@ -2003,7 +2368,9 @@
     "/v1/{org_id}/projects/{proj_id}/keys/{key_name}": {
       "delete": {
         "operationId": "deleteProjectKey",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Delete project key",
         "description": "Deletes project key",
         "parameters": [
@@ -2061,7 +2428,9 @@
       },
       "put": {
         "operationId": "updateProjectKey",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Update project key",
         "description": "Update project key",
         "parameters": [
@@ -2131,7 +2500,9 @@
     "/web/{org_id}/projects/{proj_id}/keys/{key_name}": {
       "delete": {
         "operationId": "deleteProjectKeyWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Delete project key",
         "description": "Deletes project key",
         "parameters": [
@@ -2189,7 +2560,9 @@
       },
       "put": {
         "operationId": "updateProjectKeyWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Update project key",
         "description": "Update project key",
         "parameters": [
@@ -2259,7 +2632,9 @@
     "/v1/{org_id}/projects/keys": {
       "get": {
         "operationId": "listAllProjectKeys",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Returns a list of all projects API keys.",
         "parameters": [
           {
@@ -2301,7 +2676,9 @@
     "/web/{org_id}/projects/keys": {
       "get": {
         "operationId": "listAllProjectKeysWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Returns a list of all projects API keys.",
         "parameters": [
           {
@@ -2343,7 +2720,9 @@
     "/v1/projects": {
       "get": {
         "operationId": "listAllProjects",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Returns list of all projects.",
         "description": "Returns list of all projects.",
         "security": [
@@ -2374,7 +2753,9 @@
     "/web/projects": {
       "get": {
         "operationId": "listAllProjectsWeb",
-        "tags": ["Web"],
+        "tags": [
+          "Web"
+        ],
         "summary": "Returns list of all projects.",
         "description": "Returns list of all projects.",
         "security": [
@@ -2405,7 +2786,9 @@
     "/v1/{org_id}/projects/{proj_id}/pull": {
       "get": {
         "operationId": "pullProject",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Pull objects from project.",
         "description": "Pull objects from project.",
         "security": [
@@ -2462,7 +2845,9 @@
     "/v1/pull": {
       "get": {
         "operationId": "pullProjectBare",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Pull objects from project.",
         "description": "Pull objects from project.",
         "security": [
@@ -2499,7 +2884,9 @@
     "/v1/{org_id}/projects/{proj_id}/push": {
       "post": {
         "operationId": "pushProject",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Push objects to project.",
         "description": "Push objects to project.",
         "security": [
@@ -2611,7 +2998,9 @@
     "/v1/push": {
       "post": {
         "operationId": "pushProjectBare",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Push objects to project.",
         "description": "Push objects to project.",
         "security": [
@@ -2705,7 +3094,9 @@
     "/v1/{org_id}/projects/{proj_id}/graph": {
       "get": {
         "operationId": "graphProject",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Fetch project graph.",
         "description": "Fetch project graph.",
         "security": [
@@ -2766,7 +3157,9 @@
     "/v1/graph": {
       "get": {
         "operationId": "graphProjectBare",
-        "tags": ["Projects"],
+        "tags": [
+          "Projects"
+        ],
         "summary": "Fetch project graph.",
         "description": "Fetch project graph.",
         "security": [
@@ -2807,7 +3200,10 @@
     "/v1/{org_id}/projects/{proj_id}/sources/{src_name}": {
       "delete": {
         "operationId": "deleteSource",
-        "tags": ["Projects", "Sources"],
+        "tags": [
+          "Projects",
+          "Sources"
+        ],
         "summary": "Delete data source by name.",
         "description": "Delete data source by name.",
         "security": [
@@ -2891,7 +3287,9 @@
     "/v1/sources/{src_name}": {
       "delete": {
         "operationId": "deleteSourceBare",
-        "tags": ["Sources"],
+        "tags": [
+          "Sources"
+        ],
         "summary": "Delete data source by name.",
         "description": "Delete data source by name.",
         "security": [
@@ -2957,7 +3355,10 @@
     "/v1/{org_id}/projects/{proj_id}/pipes/{pipe_name}": {
       "delete": {
         "operationId": "deletePipe",
-        "tags": ["Projects", "Pipes"],
+        "tags": [
+          "Projects",
+          "Pipes"
+        ],
         "summary": "Delete pipe by name.",
         "description": "Delete pipe by name.",
         "security": [
@@ -3041,7 +3442,9 @@
     "/v1/pipes/{pipe_name_format}": {
       "delete": {
         "operationId": "deletePipeBare",
-        "tags": ["Pipes"],
+        "tags": [
+          "Pipes"
+        ],
         "summary": "Delete pipe by name.",
         "description": "Delete pipe by name.",
         "security": [
@@ -3105,7 +3508,9 @@
       },
       "get": {
         "operationId": "getPipe",
-        "tags": ["Pipes"],
+        "tags": [
+          "Pipes"
+        ],
         "summary": "Returns data from a published pipe.",
         "parameters": [
           {
@@ -3158,7 +3563,9 @@
     "/v1/run/{pipe_name_format}": {
       "get": {
         "operationId": "runPipe",
-        "tags": ["Pipes"],
+        "tags": [
+          "Pipes"
+        ],
         "summary": "Returns data from existing draft pipe.",
         "parameters": [
           {
@@ -3200,7 +3607,9 @@
       },
       "post": {
         "operationId": "runPipe",
-        "tags": ["Pipes"],
+        "tags": [
+          "Pipes"
+        ],
         "summary": "Create a pipe/source config and return the resulting data.",
         "parameters": [
           {
@@ -3272,7 +3681,9 @@
     "/v1/{org_id}/projects/{proj_id}/schemas": {
       "post": {
         "operationId": "inferSchema",
-        "tags": ["Sources"],
+        "tags": [
+          "Sources"
+        ],
         "summary": "Infer source schema.",
         "description": "Infer source schema.",
         "security": [
@@ -3352,7 +3763,9 @@
     "/v1/schemas": {
       "post": {
         "operationId": "inferSchemaBare",
-        "tags": ["Sources"],
+        "tags": [
+          "Sources"
+        ],
         "summary": "Infer source schema.",
         "description": "Infer source schema.",
         "security": [
@@ -3412,7 +3825,9 @@
     "/v1/{org_id}/projects/{proj_id}/schemas/validate": {
       "post": {
         "operationId": "validateSchema",
-        "tags": ["Sources"],
+        "tags": [
+          "Sources"
+        ],
         "summary": "Validate source schema.",
         "description": "Validate source schema.",
         "security": [
@@ -3454,7 +3869,10 @@
             "schema": {
               "type": "string",
               "default": "json",
-              "enum": ["json", "yaml"]
+              "enum": [
+                "json",
+                "yaml"
+              ]
             },
             "description": "Format of the schema"
           }
@@ -3499,7 +3917,9 @@
     "/v1/schemas/validate": {
       "post": {
         "operationId": "validateSchemaBare",
-        "tags": ["Sources"],
+        "tags": [
+          "Sources"
+        ],
         "summary": "Validate schema.",
         "description": "Validate schema.",
         "parameters": [
@@ -3518,7 +3938,10 @@
             "schema": {
               "type": "string",
               "default": "json",
-              "enum": ["json", "yaml"]
+              "enum": [
+                "json",
+                "yaml"
+              ]
             },
             "description": "Format of the schema"
           }
@@ -3568,7 +3991,9 @@
     "/v1/{org_id}/projects/{proj_id}/pipes/{pipe_name}/materialize": {
       "get": {
         "operationId": "materializePipe",
-        "tags": ["Pipes"],
+        "tags": [
+          "Pipes"
+        ],
         "summary": "Get materialized pipe from draft.",
         "description": "Get materialized pipe from draft.",
         "security": [
@@ -3611,7 +4036,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/PipeFile"
+                      },
+                      {
+                        "$ref": "#/components/schemas/SourceFile"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -3637,7 +4072,9 @@
     "/v1/pipes/{pipe_name_format}/materialize": {
       "get": {
         "operationId": "materializePipeBare",
-        "tags": ["Pipes"],
+        "tags": [
+          "Pipes"
+        ],
         "summary": "Get materialized pipe from draft.",
         "description": "Get materialized pipe from draft.",
         "parameters": [
@@ -3662,7 +4099,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/PipeFile"
+                      },
+                      {
+                        "$ref": "#/components/schemas/SourceFile"
+                      }
+                    ]
+                  }
                 }
               }
             }
@@ -3685,164 +4132,12 @@
         }
       }
     },
-    "/v1/{org_id}/projects/{proj_id}/schemas/ai-data-inference": {
-      "post": {
-        "operationId": "aiInferenceSchema",
-        "tags": ["Sources"],
-        "summary": "Get resulting row samples after ingestion into AI-source.",
-        "description": "Get resulting row samples after ingestion into AI-source.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "proj_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Project id",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "schema",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Should be a valid JSON or YAML format"
-          },
-          {
-            "in": "query",
-            "name": "format",
-            "schema": {
-              "type": "string",
-              "default": "json",
-              "enum": ["json", "yaml"]
-            },
-            "description": "Format of the schema"
-          }
-        ],
-        "requestBody": {
-          "description": "Data samples to infer what will be ingested",
-          "content": {
-            "application/x-ndjson": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/x-ndjson": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Misc error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Project not found"
-          }
-        }
-      }
-    },
-    "/v1/schemas/ai-data-inference": {
-      "post": {
-        "operationId": "aiInferenceBare",
-        "tags": ["Sources"],
-        "summary": "Get resulting row samples after ingestion into AI-source.",
-        "description": "Get resulting row samples after ingestion into AI-source.",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "schema",
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "description": "Should be a valid JSON or YAML format"
-          },
-          {
-            "in": "query",
-            "name": "format",
-            "schema": {
-              "type": "string",
-              "default": "json",
-              "enum": ["json", "yaml"]
-            },
-            "description": "Format of the schema"
-          }
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "description": "Data samples to infer what will be ingested",
-          "content": {
-            "application/x-ndjson": {
-              "schema": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/x-ndjson": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Misc error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Project not found"
-          }
-        }
-      }
-    },
     "/v1/{org_id}/projects/{proj_id}/doctor": {
       "get": {
         "operationId": "listDoctorChecks",
-        "tags": ["Diagnostic"],
+        "tags": [
+          "Diagnostic"
+        ],
         "summary": "List available diagnostic checks.",
         "description": "List available diagnostic checks.",
         "security": [
@@ -3901,7 +4196,9 @@
       },
       "post": {
         "operationId": "runDoctor",
-        "tags": ["Diagnostic"],
+        "tags": [
+          "Diagnostic"
+        ],
         "summary": "Run diagnostic checks.",
         "description": "Run diagnostic checks.",
         "security": [
@@ -3975,7 +4272,9 @@
     "/v1/doctor": {
       "get": {
         "operationId": "listDoctorChecksBare",
-        "tags": ["Diagnostic"],
+        "tags": [
+          "Diagnostic"
+        ],
         "summary": "List available diagnostic checks.",
         "description": "List available diagnostic checks.",
         "security": [
@@ -4014,7 +4313,9 @@
       },
       "post": {
         "operationId": "runDoctorBare",
-        "tags": ["Diagnostic"],
+        "tags": [
+          "Diagnostic"
+        ],
         "summary": "Run diagnostic checks.",
         "description": "Run diagnostic checks.",
         "parameters": [
@@ -4063,6 +4364,194 @@
           },
           "404": {
             "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/metrics": {
+      "get": {
+        "operationId": "getMetrics",
+        "tags": [
+          "Observability"
+        ],
+        "summary": "Get source metrics.",
+        "description": "Get source metrics. It returns a map with source name as key and metrics object as value. Metrics object contains total metrics and binned metrics if `time_interval_s` is provided. By default, `from_dt` and `to_dt` are set to all time. If `time_interval_s` is provided, metrics will be binned within the specified time interval.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name. Can be repeated multiple times. If not provided, metrics for all sources will be returned.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "time_interval_s",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Time interval in seconds for binning metrics. Used in conjunction with `from_dt` and `to_dt` to bin metrics within the specified time range.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "from_dt",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Start date-time for filtering metrics. Should be used in conjunction with `to_dt`.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "to_dt",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "End date-time for filtering metrics. Should be used in conjunction with `from_dt`.",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A map of source names to their stats.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/SourceStats"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/schemas/ai": {
+      "post": {
+        "operationId": "getAIData",
+        "tags": [
+          "Sources"
+        ],
+        "summary": "Get AI processed rows.",
+        "description": "Get AI processed rows.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart message for schema and data.",
+          "content": {
+            "application/x-ndjson": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "application/csv": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/sources/{src_name}/data": {
+      "delete": {
+        "operationId": "truncateSourceBare",
+        "tags": [
+          "Sources"
+        ],
+        "summary": "Delete all source data (truncate source).",
+        "description": "Delete all source data (truncate source).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "src_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project or source not found"
           }
         }
       }

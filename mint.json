@@ -109,7 +109,8 @@
         "api-reference/sources/infer_ai",
         "api-reference/sources/delete",
         "api-reference/sources/infer",
-        "api-reference/sources/validate"
+        "api-reference/sources/validate",
+        "api-reference/sources/truncate"
       ]
     },
     {

@@ -640,9 +640,59 @@
           "cols"
         ]
       },
-      "BaseSourceStats": {
+      "SourceStatsBin": {
         "type": "object",
         "properties": {
+          "ts": {
+            "type": "string",
+            "description": "Timestamp of the bin."
+          },
+          "uncompressed_bytes": {
+            "type": "integer",
+            "default": 0,
+            "description": "Total size of uncompressed data in bytes."
+          },
+          "uncompressed_bytes_rt": {
+            "type": "integer",
+            "default": 0,
+            "description": "Running total size of uncompressed data in bytes."
+          },
+          "rows": {
+            "type": "integer",
+            "default": 0,
+            "description": "The number of rows."
+          },
+          "rows_rt": {
+            "type": "integer",
+            "default": 0,
+            "description": "Running total number of rows."
+          },
+          "errors": {
+            "type": "integer",
+            "default": 0,
+            "description": "The number of errors."
+          },
+          "errors_rt": {
+            "type": "integer",
+            "default": 0,
+            "description": "Running total number of errors."
+          }
+        },
+        "required": [
+          "uncompressed_bytes_rt",
+          "rows_rt",
+          "errors_rt"
+        ]
+      },
+      "SourceStats": {
+        "type": "object",
+        "properties": {
+          "bins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceStatsBin"
+            }
+          },
           "compressed_bytes": {
             "type": "integer",
             "default": 0,
@@ -677,74 +727,21 @@
           "errors"
         ]
       },
-      "BaseRunningTotalSourceStats": {
+      "Template": {
         "type": "object",
         "properties": {
-          "compressed_bytes_rt": {
-            "type": "integer",
-            "default": 0,
-            "description": "Running total size of compressed data in bytes."
+          "name": {
+            "type": "string",
+            "description": "Template name"
           },
-          "uncompressed_bytes_rt": {
-            "type": "integer",
-            "default": 0,
-            "description": "Running total size of uncompressed data in bytes."
-          },
-          "bytes_on_disk_rt": {
-            "type": "integer",
-            "default": 0,
-            "description": "Running total size of all the data in bytes."
-          },
-          "rows_rt": {
-            "type": "integer",
-            "default": 0,
-            "description": "Running total number of rows."
-          },
-          "errors_rt": {
-            "type": "integer",
-            "default": 0,
-            "description": "Running total number of errors."
+          "description": {
+            "type": "string",
+            "description": "Template description"
           }
         },
         "required": [
-          "compressed_bytes_rt",
-          "uncompressed_bytes_rt",
-          "bytes_on_disk_rt",
-          "rows_rt",
-          "errors_rt"
-        ]
-      },
-      "SourceStatsBin": {
-        "type": "object",
-        "properties": {
-          "ts": {
-            "type": "string",
-            "description": "Timestamp of the bin."
-          }
-        },
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseSourceStats"
-          },
-          {
-            "$ref": "#/components/schemas/BaseRunningTotalSourceStats"
-          }
-        ]
-      },
-      "SourceStats": {
-        "type": "object",
-        "properties": {
-          "bins": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SourceStatsBin"
-            }
-          }
-        },
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BaseSourceStats"
-          }
+          "name",
+          "description"
         ]
       }
     }
@@ -4552,6 +4549,100 @@
           },
           "404": {
             "description": "Project or source not found"
+          }
+        }
+      }
+    },
+    "/v1/templates": {
+      "get": {
+        "operationId": "listTemplates",
+        "tags": [
+          "Templates"
+        ],
+        "summary": "List all available templates.",
+        "description": "List all available templates.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of templates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Template"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      },
+      "post": {
+        "operationId": "addTemplate",
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Attach new template to a workspace.",
+        "description": "Attach new template to a workspace.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "template params",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "template name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
           }
         }
       }

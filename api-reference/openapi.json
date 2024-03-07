@@ -2926,7 +2926,7 @@
               "type": "boolean",
               "default": false
             },
-            "description": "Get execution plan without executing it"
+            "description": "Get execution plan without executing it."
           },
           {
             "in": "query",
@@ -2936,6 +2936,15 @@
               "default": false
             },
             "description": "Force delete/overwrite even if data will be lost."
+          },
+          {
+            "in": "query",
+            "name": "rename",
+            "schema": {
+              "type": "string",
+              "example": "name=new_name"
+            },
+            "description": "Use `rename` strategy. Specify a single renamed object name and its new name."
           }
         ],
         "requestBody": {
@@ -3032,6 +3041,15 @@
               "default": false
             },
             "description": "Force delete/overwrite even if data will be lost."
+          },
+          {
+            "in": "query",
+            "name": "rename",
+            "schema": {
+              "type": "string",
+              "example": "name=new_name"
+            },
+            "description": "Use `rename` strategy. Specify a single renamed object name and its new name."
           }
         ],
         "requestBody": {

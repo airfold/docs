@@ -110,7 +110,7 @@
         "api-reference/sources/delete",
         "api-reference/sources/infer",
         "api-reference/sources/validate",
-        "api-reference/sources/truncate"
+        "api-reference/sources/delete_data"
       ]
     },
     {

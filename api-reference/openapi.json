@@ -14,6 +14,11 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer"
+      },
+      "tokenAuth": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "token"
       }
     },
     "schemas": {
@@ -194,6 +199,64 @@
           "user"
         ]
       },
+      "CreateSubscription": {
+        "type": "object",
+        "required": [
+          "plan_name"
+        ],
+        "properties": {
+          "plan_name": {
+            "type": "string",
+            "enum": [
+              "free",
+              "pro"
+            ],
+            "description": "Subscription Plan name"
+          }
+        }
+      },
+      "BillingConfig": {
+        "type": "object",
+        "properties": {
+          "publishableKey": {
+            "type": "string",
+            "description": "Stripe publishable key"
+          }
+        }
+      },
+      "RetryInvoice": {
+        "type": "object",
+        "required": [
+          "payment_method_id",
+          "invoice_id"
+        ],
+        "properties": {
+          "payment_method_id": {
+            "type": "string",
+            "description": "Payment method id"
+          },
+          "invoice_id": {
+            "type": "string",
+            "description": "Invoice id"
+          }
+        }
+      },
+      "UpdateSubscription": {
+        "type": "object",
+        "required": [
+          "new_plan_name"
+        ],
+        "properties": {
+          "new_plan_name": {
+            "type": "string",
+            "enum": [
+              "free",
+              "pro"
+            ],
+            "description": "New plan name"
+          }
+        }
+      },
       "ChangeOwner": {
         "type": "object",
         "required": [
@@ -203,6 +266,10 @@
           "owner": {
             "type": "string",
             "description": "New owner email"
+          },
+          "payment_method_id": {
+            "type": "string",
+            "description": "New owner payment method id"
           }
         }
       },
@@ -743,10 +810,123 @@
           "name",
           "description"
         ]
+      },
+      "RenameRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "New name"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "BytesMetric": {
+        "type": "object",
+        "properties": {
+          "bytes": {
+            "type": "integer",
+            "default": 0,
+            "description": "Total bytes."
+          }
+        },
+        "required": [
+          "bytes"
+        ]
+      },
+      "AITokens": {
+        "type": "object",
+        "properties": {
+          "prompt_tokens": {
+            "type": "integer",
+            "default": 0,
+            "description": "Prompt tokens."
+          },
+          "completion_tokens": {
+            "type": "integer",
+            "default": 0,
+            "description": "Completion tokens."
+          },
+          "total_tokens": {
+            "type": "integer",
+            "default": 0,
+            "description": "Total tokens."
+          }
+        },
+        "required": [
+          "prompt_tokens",
+          "completion_tokens",
+          "total_tokens"
+        ]
+      },
+      "UsageMetricsBin": {
+        "type": "object",
+        "properties": {
+          "ts": {
+            "type": "string",
+            "description": "Timestamp of the bin."
+          },
+          "processed_bytes": {
+            "$ref": "#/components/schemas/BytesMetric",
+            "description": "Total processed bytes."
+          },
+          "processed_bytes_rt": {
+            "$ref": "#/components/schemas/BytesMetric",
+            "description": "Running total processed bytes."
+          },
+          "ai_tokens": {
+            "$ref": "#/components/schemas/AITokens",
+            "description": "AI tokens usage."
+          },
+          "ai_tokens_rt": {
+            "$ref": "#/components/schemas/AITokens",
+            "description": "Running total AI tokens usage."
+          }
+        },
+        "required": [
+          "processed_bytes",
+          "processed_bytes_rt",
+          "ai_tokens",
+          "ai_tokens_rt"
+        ]
+      },
+      "UsageMetrics": {
+        "type": "object",
+        "properties": {
+          "bins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageMetricsBin"
+            }
+          },
+          "processed_bytes": {
+            "$ref": "#/components/schemas/BytesMetric",
+            "description": "Total processed bytes."
+          },
+          "stored_bytes": {
+            "$ref": "#/components/schemas/BytesMetric",
+            "description": "Total stored bytes."
+          },
+          "ai_tokens": {
+            "$ref": "#/components/schemas/AITokens",
+            "description": "AI tokens usage."
+          }
+        },
+        "required": [
+          "processed_bytes",
+          "stored_bytes",
+          "ai_tokens"
+        ]
       }
     }
   },
   "servers": [
+    {
+      "url": "http://localhost:3000/dev",
+      "description": "Development server"
+    },
     {
       "url": "https://api.airfold.co",
       "description": "Production server"
@@ -952,6 +1132,729 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/billing/subscription": {
+      "post": {
+        "operationId": "creteSubscription",
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Create organization subscription.",
+        "description": "Returns a Stripe Subscription object.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateSubscription",
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Update organization subscription.",
+        "description": "Returns a Stripe Subscription object.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubscription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/billing/subscription": {
+      "post": {
+        "operationId": "createSubscriptionWeb",
+        "tags": [
+          "Web",
+          "Billing"
+        ],
+        "summary": "Create organization subscription.",
+        "description": "Returns a Stripe Subscription object.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubscription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateSubscriptionWeb",
+        "tags": [
+          "Web",
+          "Billing"
+        ],
+        "summary": "Update organization subscription.",
+        "description": "Returns a Stripe Subscription object.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubscription"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/billing/config": {
+      "get": {
+        "operationId": "getBillingConfig",
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Get billing configuration.",
+        "description": "Returns a dictionary with settings. Use to get publishable key for stripe.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingConfig"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/billing/config": {
+      "get": {
+        "operationId": "getBillingConfigWeb",
+        "tags": [
+          "Web",
+          "Billing"
+        ],
+        "summary": "Get billing configuration.",
+        "description": "Returns a dictionary with settings. Use to get publishable key for stripe.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingConfig"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/billing/customer": {
+      "get": {
+        "operationId": "getOrgCustomer",
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Get the stripe customer id for the organization.",
+        "description": "Returns the customer id.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/billing/customer": {
+      "get": {
+        "operationId": "getOrgCustomerWeb",
+        "tags": [
+          "Web",
+          "Billing"
+        ],
+        "summary": "Get the stripe customer id for the organization.",
+        "description": "Returns the customer id.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/billing/retrieve-payment-method": {
+      "get": {
+        "operationId": "retrievePaymentMethod",
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Retrieve a payment method.",
+        "description": "Returns a PaymentMethod object.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "payment_method_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Payment method id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/billing/retrieve-payment-method": {
+      "get": {
+        "operationId": "retrievePaymentMethodWeb",
+        "tags": [
+          "Web",
+          "Billing"
+        ],
+        "summary": "Retrieve a payment method.",
+        "description": "Returns a PaymentMethod object.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "payment_method_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Payment method id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/billing/retrieve-upcoming-invoice": {
+      "get": {
+        "operationId": "retrieveUpcomingInvoice",
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Retrieve an upcoming invoice.",
+        "description": "Returns an invoice object.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "new_plan_name",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "free",
+                "pro"
+              ]
+            },
+            "description": "New plan name",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "402": {
+            "description": "Payment Required"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/billing/retrieve-upcoming-invoice": {
+      "get": {
+        "operationId": "retrieveUpcomingInvoiceWeb",
+        "tags": [
+          "Web",
+          "Billing"
+        ],
+        "summary": "Retrieve an upcoming invoice.",
+        "description": "Returns an invoice object.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "new_plan_name",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "free",
+                "pro"
+              ]
+            },
+            "description": "New plan name",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "402": {
+            "description": "Payment Required"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/v1/{org_id}/billing/retry-invoice": {
+      "post": {
+        "operationId": "retryInvoice",
+        "tags": [
+          "Billing"
+        ],
+        "summary": "Retry an invoice.",
+        "description": "Returns an invoice object.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryInvoice"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
+          }
+        }
+      }
+    },
+    "/web/{org_id}/billing/retry-invoice": {
+      "post": {
+        "operationId": "retryInvoiceWeb",
+        "tags": [
+          "Web",
+          "Billing"
+        ],
+        "summary": "Retry an invoice.",
+        "description": "Returns an invoice object.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "org_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Organization id",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryInvoice"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "403": {
+            "description": "Access denied."
           }
         }
       }
@@ -1710,6 +2613,45 @@
           },
           "404": {
             "description": "Member not found."
+          }
+        }
+      }
+    },
+    "/web/templates": {
+      "get": {
+        "operationId": "listTemplatesWeb",
+        "tags": [
+          "Templates"
+        ],
+        "summary": "List all available templates.",
+        "description": "List all available templates.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "list of templates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Template"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
           }
         }
       }
@@ -3361,6 +4303,73 @@
             "description": "Project or source not found"
           }
         }
+      },
+      "put": {
+        "operationId": "renameSourceBare",
+        "tags": [
+          "Sources"
+        ],
+        "summary": "Rename source by name.",
+        "description": "Rename source by name.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "src_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Get execution plan without executing it"
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for rename",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project or source not found"
+          }
+        }
       }
     },
     "/v1/{org_id}/projects/{proj_id}/pipes/{pipe_name}": {
@@ -3569,11 +4578,78 @@
             "description": "Endpoint not found or cannot process format."
           }
         }
+      },
+      "put": {
+        "operationId": "renamePipeBare",
+        "tags": [
+          "Pipes"
+        ],
+        "summary": "Rename pipe by name.",
+        "description": "Rename pipe by name.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pipe_name_format",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pipe name",
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Get execution plan without executing it"
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for rename",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionPlan"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project or pipe not found"
+          }
+        }
       }
     },
     "/v1/run/{pipe_name_format}": {
       "get": {
-        "operationId": "runPipe",
+        "operationId": "getRunPipe",
         "tags": [
           "Pipes"
         ],
@@ -4386,7 +5462,7 @@
           "Observability"
         ],
         "summary": "Get source metrics.",
-        "description": "Get source metrics. It returns a map with source name as key and metrics object as value. Metrics object contains total metrics and binned metrics if `time_interval_s` is provided. By default, `from_dt` and `to_dt` are set to all time. If `time_interval_s` is provided, metrics will be binned within the specified time interval.",
+        "description": "Get source metrics. It returns a map with source name as key and metrics object as value. If neither `from_dt` nor `to_dt` is provided, only total metrics are returned. Binned metrics will be added to the response if `time_interval_s` is specified. If `time_interval_s` is provided, metrics will be binned within the specified time interval.",
         "parameters": [
           {
             "in": "query",
@@ -4526,12 +5602,12 @@
     },
     "/v1/sources/{src_name}/data": {
       "delete": {
-        "operationId": "truncateSourceBare",
+        "operationId": "deleteSourceDataBare",
         "tags": [
           "Sources"
         ],
-        "summary": "Delete all source data (truncate source).",
-        "description": "Delete all source data (truncate source).",
+        "summary": "Delete source data.",
+        "description": "Delete all source data(truncate source) if `where` is not provided.",
         "security": [
           {
             "bearerAuth": []
@@ -4546,6 +5622,15 @@
             },
             "description": "Source name",
             "required": true
+          },
+          {
+            "in": "query",
+            "name": "where",
+            "schema": {
+              "type": "string"
+            },
+            "description": "SQL WHERE clause to filter rows to delete.",
+            "required": false
           }
         ],
         "responses": {
@@ -4657,6 +5742,213 @@
           },
           "409": {
             "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      },
+      "put": {
+        "operationId": "changeTemplateState",
+        "tags": [
+          "Templates"
+        ],
+        "summary": "Change template state.",
+        "description": "Change template state.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "state update",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "subscription": {
+                    "type": "string",
+                    "description": "subscription state",
+                    "enum": [
+                      "start",
+                      "stop"
+                    ],
+                    "default": "start"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "template name, required for `subscription: start`"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/usage": {
+      "get": {
+        "operationId": "getUsage",
+        "tags": [
+          "Observability"
+        ],
+        "summary": "Get usage.",
+        "description": "Get usage. It returns a map of usage metrics. Binned metrics will be added to the response if `time_interval_s` is specified. If `time_interval_s` is provided, metrics will be binned within the specified time interval.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "time_interval_s",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Time interval in seconds for binning usage metrics. Used in conjunction with `from_dt` and `to_dt` to bin usage metrics within the specified time range.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "from_dt",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Start date-time for filtering usage metrics. Should be used in conjunction with `to_dt`.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "to_dt",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "End date-time for filtering usage metrics. Should be used in conjunction with `from_dt`.",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A map of total usage metrics with binned usage metrics if `time_interval_s` is specified.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/UsageMetrics"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/openapi": {
+      "get": {
+        "operationId": "getOpenapiDoc",
+        "tags": [
+          "Pipes"
+        ],
+        "summary": "Get OpenAPI doc for all accessible pipes.",
+        "description": "Get OpenAPI doc for all accessible pipes.",
+        "security": [
+          {
+            "tokenAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OpenAPI doc.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/pipes": {
+      "get": {
+        "operationId": "listPipeDoc",
+        "tags": [
+          "Pipes"
+        ],
+        "summary": "Get OpenAPI doc for all accessible pipes.",
+        "description": "Get OpenAPI doc for all accessible pipes.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OpenAPI doc.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
           }
         }
       }

@@ -5607,7 +5607,7 @@
           "Sources"
         ],
         "summary": "Delete source data.",
-        "description": "Delete all source data(truncate source) if `where` is not provided.",
+        "description": "Delete source data. Use `where` query parameter to filter rows to delete. If `where` is not provided, all rows will be deleted(truncated).",
         "security": [
           {
             "bearerAuth": []

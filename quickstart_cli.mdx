@@ -77,7 +77,7 @@ Let's ingest the CSV file we used to generate the source:
 $ af source append events https://airfold.s3.amazonaws.com/events.csv
 ```
 
-## Create a [Pipe](/workspace/pipe)
+## Create a [Pipe](/workspace/pipes)
 All the SQL queries in Airfold are written inside `pipes`.<br />
 Pipes are a sequenece of one or more SQL queries (Nodes) that are executed in order, each of those SQL queries is called a Node, and each Node is simply a `SELECT` statement.
 
@@ -133,7 +133,7 @@ $ af pipe ls
 - top10: published | created 1 min ago | updated 1 min ago
 ```
 
-Query the results using the [API](/reference/api):
+Query the results using the [API](/api-reference):
 ```bash
 $ curl --request GET \
   --url https://api.airfold.co/v1/pipes/top10.ndjson \
@@ -182,4 +182,4 @@ $ af pipe query top10.ndjson
 ## Next Steps
 Congratulations! You've successfully ingested, queried, and published data in Airfold.<br />
 Now that you've learned the basics, you can explore [workspaces](/workspace/workspaces), [sources](/workspace/sources), [pipes](/workspace/pipes), and [tokens](/workspace/tokens).<br />
-Or, check the reference of the [API](/reference/api) and the [CLI](/reference/cli) to learn more about how to interact with Airfold.
+Or, check the reference of the [API](/api-reference) and the [CLI](/reference/cli) to learn more about how to interact with Airfold.

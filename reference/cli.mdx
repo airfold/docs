@@ -185,6 +185,17 @@ Here's a brief overview of all the available commands, arguments, and flags:
       </Expandable>
     </ResponseField>
     <ResponseField name="delete" type="Subcommand">
+      Delete source data.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="name" type="Argument" required>
+          Source name.
+        </ResponseField>
+        <ResponseField name="where" type="Flag" required>
+          SQL WHERE condition to delete data. Ex.: logLevel='ERROR'
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="drop" type="Subcommand">
       Delete source.
       <Expandable title="Arguments and Flags">
         <ResponseField name="name" type="Argument" required>

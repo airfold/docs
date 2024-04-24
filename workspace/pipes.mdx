@@ -4,7 +4,7 @@ description: 'All the SQL queries in Airfold are written inside `pipes`.'
 icon: "rectangle-vertical-history"
 ---
 
-Pipes are a sequenece of one or more SQL queries (Nodes) that are executed in order, each of those SQL queries is called a Node, and each Node is simply a `SELECT` statement.
+Pipes are a sequence of one or more SQL queries (Nodes) that are executed in order, each of those SQL queries is called a Node, and each Node is simply a `SELECT` statement.
 
 Pipes result in either a published pipe or a materialized pipe.
 
@@ -41,7 +41,7 @@ This creates an API endpoint that serves the result of your pipe, the result is 
 
 To publish a draft pipe, assign an endpoint name to the `publish` field.
 
-Published pipes can parameterizing their SQL using Jinja2 via the `params` field.
+Published pipes can parameterize their SQL using Jinja2 via the `params` field.
 
 Unlike draft pipes, published pipes can be accessed (via `FROM`) by other pipes.
 
@@ -56,7 +56,7 @@ Although materialized pipes themselves cannot be accessed (via `FROM`) by other 
 ### Supercharge your pipes!
 Published pipes are batch and compute their results on read, thus they're not suited for intensive data transformations.
 
-Instead, a common pattern is to front a materialized pipe with a published pipe. The materialized pipe incrementally transforms the data as it is ingested and writes it to its source, allowing the published pipe to instantly acceess the already transformed data from the source on read.
+Instead, a common pattern is to front a materialized pipe with a published pipe. The materialized pipe incrementally transforms the data as it is ingested and writes it to its source, allowing the published pipe to instantly access the already transformed data from the source on read.
 </Tip>
 
 ### Sample Pipes
@@ -82,11 +82,11 @@ nodes:
         sql: select timestamp, level, file, message from logs
     - error:
         description: Getting errors
-        sql: select message from load where level = '{{ level }}'
+        sql: select message from load where level = {{ level }}
 publish: level
 params:
     - name: level
-      type: String
+      type: string
       default: error
 ```
 

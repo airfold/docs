@@ -20,9 +20,9 @@ Before we begin, we need to create a workspace to store our data and resources, 
 1. Go to [Airfold](https://www.app.airfold.co) and create a new workspace.
 2. Copy an Admin token from the workspace's **Token** page.
 
-The token should look like this: `af6eab8fcd902e4cbfb63ba174469989cd`.
+The token should look like this: `aft_6eab8fcd902e4cbfb63ba174469989cd.Ds1PME5dQsJKosKQWVcZiBSlRFBbmhzIocvHg8KQddV`.
 
-## Setup the [CLI](/reference/cli)
+## Set up the [CLI](/reference/cli)
 <Note>
 The CLI requires Python 3.10 or higher.
 </Note>
@@ -41,26 +41,60 @@ To see a list of available commands just run `af`.
 To create a source, a YAML file defining the source is required.<br />
 Let's generate a source by inferring the schema from a CSV file:
 ```bash
-$ af source create https://airfold.s3.amazonaws.com/events.csv
+$ af source create https://airfold-demo-data.s3.us-east-2.amazonaws.com/quickstart/events.csv .
 ```
 
 The CLI will infer the schema from the CSV file and generate a YAML file with the following contents:
-```yaml events.yaml
+```yaml ./sources/events.yaml
+name: events
 cols:
-  date: DateTime
-  product_id: String
-  user_id: String
-  event: String
-  quantity: Int32
-settings: |
-  MergeTree()
-  PARTITION BY toYYYYMM(date)
-  ORDER BY (date, product_id)
+  acceptcharset: String
+  acceptencoding: String
+  acceptlanguage: String
+  browsername: String
+  browserversion: String
+  cachecontrol: String
+  city: String
+  connection: String
+  contentlength: String
+  contenttype: String
+  country: String
+  cpuarchitecture: String
+  devicemodel: String
+  devicetype: String
+  devicevendor: String
+  enginename: String
+  engineversion: String
+  event_ts: DateTime64(3)
+  from: String
+  headers: String
+  host: String
+  ip_address: String
+  is_bot: Int64
+  latitude: Float64
+  log_level: String
+  log_message: String
+  longitude: Float64
+  method: String
+  origin: String
+  osname: String
+  osversion: String
+  protocol: String
+  referer: String
+  region: String
+  url: String
+  useragent: String
+  via: String
+  xforwaredforip: String
+settings:
+  engine: MergeTree()
+  order_by: (`event_ts`, `ip_address`)
+  partition_by: toYYYYMM(event_ts)
 ```
 
 Push the source to your workspace:
 ```bash
-$ af push events.yaml
+$ af push ./sources/events.yaml
 ```
 
 List the sources in your workspace to confirm that the source was created:
@@ -72,59 +106,65 @@ $ af source ls
 ## [Ingest Data](/ingest)
 Now that we have a source, we can ingest data into it.
 
-Let's ingest the CSV file we used to generate the source:
+Let's ingest the file we used to generate the source:
 ```bash
-$ af source append events https://airfold.s3.amazonaws.com/events.csv
+$ af source append events https://airfold-demo-data.s3.us-east-2.amazonaws.com/quickstart/events.csv
 ```
 
 ## Create a [Pipe](/workspace/pipes)
 All the SQL queries in Airfold are written inside `pipes`.<br />
-Pipes are a sequenece of one or more SQL queries (Nodes) that are executed in order, each of those SQL queries is called a Node, and each Node is simply a `SELECT` statement.
+Pipes are a sequence of one or more SQL queries (Nodes) that are executed in order, each of those SQL queries is called a Node, and each Node is simply a `SELECT` statement.
 
 <Tip>
 Use pipes to build features over your data!
 </Tip>
 
-Let's create a pipe to identify the top 10 most searched products:
-```yaml top10.yaml
+Let's create a pipe to identify the counts by log level:
+```yaml levels.yaml
 nodes:
-  - name: search_events
-    query: SELECT * FROM events WHERE event = 'search'
-  - name: aggregate_by_product
-    query: SELECT product_id, count() AS total FROM search_events GROUP BY product_id
-  - name: top10
-    query: SELECT * FROM aggregate_by_product LIMIT 10
+  - node1:
+      sql: |
+        SELECT
+          log_level,
+          count()
+        FROM
+          events
+        GROUP BY
+          log_level
 ```
 
 Push the pipe to your workspace:
 ```bash
-$ af push top10.yaml
+$ af push levels.yaml
 ```
 
 List the pipes in your workspace to confirm that the pipe was created:
 ```bash
 $ af pipe ls
-- top10: draft | created 1 min ago | updated 1 min ago
+- levels: draft | created 1 min ago | updated 1 min ago
 ```
 
 ## Publish the Results
 We've pushed the pipe to our workspace, but we have not yet published an endpoint from it.<br />
 To publish the pipe, we need to turn it into a published pipe.<br />
 To do so, we need to set the `publish` field to the name of the endpoint we want to publish:
-```yaml top10.yaml
+```yaml levels.yaml
 nodes:
-  - name: search_events
-    query: SELECT * FROM events WHERE event = 'search'
-  - name: aggregate_by_product
-    query: SELECT product_id, count() AS total FROM search_events GROUP BY product_id
-  - name: top10
-    query: SELECT * FROM aggregate_by_product LIMIT 10
-publish: top10
+  - node1:
+      sql: |
+        SELECT
+          log_level,
+          count()
+        FROM
+          events
+        GROUP BY
+          log_level
+publish: levels
 ```
 
 Push the pipe to your workspace:
 ```bash
-$ af push top10.yaml
+$ af push levels.yaml
 ```
 
 List the pipes in your workspace to confirm that the pipe was created:
@@ -136,45 +176,48 @@ $ af pipe ls
 Query the results using the [API](/api-reference):
 ```bash
 $ curl --request GET \
-  --url https://api.airfold.co/v1/pipes/top10.ndjson \
-  --header 'Authorization: <authorization>'
+  --url https://api.airfold.co/v1/pipes/levels.json \
+  --header 'Authorization: Bearer <use auth token here>'
 
-[{
-    "product_id": "6c28b658-1aaa-11eb-8cb5-acde48001122",
-    "total": 33
-}, {
-    "product_id": "6b50e868-1aaa-11eb-a226-acde48001122",
-    "total": 32
-}, {
-    "product_id": "6c482f92-1aaa-11eb-b193-acde48001122",
-    "total": 31
-}, {
-    "product_id": "6aaacc1c-1aaa-11eb-b4d1-acde48001122",
-    "total": 31
-}, {
-    "product_id": "6c0357be-1aaa-11eb-8e3f-acde48001122",
-    "total": 31
-}, {
-    "product_id": "6bc78434-1aaa-11eb-8a21-acde48001122",
-    "total": 31
-}, {
-    "product_id": "6c29f858-1aaa-11eb-bd1a-acde48001122",
-    "total": 31
-}, {
-    "product_id": "6c02518c-1aaa-11eb-9307-acde48001122",
-    "total": 31
-}, {
-    "product_id": "6c5b3222-1aaa-11eb-950e-acde48001122",
-    "total": 30
-}, {
-    "product_id": "6b0fcb8a-1aaa-11eb-bc59-acde48001122",
-    "total": 30
-}]
+{
+        "meta":
+        [
+                {
+                        "name": "log_level",
+                        "type": "String"
+                },
+                {
+                        "name": "count()",
+                        "type": "UInt64"
+                }
+        ],
+
+        "data":
+        [
+                {
+                        "log_level": "WARN",
+                        "count()": "2"
+                },
+                {
+                        "log_level": "INFO",
+                        "count()": "8"
+                }
+        ],
+
+        "rows": 2,
+
+        "statistics":
+        {
+                "elapsed": 0.001772939,
+                "rows_read": 10,
+                "bytes_read": 130
+        }
+}
 ```
 
 Or using the [CLI](/reference/cli):
 ```bash
-$ af pipe query top10.ndjson
+$ af pipe query levels --format json
 
 [...]
 ```

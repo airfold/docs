@@ -924,10 +924,6 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000/dev",
-      "description": "Development server"
-    },
-    {
       "url": "https://api.airfold.co",
       "description": "Production server"
     }

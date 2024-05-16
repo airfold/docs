@@ -951,6 +951,14 @@
             },
             "description": "Source name",
             "required": true
+          },
+          {
+            "in": "query",
+            "name": "wait",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to `true` wait for the data to be written before returning"
           }
         ],
         "requestBody": {

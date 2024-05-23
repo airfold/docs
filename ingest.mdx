@@ -24,7 +24,7 @@ For example, ingesting NDJSON is as simple as:
 ```bash
 curl --request POST \
   --url https://api.airfold.co/v1/events/{source} \
-  --header 'Authorization: <authorization>' \
+  --header 'Authorization: Bearer <key>' \
   --header 'Content-Type: application/json' \
   --data '[
   { "id": 123, "name": "Sarah"},

@@ -22,7 +22,7 @@
   "feedback.thumbsRating": true,
   "topbarLinks": [
     {
-      "name": "Join our Slack",
+      "name": "Join our Community!",
       "url": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw"
     }
   ],
@@ -39,24 +39,24 @@
 
   "anchors": [
     {
-      "name": "Join our Slack!",
-      "icon": "slack",
-      "url": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw"
-    },
-    {
       "name": "Home",
       "icon": "house-blank",
       "url": "https://www.airfold.co/"
     },
     {
-      "name": "Workshop",
-      "icon": "rocket",
-      "url": "https://www.airfold.co/workshop"
-    },
-    {
       "name": "Blog",
       "icon": "newspaper",
-      "url": "https://www.airfold.co/"
+      "url": "https://www.airfold.co/blog"
+    },
+    {
+      "name": "Join our Community",
+      "icon": "slack",
+      "url": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw"
+    },
+    {
+      "name": "Schedule a demo",
+      "icon": "rocket",
+      "url": "https://cal.com/julianofficial/call"
     }
   ],
   "navigation": [

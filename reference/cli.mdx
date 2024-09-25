@@ -174,10 +174,10 @@ Here's a brief overview of all the available commands, arguments, and flags:
       Create source.
       <Expandable title="Arguments and Flags">
         <ResponseField name="events_path" type="Argument" required>
-          Path to a local object file(s) or URL(s).
+          Path to a local object file(s) or URL.
         </ResponseField>
         <ResponseField name="path" type="Argument">
-          Target directory to create files in, ('-' will dump to stdout). Default: '-' (stdout).
+          Target directory to create files in, ('-' will dump to stdout). Default: '-' (stdout). Preserves workspace structure.
         </ResponseField>
         <ResponseField name="--out" type="Flag">
           New source output path, ex.: `sources/src1.yaml`. It overrides `path` argument. Default: None.
@@ -225,6 +225,23 @@ Here's a brief overview of all the available commands, arguments, and flags:
       <Expandable title="Arguments and Flags">
         <ResponseField name="name" type="Argument" required>
           Source name.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="recalc" type="Subcommand">
+      Recalculate AI columns.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="name" type="Argument" required>
+          Source name.
+        </ResponseField>
+        <ResponseField name="cols" type="Argument">
+          Columns to recalculate. Default: None.
+        </ResponseField>
+        <ResponseField name="wait" type="Flag">
+          Wait for recalculation to finish. Default: False.
+        </ResponseField>
+        <ResponseField name="max_wait" type="Flag">
+          Maximum time to wait for recalculation to finish. Default: `900 seconds`.
         </ResponseField>
       </Expandable>
     </ResponseField>

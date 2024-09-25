@@ -29,14 +29,17 @@ settings: |
 
 ```yaml source_ai.yaml
 description: "Error logs from a web server"
-message: |-
-  Output a description of the following error {error}.
 cols:
   ts: DateTime
   file: String
   error: String
-added_cols:
-  error_description: String
+ai_cols:
+    - name: error_description
+      type: String
+      description: Error description
+      using:
+          - error
+          - file
 settings: |
   MergeTree()
   PARTITION BY toYear(ts)
@@ -47,7 +50,7 @@ settings: |
 <br />
 
 <Note>
-The `added_cols` field specifies which columns the AI source needs to fill, and the `message` field specifies how to fill them, using the columns from the source in curly braces.
+The `ai_cols` field specifies which columns the AI source needs to fill. The `using` field specifies the columns to use in the AI transformation.
 </Note>
 
 ## The `_errors` Table
@@ -82,9 +85,23 @@ af push source.yaml
 <ResponseField name="settings" type="string | {key: value} | array">
   [ClickHouse table configuration](https://clickhouse.com/docs/en/sql-reference/statements/create/table) for the source, which can include `ORDER BY`, `PARTITION BY`, Table Engine, etc. The settings can be a String, a key-value pair, or an array comprising either or both. Optional.
 </ResponseField>
-<ResponseField name="message" type="string">
-  A message for the AI from which it would derive the columns in `added_cols`. The message should use the source's `cols` within curly braces e.g. `{col}`. This field is mandatory if `added_cols` is present, transforming the source into an AI source.
-</ResponseField>
-<ResponseField name="added_cols" type="{name: type}">
-  Specifies additional columns to be filled by the AI, based on the `message` field's instructions. This field is mandatory if `message` is present, transforming the source into an AI source.
+<ResponseField name="ai_cols" type="array">
+    Columns to be filled by the AI source.
+    <Expandable title="AIColumn Properties">
+        <ResponseField name="name" type="string" required>
+            The name of the column.
+        </ResponseField>
+        <ResponseField name="type" type="string" required>
+            The data type of the column.
+        </ResponseField>
+        <ResponseField name="description" type="string" required>
+            A description of the column (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types)).
+        </ResponseField>
+        <ResponseField name="default_value" type="string">
+            The default value of the column.
+        </ResponseField>
+        <ResponseField name="using" type="array" required>
+            The columns to use in the AI transformation.
+        </ResponseField>
+    </Expandable>
 </ResponseField>

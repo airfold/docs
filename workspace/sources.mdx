@@ -86,22 +86,22 @@ af push source.yaml
   [ClickHouse table configuration](https://clickhouse.com/docs/en/sql-reference/statements/create/table) for the source, which can include `ORDER BY`, `PARTITION BY`, Table Engine, etc. The settings can be a String, a key-value pair, or an array comprising either or both. Optional.
 </ResponseField>
 <ResponseField name="ai_cols" type="array">
-    Columns to be filled by the AI source.
-    <Expandable title="AIColumn Properties">
-        <ResponseField name="name" type="string" required>
-            The name of the column.
-        </ResponseField>
-        <ResponseField name="type" type="string" required>
-            The data type of the column.
-        </ResponseField>
-        <ResponseField name="description" type="string" required>
-            A description of the column (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types)).
-        </ResponseField>
-        <ResponseField name="default_value" type="string">
-            The default value of the column.
-        </ResponseField>
-        <ResponseField name="using" type="array" required>
-            The columns to use in the AI transformation.
-        </ResponseField>
-    </Expandable>
+  Columns to be filled by the AI source.
+  <Expandable title="AIColumn Properties">
+    <ResponseField name="name" type="string" required>
+      The name of the column.
+    </ResponseField>
+    <ResponseField name="type" type="string" required>
+      The data type of the column.
+    </ResponseField>
+    <ResponseField name="description" type="string" required>
+      A description of the column (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types)).
+    </ResponseField>
+    <ResponseField name="default_value" type="string">
+      The default value of the column.
+    </ResponseField>
+    <ResponseField name="using" type="array" required>
+      The columns to use in the AI transformation.
+    </ResponseField>
+  </Expandable>
 </ResponseField>

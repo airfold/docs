@@ -248,6 +248,26 @@ Here's a brief overview of all the available commands, arguments, and flags:
   </Expandable>
 </ResponseField>
 
+<ResponseField name="job" type="Command">
+  Source commands.
+  <Expandable title="Subcommands">
+    <ResponseField name="ls" type="Subcommand">
+      List jobs.
+    </ResponseField>
+    <ResponseField name="cancel" type="Subcommand">
+      Cancel job.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="id" type="Argument" required>
+          Job ID.
+        </ResponseField>
+        <ResponseField name="wait" type="Flag">
+          Wait for job to be canceled. Default: False.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
 <ResponseField name="verbose" type="Global Flag">
   Set verbosity level, can be repeated.
 </ResponseField>

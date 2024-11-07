@@ -1,43 +1,53 @@
 ---
-title: 'What is a Workspace?'
+title: 'Workspaces'
 sidebarTitle: 'Workspaces'
-description: 'Create `workspaces` to organize and collaborate on your projects.'
+description: 'Organize and collaborate on your projects'
 icon: "folder-tree"
 ---
 
-Workspaces help you organize and collaborate on your Airfold projects.
-A workspace is an area that contains a set of resources such as [sources](/workspace/sources), [pipes](/workspace/pipes), nodes, API endpoints, and [tokens](/workspace/tokens).
+A workspace contains all the resources you need, including [sources](/workspace/sources), [pipes](/workspace/pipes), nodes, API endpoints, and tokens.
 
-It's easy to invite other users to your workspace and set appropriate permissions for each user.
+Workspaces are commonly used to separate projects and teams, but how you organize them is up to you.
 
-## Why Use Workspaces?
-Workspaces allow you to separate different projects, use cases, and dev/staging/production environments for the things you work on in Airfold.
+## Creation
+Click on the top-left corner (name of your current workspace), then click on <br />
+"+ New Workspace":
+![creating a workspace](/images/create_workspace.png)
 
-## How to Organize Workspaces?
-How to organize your workspaces in Airfold is up to you. Common patterns include a separate workspace per project, or per team.
+That's it! You can now start building, see [sources](/workspace/sources) and [pipes](/workspace/pipes) for next steps.
 
-<Tip>
-Workspaces are often used to give a team, or a project, its own space to work in.
-</Tip>
+## Authorization
+From here, you can also access your tokens by clicking on the gear icon:
+![token](/images/token.png)
 
-## Creating Workspaces
-Creating multiple workspaces in Airfold is easy. Upon creating a workspace, you can start building immediately, no need to wait for infrastructure or configure anything.
+They are required for any operation performed via the CLI or REST API, and also safeguard the endpoints you publish within Airfold.
+
+### Token Scopes
+The scope of a token determines its access level and capabilities:
+
+- **Admin:** Grants complete access to all tables and methods. Full control over the Airfold environment
+- **Append:** Provides append-only access to all sources. Suitable for ingesting data into Airfold
+- **Fetch:** Offers read-only access to endpoints. Suitable for serving endpoints to applications
+
+A token is required to read endpoints from published pipes.
+
 
 ## Workspace Files
-A workspace file is a YAML file that describes a resource in Airfold, and collectively, workspace files are the source code of your Airfold workspace.
-And like any source code, engineers can apply the same principles they already know and love:
+A workspace file is a YAML file that describes a resource in Airfold, which collectively make up the source code of your Airfold workspace.
 
-- **Version control** - Push workspace files to a Git repository for version control and more efficient collaboration with your team.
-- **A single source of truth** - The workspace files in the main branch of your repository are the single source of truth for your workspace. Use `git pull` to sync your local workspace with the latest changes from the main branch.
+### Key Features
+
+- **Version control** - Push workspace files to a Git repository for version control and efficient collaboration with your team.
+- **Single source of truth** - The workspace files in the main branch of your repository are the single source of truth for your workspace. Use `git pull` to sync your local workspace with the latest changes from the main branch.
 - **CI / CD** - Incorporate your CI workflows, run tests, use Airfold CLI's `af push` to deploy changes to your workspace, and more.
-- **Pull Requests** - Use pull requests to review changes to your workspace before merging them into the main branch *(which can trigger a CI with `af push` to deploy changes to your workspace)*.
+- **Pull Requests** - Use pull requests to review changes to your workspace before merging them into the main branch (which can trigger a CI with `af push` to deploy changes to your workspace).
 
-Workspace files are not tied to a specific workspace, and can be deployed to any workspace. This allows you to easily create new workspaces from existing ones, or to apply changes to multiple workspaces at once.
+Workspace files are not tied to a specific workspace, and can be deployed to any workspace. You can easily create new workspaces from existing ones, or to apply changes to multiple workspaces at once.
 
-## Workspace File Structure
-There are two types of workspace files **pipes** and **sources**.
+### File Structure
+There are two types of workspace files [pipes](/workspace/pipes) and [sources](/workspace/sources).
 
-Here's an example of a workspace structure:
+Here's an example:
 ```bash
 /.airfold/config.yaml
 /pipes
@@ -52,16 +62,17 @@ Here's an example of a workspace structure:
   /sales_over_time.yaml
 ```
 
-## Push Resources to a Workspace
-Push resources to your workspace using the [CLI `af push`](/reference/cli) or the [`/push` API](/api-reference/workspace/push).<br />
-For example, to push all the resources in the `pipes` directory:
+### Push Files to a Workspace
+Using the CLI command [`af push`](/reference/cli) or [`/push`](/api-reference/workspace/push) API.<br />
+
+For example, you can push all files in the `pipes` directory with:
 ```bash
 af push pipes/*
 ```
 
 <Tip>
-### Pull Resources from a Workspace
-To pull all resources from your workspace to your local machine as YAML files use the [CLI `af pull`](/reference/cli) or the [`/pull` API](/api-reference/workspace/pull).
+### Tip
+Use Git to version control your workspace files with your repository being the single source of truth for your workspace.
 
-However, it is recommended to use Git to version control your workspace files with your repository being the single source of truth for your workspace, then use `git pull` to sync your local workspace with the latest changes from the main branch.
+Then use `git pull` to sync your local workspace with the latest changes from the main branch.
 </Tip>

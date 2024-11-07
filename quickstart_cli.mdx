@@ -107,7 +107,7 @@ ai_cols:
   - name: features_mentioned
     type: Array(Enum('Customizable Templates', 'Inventory Management', 'Marketing
       Automation', 'Customer Support Integration', 'Social Media Integration', 'None'))
-    description: Which features are mentioned in the call
+    description: Which features are mentioned in the call?
     default_value: '["None"]'
     using:
       - Transcript
@@ -128,7 +128,7 @@ Push this configuration to create the AI Table:
 $ af push path/to/analysis.yaml
 ```
 
-## Ingest Data from `sales_calls` to `analysis`
+### Ingest Data from `sales_calls` to `analysis`
 Create a [pipe](/workspace/pipes) to transfer data from sales_calls to analysis. 
 Pipes in Airfold are used to run sequences of SQL queries that can transform, filter, and aggregate data across tables. 
 Each step in a pipe is called a "node," and each node runs a single SQL statement, allowing for more complex data analysis workflows. <br />
@@ -174,18 +174,18 @@ nodes:
           successful = true
 publish: insights
 ```
-* `arrayJoin(features_mentioned) AS feature`: This function "explodes" the features_mentioned array, creating a row for each feature mentioned.
-* `count(): Counts the total successful calls`.
-* `topK(2)(feature)`: Extracts the two most frequently mentioned features.
-* `WHERE successful = true`: Filters the results to include only successful calls.
-* `publish`: publishes this as an endpoint, this line may be excluded if you do not wish to publish as an endpoint.
+* `arrayJoin(features_mentioned) AS feature`: This function "explodes" the features_mentioned array, creating a row for each feature mentioned
+* `count(): Counts the total successful calls`
+* `topK(2)(feature)`: Extracts the two most frequently mentioned features
+* `WHERE successful = true`: Filters the results to include only successful calls
+* `publish`: publishes this as an endpoint, this line may be excluded if you do not wish to publish as an endpoint
 
 Push the insights pipe:
 ```bash
 $ af push path/to/insights.yaml
 ```
 
-## Query Results
+### Query Results
 
 Use the [API](/api-reference):
 ```bash
@@ -233,5 +233,5 @@ Which should output:
 ## Next Steps
 You've successfully ingested, analyzed, and published data using Airfold in a few simple steps! This workflow enables intuitive interaction with unstructured data, transforming raw call transcripts into actionable insights.
 
-Explore [workspaces](/workspace/workspaces), [sources](/workspace/sources), [pipes](/workspace/pipes), and [tokens](/workspace/tokens) to learn more about how to interact with Airfold.
+Explore [workspaces](/workspace/workspaces), [sources](/workspace/sources), and [pipes](/workspace/pipes) to learn more about how to interact with Airfold.
 Our the [API](/api-reference) and [CLI](/reference/cli) documentation is also available for further information.

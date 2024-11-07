@@ -1,93 +1,81 @@
 ---
 title: 'Source'
-description: 'Bring your data into Airfold.'
+description: 'Bring your data into Airfold'
 icon: "database"
 ---
 
-sources make it easy to bring your data into Airfold. sources are akin to tables in a database. They store data according to a defined schema.
+Akin to tables in a database, sources store data according to a defined schema.
 
 All the workspace data lives inside sources, which can be queried, filtered, aggregated, and joined using SQL.
 
-Data is ingested into sources directly through Airfold's [Ingest API](/ingest) or by a [materialized pipe](/workspace/pipes).
+Data is ingested into sources directly through Airfold's Ingest API or by a [pipe](/workspace/pipes).
 
-Additionally, sources can be enhanced into AI sources for transforming unstructured data into structured formats, unlocking powerful analytical potential.
+Additionally, sources can be enhanced into **AI sources** for transforming unstructured data into structured formats, unlocking powerful analytical potential.
 
-### Sample Sources
-
+## Creation
+Define the schema for your source in a YAML file:
 <CodeGroup>
-```yaml source.yaml
-description: "Error logs from a web server"
+```yaml sales_calls.yaml
+type: Table
+name: sales_calls
+description: sales call transcripts
 cols:
-  ts: DateTime
-  file: String
-  error: String
-settings: |
-  MergeTree()
-  PARTITION BY toYear(ts)
-  ORDER BY (ts, file)
+  ID: UUID
+  Transcript: String
+settings:
+  engine: MergeTree()
+  order_by: '`ID`'
+  partition_by: tuple()
 ```
 
-```yaml source_ai.yaml
-description: "Error logs from a web server"
-cols:
-  ts: DateTime
-  file: String
-  error: String
+```yaml ai_sales_calls.yaml
+type: AITable
+name: ai_sales_calls
+description: AI enhanced version of sales_calls
 ai_cols:
-    - name: error_description
-      type: String
-      description: Error description
-      using:
-          - error
-          - file
-settings: |
-  MergeTree()
-  PARTITION BY toYear(ts)
-  ORDER BY (ts, file)
+  - name: successful
+    type: Nullable(Bool)
+    description: Whether this call was successful (which is defined as successfully
+      setting up a follow up call). If the follow up scheduling is successful, the
+      call should include an explicit date/time for the call.
+    default_value: '""'
+    using:
+      - Transcript
+  - name: competitors_mentioned
+    type: Array(String)
+    description: Who are the competitors mentioned (if any)?
+    default_value: '"N/A"'
+    using:
+      - Transcript
+  - name: features_mentioned
+    type: Array(Enum('Customizable Templates', 'Inventory Management', 'Marketing
+      Automation', 'Customer Support Integration', 'Social Media Integration', 'None'))
+    description: Which features are mentioned in the call?
+    default_value: '["None"]'
+    using:
+      - Transcript
+cols:
+  ID: UUID
+  Transcript: String
 ```
 </CodeGroup>
 
 <br />
 
-<Note>
-The `ai_cols` field specifies which columns the AI source needs to fill. The `using` field specifies the columns to use in the AI transformation.
-</Note>
+### Properties
 
-## The `_errors` Table
-Every Workspace has an associated `_errors` source table, which contains all errors that occurred during ingestion, for example, if a row failed to be ingested due to schema mismatch.
-
-This way, the whole ingestion process is not interrupted by a single error, and the error can be reviewed and fixed later.
-
-The `_errors` is treated like any other source, and can be queried, filtered, and joined with other sources, for example, to find the most common errors by source:
-
-```sql
-SELECT source, COUNT(*) AS count
-FROM _errors
-GROUP BY source
-ORDER BY count DESC
-```
-
-## Push a Source
-Push sources to your [workspace](/workspace/workspaces) using the [CLI `af push`](/reference/cli) or the [`/push` API](/api-reference/workspace/push).<br />
-For example, to push the source above:
-```bash
-af push source.yaml
-```
-
-## Properties
-
+<ResponseField name="type" type="string">
+  Type of source: `Table` or `AITable`
+</ResponseField>
+<ResponseField name="name" type="string">
+  Name of source
+</ResponseField>
 <ResponseField name="description" type="string">
-  A brief overview of the source's content or purpose. Optional.
-</ResponseField>
-<ResponseField name="cols" type="{name: type}" required>
-  Defines the schema of the source as a list of columns where each column name is a key and its data type is the value (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types)).
-</ResponseField>
-<ResponseField name="settings" type="string | {key: value} | array">
-  [ClickHouse table configuration](https://clickhouse.com/docs/en/sql-reference/statements/create/table) for the source, which can include `ORDER BY`, `PARTITION BY`, Table Engine, etc. The settings can be a String, a key-value pair, or an array comprising either or both. Optional.
+  A brief overview of the source's content or purpose (optional)
 </ResponseField>
 <ResponseField name="ai_cols" type="array">
   Columns to be filled by the AI source.
-  <Expandable title="AIColumn Properties">
+  <Expandable title="ai_cols Properties" defaultOpen="true">
     <ResponseField name="name" type="string" required>
       The name of the column.
     </ResponseField>
@@ -105,3 +93,60 @@ af push source.yaml
     </ResponseField>
   </Expandable>
 </ResponseField>
+<ResponseField name="cols" type="{name: type}" required>
+  Defines the schema of the source as a list of columns where each column name is a key and its data type is the value (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types))
+</ResponseField>
+<ResponseField name="settings" type="string | {key: value} | array">
+  [ClickHouse table configuration](https://clickhouse.com/docs/en/sql-reference/statements/create/table) for the source, which can include `ORDER BY`, `PARTITION BY`, Table Engine, etc. The settings can be a String, a key-value pair, or an array comprising either or both. Optional.
+</ResponseField>
+
+## Push
+Push sources to your [workspace](/workspace/workspaces) using the [CLI command](/reference/cli) or [API](/api-reference/workspace/push).<br />
+
+### CLI
+
+For example, to push `sales_calls.yaml`, run:
+```bash
+af push sales_calls.yaml
+```
+
+### Ingest API
+We can also use [Ingest API](/api-reference/ingest/ingest):
+
+The Ingest API supports the following formats:
+- NDJSON
+- CSV
+- Parquet
+
+For example, ingesting NDJSON is as simple as:
+```bash
+curl --request POST \
+  --url https://api.airfold.co/v1/sales_analysis/{source} \
+  --header 'Authorization: Bearer <key>' \
+  --header 'Content-Type: application/json' \
+  --data '[
+  { "id": 123, "name": "Sarah"},
+  { "id": 456, "name": "Alex"}
+]'
+```
+
+<Note>
+### Rate Limits
+The Ingest API is rate limited to 1000 events/sec per source. If you need to ingest more events, please [contact us](https://www.airfold.co).
+</Note>
+
+
+## `_errors` Table
+Every workspace has an associated `_errors` source table, which contains all errors that occurred during ingestion (e.g.: if a row failed to be ingested due to schema mismatch).
+
+This way, the whole ingestion process is uninterrupted and the error can be fixed later.
+
+`_errors` is treated like any other source, so it can be queried, filtered, and joined with other sources.
+
+For example, we can find the most common errors by source:
+```sql
+SELECT source, COUNT(*) AS count
+FROM _errors
+GROUP BY source
+ORDER BY count DESC
+```

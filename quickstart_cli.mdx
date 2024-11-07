@@ -1,24 +1,26 @@
 ---
 title: 'Quickstart (CLI)'
-description: 'This section covers ingesting, querying and publishing data using the Airfold CLI.'
+description: 'This section covers ingesting, creating AI columns, querying, and publishing data using the Airfold CLI.'
 icon: 'code'
 ---
 
-## Use-case
-In this guide, we'll develop an API to identify the top 10 most searched products on an e-commerce platform.
+## Overview
+In this guide, we'll develop an API to identify the top mentioned features in sales calls.
 
-We'll process e-commerce events to track user interactions like item views, cart additions, and checkout completions. Our dataset, a 50-million-row CSV file, captures these activities.
+We'll process sales call transcripts to extract insights like competitors mentioned, features mentioned, and whether it was successful. Our dataset, a 70-row CSV file, captures these activities.
 
 Our steps include:
-* Ingesting the dataset.
-* Executing queries to filter, aggregate, and refine the data into a top 10 list.
-* Exposing the top 10 results through an HTTP API.
+* Ingesting the dataset
+* Creating AI columns
+* Executing queries to filter, aggregate, and refine the data into a top 2 list
+* Exposing the top features through an HTTP API
 
 ## Create a [Workspace](/workspace/workspaces)
 Before we begin, we need to create a workspace to store our data and resources, as well as a token to authenticate our CLI.
 
 1. Go to [Airfold](https://www.app.airfold.co) and create a new workspace.
 2. Copy an Admin token from the workspace's **Token** page.
+![Token](images/token.png)
 
 The token should look like this: `aft_6eab8fcd902e4cbfb63ba174469989cd.Ds1PME5dQsJKosKQWVcZiBSlRFBbmhzIocvHg8KQddV`.
 
@@ -30,199 +32,206 @@ The CLI requires Python 3.10 or higher.
 1. Install the CLI using `pip install airfold-cli`.
 2. Run `af config` and paste your token when prompted.
 ```
-$ af config
-Configuring for API URL: https://api.airfold.co
-? Api key: <your token>
+pip install airfold-cli
+af config
 ```
 
-To see a list of available commands just run `af`.
-
 ## Create a [Source](/workspace/sources)
+
+First, **<a href="/public/sales_calls.csv" download="sales_calls.csv">download sales_calls.csv</a>**
+
 To create a source, a YAML file defining the source is required.<br />
-Let's generate a source by inferring the schema from a CSV file:
+
+Let's generate a source by inferring the schema from a CSV file <br />
+(replace `/path/to/sales_calls.csv` with actual filepath):
 ```bash
-$ af source create https://airfold-demo-data.s3.us-east-2.amazonaws.com/quickstart/events.csv .
+$ af source create path/to/sales_calls.csv .
 ```
 
 The CLI will infer the schema from the CSV file and generate a YAML file with the following contents:
-```yaml ./sources/events.yaml
-name: events
+```yaml ./sources/sales_calls.yaml
+version: clickhouse.airfold.co/v1
+type: Table
+name: sales_calls
 cols:
-  acceptcharset: String
-  acceptencoding: String
-  acceptlanguage: String
-  browsername: String
-  browserversion: String
-  cachecontrol: String
-  city: String
-  connection: String
-  contentlength: String
-  contenttype: String
-  country: String
-  cpuarchitecture: String
-  devicemodel: String
-  devicetype: String
-  devicevendor: String
-  enginename: String
-  engineversion: String
-  event_ts: DateTime64(3)
-  from: String
-  headers: String
-  host: String
-  ip_address: String
-  is_bot: Int64
-  latitude: Float64
-  log_level: String
-  log_message: String
-  longitude: Float64
-  method: String
-  origin: String
-  osname: String
-  osversion: String
-  protocol: String
-  referer: String
-  region: String
-  url: String
-  useragent: String
-  via: String
-  xforwaredforip: String
+  ID: UUID
+  Transcript: String
 settings:
   engine: MergeTree()
-  order_by: (`event_ts`, `ip_address`)
-  partition_by: toYYYYMM(event_ts)
+  order_by: '`ID`'
+  partition_by: tuple()
 ```
 
-Push the source to your workspace:
+Push the source definition to your workspace:
 ```bash
-$ af push ./sources/events.yaml
+$ af push ./sources/sales_calls.yaml
 ```
 
-List the sources in your workspace to confirm that the source was created:
+At this point, our source has been created but no data has been ingested yet.
+
+Verify creation by listing sources:
 ```bash
 $ af source ls
-- events: 0 rows | 0 bytes | 0 errors | created 1 min ago | updated 1 min ago
 ```
 
 ## [Ingest Data](/ingest)
-Now that we have a source, we can ingest data into it.
 
-Let's ingest the file we used to generate the source:
+With the source set up, ingest the CSV data:
 ```bash
-$ af source append events https://airfold-demo-data.s3.us-east-2.amazonaws.com/quickstart/events.csv
+$ af source append sales_calls path/to/sales_calls.csv
 ```
 
-## Create a [Pipe](/workspace/pipes)
-All the SQL queries in Airfold are written inside `pipes`.<br />
-Pipes are a sequence of one or more SQL queries (Nodes) that are executed in order, each of those SQL queries is called a Node, and each Node is simply a `SELECT` statement.
+## Create an AI Table
+To derive insights, we can create AI columns that automatically extract competitor mentions, feature mentions, and success indicators.
 
-<Tip>
-Use pipes to build features over your data!
-</Tip>
+In your workspace, create a `analysis.yaml` file with this configuration:
+```yaml analysis.yaml
+version: clickhouse.airfold.co/v1
+type: AITable
+name: analysis
+ai_cols:
+  - name: successful
+    type: Nullable(Bool)
+    description: Whether this call was successful (which is defined as successfully
+      setting up a follow up call). If the follow up scheduling is successful, the
+      call should include an explicit date/time for the call.
+    default_value: '""'
+    using:
+      - Transcript
+  - name: competitors_mentioned
+    type: Array(String)
+    description: Who are the competitors mentioned (if any)?
+    default_value: '"N/A"'
+    using:
+      - Transcript
+  - name: features_mentioned
+    type: Array(Enum('Customizable Templates', 'Inventory Management', 'Marketing
+      Automation', 'Customer Support Integration', 'Social Media Integration', 'None'))
+    description: Which features are mentioned in the call?
+    default_value: '["None"]'
+    using:
+      - Transcript
+cols:
+  ID: UUID
+  Transcript: String
+```
 
-Let's create a pipe to identify the counts by log level:
-```yaml levels.yaml
+`ai_cols` defines our AI-generated columns:
+* `successful`: Identifies whether the call was successful based on the transcript content
+* `competitors_mentioned`: Extracts any competitor names mentioned in the transcript
+* `features_mentioned`: Lists any product features that were discussed
+
+To see more details on the parameters of `ai_cols`, check out [source](/workspace/sources).
+
+Push this configuration to create the AI Table:
+```bash
+$ af push path/to/analysis.yaml
+```
+
+### Ingest Data from `sales_calls` to `analysis`
+Create a [pipe](/workspace/pipes) to transfer data from sales_calls to analysis. 
+Pipes in Airfold are used to run sequences of SQL queries that can transform, filter, and aggregate data across tables. 
+Each step in a pipe is called a "node," and each node runs a single SQL statement, allowing for more complex data analysis workflows. <br />
+
+Define it in a new `pipe_to_analysis.yaml` file:
+```yaml pipe_to_analysis.yaml
+type: Pipe
+name: pipe_to_analysis
+nodes:
+  - transform:
+      sql: SELECT `ID`, `Transcript` FROM "sales_calls"
+to: analysis
+```
+
+Push the pipe configuration:
+```bash
+$ af push path/to/pipe_to_analysis.yaml
+```
+
+Now, ingest data using:
+```bash
+$ af source append analysis path/to/sales_calls.csv
+```
+
+At this point, we have two populated tables:
+* `sales_calls`: containing original data `ID` and `Transcript`
+* `analysis`: containing data from `sales_calls` and additional AI columns
+
+## Further Analysis with [Pipes](/workspace/pipes)
+To identify top-mentioned features in successful calls, create an `insights.yaml` file:
+```yaml insights.yaml
 nodes:
   - node1:
       sql: |
+        WITH
+          arrayJoin(features_mentioned) AS feature
         SELECT
-          log_level,
-          count()
+          count() AS num_successful_calls,
+          topK(2)(feature) AS top_features
         FROM
-          events
-        GROUP BY
-          log_level
+          analysis
+        WHERE
+          successful = true
+publish: insights
 ```
+* `arrayJoin(features_mentioned) AS feature`: This function "explodes" the features_mentioned array, creating a row for each feature mentioned
+* `count(): Counts the total successful calls`
+* `topK(2)(feature)`: Extracts the two most frequently mentioned features
+* `WHERE successful = true`: Filters the results to include only successful calls
+* `publish`: publishes this as an endpoint, this line may be excluded if you do not wish to publish as an endpoint
 
-Push the pipe to your workspace:
+Push the insights pipe:
 ```bash
-$ af push levels.yaml
+$ af push path/to/insights.yaml
 ```
 
-List the pipes in your workspace to confirm that the pipe was created:
-```bash
-$ af pipe ls
-- levels: draft | created 1 min ago | updated 1 min ago
-```
+### Query Results
 
-## Publish the Results
-We've pushed the pipe to our workspace, but we have not yet published an endpoint from it.<br />
-To publish the pipe, we need to turn it into a published pipe.<br />
-To do so, we need to set the `publish` field to the name of the endpoint we want to publish:
-```yaml levels.yaml
-nodes:
-  - node1:
-      sql: |
-        SELECT
-          log_level,
-          count()
-        FROM
-          events
-        GROUP BY
-          log_level
-publish: levels
-```
-
-Push the pipe to your workspace:
-```bash
-$ af push levels.yaml
-```
-
-List the pipes in your workspace to confirm that the pipe was created:
-```bash
-$ af pipe ls
-- top10: published | created 1 min ago | updated 1 min ago
-```
-
-Query the results using the [API](/api-reference):
+Use the [API](/api-reference):
 ```bash
 $ curl --request GET \
-  --url https://api.airfold.co/v1/pipes/levels.json \
+  --url https://api.airfold.co/v1/pipes/insights.json \
   --header 'Authorization: Bearer <use auth token here>'
+```
+Or the [CLI](/reference/cli):
+```bash
+$ af pipe query insights --format json
+```
+
+Which should output:
+```
 
 {
-        "meta":
-        [
-                {
-                        "name": "log_level",
-                        "type": "String"
-                },
-                {
-                        "name": "count()",
-                        "type": "UInt64"
-                }
-        ],
-
-        "data":
-        [
-                {
-                        "log_level": "WARN",
-                        "count()": "2"
-                },
-                {
-                        "log_level": "INFO",
-                        "count()": "8"
-                }
-        ],
-
-        "rows": 2,
-
-        "statistics":
-        {
-                "elapsed": 0.001772939,
-                "rows_read": 10,
-                "bytes_read": 130
-        }
+  "meta": [
+    {
+      "name": "num_successful_calls",
+      "type": "UInt64"
+    },
+    {
+      "name": "top_features",
+      "type": "Array(Enum8('Customizable Templates' = 1, 'Inventory Management' = 2, 'Marketing Automation' = 3, 'Customer Support Integration' = 4, 'Social Media Integration' = 5, 'None' = 6))"
+    }
+  ],
+  "data": [
+    {
+      "num_successful_calls": "57",
+      "top_features": [
+        "Customizable Templates",
+        "Inventory Management"
+      ]
+    }
+  ],
+  "rows": 1,
+  "statistics": {
+    "elapsed": 0.002417386,
+    "rows_read": 70,
+    "bytes_read": 2780
+  }
 }
 ```
 
-Or using the [CLI](/reference/cli):
-```bash
-$ af pipe query levels --format json
-
-[...]
-```
-
 ## Next Steps
-Congratulations! You've successfully ingested, queried, and published data in Airfold.<br />
-Now that you've learned the basics, you can explore [workspaces](/workspace/workspaces), [sources](/workspace/sources), [pipes](/workspace/pipes), and [tokens](/workspace/tokens).<br />
-Or, check the reference of the [API](/api-reference) and the [CLI](/reference/cli) to learn more about how to interact with Airfold.
+You've successfully ingested, analyzed, and published data using Airfold in a few simple steps! This workflow enables intuitive interaction with unstructured data, transforming raw call transcripts into actionable insights.
+
+Explore [workspaces](/workspace/workspaces), [sources](/workspace/sources), and [pipes](/workspace/pipes) to learn more about how to interact with Airfold.
+Our the [API](/api-reference) and [CLI](/reference/cli) documentation is also available for further information.

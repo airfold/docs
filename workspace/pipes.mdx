@@ -1,19 +1,13 @@
 ---
 title: 'Pipe'
-description: 'All the SQL queries in Airfold are written inside `pipes`.'
+description: 'Build features over your data'
 icon: "rectangle-vertical-history"
 ---
 
-Pipes are a sequence of one or more SQL queries (Nodes) that are executed in order, each of those SQL queries is called a Node, and each Node is simply a `SELECT` statement.
-
-Pipes result in either a published pipe or a materialized pipe.
-
-<Tip>
-Use pipes to build features over your data!
-</Tip>
+Pipes are a sequence of one or more SQL queries (Nodes) that are executed in order, and they result in either a published or materialized pipe.
 
 ## What is a Node?
-A node is a container for a single SQL `SELECT` statement.
+A node is esssentially a single SQL `SELECT` statement.
 
 Nodes live within pipes and are executed sequentially in the order they are defined in the pipe.
 
@@ -22,46 +16,21 @@ Each node can read data from [sources](/workspace/sources), published pipes, or 
 The schema of the last node in the pipe determines the pipe's schema.
 
 <Tip>
-### Best Practices for Nodes
-Use nodes to break down complex queries into smaller, more manageable, sequential steps. Then chain nodes together to build the logic incrementally.
+### Best Practices
+Use nodes to break down complex queries into smaller, more manageable steps. Then chain nodes together to build the logic incrementally.
 
-Each node can be developed & tested individually. This makes it much easier to build complex query logic in Airfold as you avoid creating large monolithic queries with many sub-queries.
+Each node can be developed & tested individually so you can avoid creating large monolithic queries with many sub-queries.
 </Tip>
 
-## The 3 Types of Pipes
+## Creation
 #### Draft pipes
+
 These are the starting point for all pipes, similar to database views in functionality.
 
 They cannot be referenced by other pipes using the `FROM` clause.
 
 Draft pipes are temporary and primarily used for development. Once finalized, a draft pipe can be transitioned into either a published or a materialized pipe, but not both.
 
-#### Published pipes
-This creates an API endpoint that serves the result of your pipe, the result is accessible in JSON, NDJSON, CSV, and Parquet formats.
-
-To publish a draft pipe, assign an endpoint name to the `publish` field.
-
-Published pipes can parameterize their SQL using Jinja2 via the `params` field.
-
-Unlike draft pipes, published pipes can be accessed (via `FROM`) by other pipes.
-
-#### Materialized pipes
-Differing from the batch nature of draft and published pipes, materialized pipes stand out for their ability to incrementally transform data as it is ingested and append their results to a designated source.
-
-To materialize a draft pipe, set the `to` field to the name of the target source.
-
-Although materialized pipes themselves cannot be accessed (via `FROM`) by other pipes, the source they write to is accessible like any other source.
-
-<Tip>
-### Supercharge your pipes!
-Published pipes are batch and compute their results on read, thus they're not suited for intensive data transformations.
-
-Instead, a common pattern is to front a materialized pipe with a published pipe. The materialized pipe incrementally transforms the data as it is ingested and writes it to its source, allowing the published pipe to instantly access the already transformed data from the source on read.
-</Tip>
-
-### Sample Pipes
-
-<CodeGroup>
 
 ```yaml draft_pipe.yaml
 description: 'Load logs and get errors'
@@ -73,63 +42,6 @@ nodes:
         description: Getting errors
         sql: select message from load where level = 'error'
 ```
-
-```yaml published_pipe.yaml
-description: 'Get errors based on level'
-nodes:
-    - load:
-        description: Loading logs
-        sql: select timestamp, level, file, message from logs
-    - error:
-        description: Getting errors
-        sql: select message from load where level = {{ level }}
-publish: level
-params:
-    - name: level
-      type: string
-      default: error
-```
-
-```yaml materialized_pipe.yaml
-description: 'Aggregate logs by level'
-nodes:
-    - load:
-        description: Loading logs
-        sql: select timestamp, level, file, message from logs
-    - error:
-        description: Aggregating logs by level
-        sql: |
-            select
-                level,
-                countState() as count
-            from load
-            group by level
-to: logs_by_level
-```
-
-</CodeGroup>
-
-<br />
-
-<Note>
-Note the materialized pipe example uses `countState()` instead of `count()`.
-
-This is because Airfold uses [ClickHouse](https://clickhouse.com/) under the hood which requires appending `State` to aggregate functions when used in a materialized pipe.
-
-Fortunately, Airfold does it automatically when materializing a draft pipe using `af materialize <pipe_name>`.
-
-Learn more about [Materialization in ClickHouse](https://clickhouse.com/blog/using-materialized-views-in-clickhouse#speed-up-aggregations-using-materialized-views), about the [`*State` combinator](https://clickhouse.com/docs/en/sql-reference/aggregate-functions/combinators#-state).
-</Note>
-
-### Push a Pipe
-Push pipes to your [workspace](/workspace/workspaces) using the [CLI `af push`](/reference/cli) or the [`/push` API](/api-reference/workspace/push).<br />
-For example, to push the draft pipe above:
-```bash
-af push draft_pipe.yaml
-```
-
-
-## Properties
 
 <ResponseField name="description" type="string">
   A brief description of the pipe's purpose or functionality. Optional.
@@ -170,3 +82,79 @@ af push draft_pipe.yaml
     </ResponseField>
   </Expandable>
 </ResponseField>
+
+
+#### Published pipes
+
+This creates an API endpoint that serves the result of your pipe, the result is accessible in JSON, NDJSON, CSV, and Parquet formats.
+
+To publish a draft pipe, assign an endpoint name to the `publish` field.
+
+Published pipes can parameterize their SQL using Jinja2 via the `params` field.
+
+Unlike draft pipes, published pipes can be accessed (via `FROM`) by other pipes.
+
+```yaml published_pipe.yaml
+description: 'Get errors based on level'
+nodes:
+    - load:
+        description: Loading logs
+        sql: select timestamp, level, file, message from logs
+    - error:
+        description: Getting errors
+        sql: select message from load where level = {{ level }}
+publish: level
+params:
+    - name: level
+      type: string
+      default: error
+```
+
+#### Materialized pipes
+
+Differing from the batch nature of draft and published pipes, materialized pipes stand out for their ability to incrementally transform data as it is ingested and append their results to a designated source.
+
+To materialize a draft pipe, set the `to` field to the name of the target source.
+
+Although materialized pipes themselves cannot be accessed (via `FROM`) by other pipes, the source they write to is accessible like any other source.
+
+```yaml materialized_pipe.yaml
+description: 'Aggregate logs by level'
+nodes:
+    - load:
+        description: Loading logs
+        sql: select timestamp, level, file, message from logs
+    - error:
+        description: Aggregating logs by level
+        sql: |
+            select
+                level,
+                countState() as count
+            from load
+            group by level
+to: logs_by_level
+```
+<Note>
+Note the materialized pipe example uses `countState()` instead of `count()`.
+
+Airfold uses [ClickHouse](https://clickhouse.com/) under the hood which requires appending `State` to aggregate functions when used in a materialized pipe.
+
+Fortunately, Airfold does it automatically when materializing a draft pipe using `af materialize <pipe_name>`.
+
+Learn more about [Materialization in ClickHouse](https://clickhouse.com/blog/using-materialized-views-in-clickhouse#speed-up-aggregations-using-materialized-views), about the [`*State` combinator](https://clickhouse.com/docs/en/sql-reference/aggregate-functions/combinators#-state).
+</Note>
+
+<Tip>
+### Best Practices
+Published pipes are batch and compute their results on read, thus they're not suited for intensive data transformations.
+
+Instead, a common pattern is to front a materialized pipe with a published pipe. The materialized pipe incrementally transforms the data as it is ingested and writes it to its source, allowing the published pipe to instantly access the already transformed data from the source on read.
+</Tip>
+
+## Push
+Push pipes to your [workspace](/workspace/workspaces) using the CLI command [`af push`](/reference/cli) or [`/push`](/api-reference/workspace/push) API.<br />
+
+For example, to push `draft_pipe.yaml`:
+```bash
+af push draft_pipe.yaml
+```

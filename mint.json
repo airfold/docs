@@ -62,15 +62,14 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["overview", "introduction", "quickstart_cli", "ingest"]
+      "pages": ["overview", "quickstart_cli"]
     },
     {
-      "group": "Workspace",
+      "group": "Features",
       "pages": [
         "workspace/workspaces",
-        "workspace/pipes",
         "workspace/sources",
-        "workspace/tokens"
+        "workspace/pipes"
       ]
     },
     {

@@ -45,7 +45,7 @@ To create a source, a YAML file defining the source is required.<br />
 Let's generate a source by inferring the schema from a CSV file <br />
 (replace `/path/to/sales_calls.csv` with actual filepath):
 ```bash
-$ af source create path/to/sales_calls.csv .
+af source create path/to/sales_calls.csv .
 ```
 
 The CLI will infer the schema from the CSV file and generate a YAML file with the following contents:
@@ -64,21 +64,21 @@ settings:
 
 Push the source definition to your workspace:
 ```bash
-$ af push ./sources/sales_calls.yaml
+af push ./sources/sales_calls.yaml
 ```
 
 At this point, our source has been created but no data has been ingested yet.
 
 Verify creation by listing sources:
 ```bash
-$ af source ls
+af source ls
 ```
 
 ## [Ingest Data](/ingest)
 
 With the source set up, ingest the CSV data:
 ```bash
-$ af source append sales_calls path/to/sales_calls.csv
+af source append sales_calls path/to/sales_calls.csv
 ```
 
 ## Create an AI Table
@@ -125,7 +125,7 @@ To see more details on the parameters of `ai_cols`, check out [source](/workspac
 
 Push this configuration to create the AI Table:
 ```bash
-$ af push path/to/analysis.yaml
+af push path/to/analysis.yaml
 ```
 
 ### Ingest Data from `sales_calls` to `analysis`
@@ -145,12 +145,12 @@ to: analysis
 
 Push the pipe configuration:
 ```bash
-$ af push path/to/pipe_to_analysis.yaml
+af push path/to/pipe_to_analysis.yaml
 ```
 
 Now, ingest data using:
 ```bash
-$ af source append analysis path/to/sales_calls.csv
+af source append analysis path/to/sales_calls.csv
 ```
 
 At this point, we have two populated tables:
@@ -182,20 +182,20 @@ publish: insights
 
 Push the insights pipe:
 ```bash
-$ af push path/to/insights.yaml
+af push path/to/insights.yaml
 ```
 
 ### Query Results
 
 Use the [API](/api-reference):
 ```bash
-$ curl --request GET \
-  --url https://api.airfold.co/v1/pipes/insights.json \
-  --header 'Authorization: Bearer <use auth token here>'
+curl --request GET \
+--url https://api.airfold.co/v1/pipes/insights.json \
+--header 'Authorization: Bearer <use auth token here>'
 ```
 Or the [CLI](/reference/cli):
 ```bash
-$ af pipe query insights --format json
+af pipe query insights --format json
 ```
 
 Which should output:

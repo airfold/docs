@@ -6,6 +6,17 @@ icon: 'flag'
 
 Retrieve a workspace token with the adequate permissions from the UI or CLI and use it to authenticate with the API.
 
+From your workspace, click on the gear icon:
+![token](/images/token.png)
+
+### Token Scopes
+The scope of a token determines its access level and capabilities:
+
+- **Admin:** Grants complete access to all tables and methods. Full control over the Airfold environment
+- **Append:** Provides append-only access to all sources. Suitable for ingesting data into Airfold
+- **Fetch:** Offers read-only access to endpoints. Suitable for serving endpoints to applications
+
+Use your token here:
 ```json
 "security": [
   {

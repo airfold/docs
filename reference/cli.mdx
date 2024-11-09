@@ -1,23 +1,29 @@
 ---
 title: 'CLI Reference'
-description: 'The `af` command.'
+description: 'Overview of `af` commands'
 icon: "square-terminal"
 ---
 
-The `af` command is the Airfold CLI, it accepts a variety of commands such as `af push` <br />
-or `af source`.
+The `af` command is the Airfold CLI, it accepts a variety of commands such as `af push` or `af source`.
 
-To view a list of the commands available in your current Airfold version, run `af` with no additional arguments.
+To view a list of the commands available in your current Airfold version, simply run `af` with no additional arguments:
+```
+af
+```
 
-To get specific help for any command, use the `--help` option with the relevant command.<br />
-For example, to see help about the `pipe` command you can run `af pipe --help`.
+To get detailed information on a specific command, use the `--help` option. 
 
-Our CLI is designed to provide a rich, interactive output.<br />
-However, when you're redirecting the output, we switch to the JSON format wherever it's possible for easier data parsing and handling.
+For instance, learn more about the `pipe` command by running:
 
-Here's a brief overview of all the available commands, arguments, and flags:
+```
+af pipe --help
+```
 
-## Properties
+The Airfold CLI provides interactive, detailed output to enhance your command-line experience. 
+
+When output is redirected, it automatically switches to JSON format when possible to support seamless data handling and parsing.
+
+## Commands
 
 <ResponseField name="config" type="Command">
   Configure your environment, such as credentials.

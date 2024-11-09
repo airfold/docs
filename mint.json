@@ -77,11 +77,11 @@
       ]
     },
     {
-      "group": "Reference",
+      "group": "CLI",
       "pages": ["reference/cli"]
     },
     {
-      "group": "API Documentation",
+      "group": "Get Started",
       "pages": ["api-reference/authentication"]
     },
     {

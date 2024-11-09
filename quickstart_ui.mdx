@@ -1,0 +1,175 @@
+---
+title: 'Quickstart (UI)'
+description: 'This section covers creating a workspace, uploading data, adding AI columns, and publishing API endpoints.'
+icon: 'laptop'
+---
+
+## Overview
+In this guide, we'll develop an API to identify the top mentioned features in sales calls.
+
+We'll process sales call transcripts to extract insights like competitors mentioned, features mentioned, and whether it was successful. Our dataset, a 70-row CSV file, captures these activities.
+
+Out steps include:
+* Creating a workspace
+* Uploading a CSV file
+* Creating AI columns
+* Filtering, aggregating, and refining the data into a top 2 list of features
+* Exposing the top features through an API
+
+## Create a [Workspace](/workspace/workspaces)
+We start by creating a new workspace.
+
+If this your first time using Airfold, you will be directed to our welcome page where you can simply type in a name:
+![Welcome](images/welcome_page.png)
+
+Otherwise, you can create a new workspace by clicking on the top-left corner, then 
+
+"+ New Workspace" :
+![creating a workspace](/images/create_workspace_zoomed.png)
+
+
+## Uploading a CSV file
+We will be using sales call transcripts for this guide, which you can **<a href="/public/sales_calls.csv" download="sales_calls.csv">download here</a>**
+
+Click on "Integrations" on the left column, then select "File upload":
+<p align="center">
+  <img src="images/integrations.png" alt="integrations" width="550"/>
+</p>
+
+From here, upload the `sales_calls.csv` file we just downloaded.
+
+Then, name it `sales_calls_csv` and click on "Create Integration".
+
+Within a few seconds, all of the data should be ingested:
+![ingested data](images/ingested_data.png)
+
+## Creating AI columns
+Now, we can start gathering insights from our data with AI columns.
+
+Start by creating a Table by clicking on "Tables", then selecting `sales_calls_csv`:
+<p align="center">
+  <img src="images/create_table.png" alt="create table" width="550"/>
+</p>
+
+We can call this `sales_calls_analysis`.
+
+From here, we can start creating AI columns:
+
+"+ Add column" > Select template: "+ Blank column" > "Next"
+
+Let's create a column to indicate whether our call was successful (we define a successful call as one that scheduled a follow-up call).
+
+Fill in the boxes like so:
+<p align="center">
+  <img src="images/add_column.png" alt="add column" width="550"/>
+</p>
+
+You can copy and paste the description here:
+```
+Whether this call was successful (which is defined as successfully setting up a follow up call). If the follow up scheduling is successful, the call should include an explicit date/time for the call.
+```
+
+<br />
+
+`Column name` is the name of your column
+
+`Column type` is the data type of your column (we use "Checkbox" in this case since success can be a true or false value)
+
+`Description` is a detailed description of what you wish to extract
+
+`Default value` is what the value defaults to
+
+`Select related columns` are the columns that are relevant to extracting this data
+
+<br />
+
+Now, click on "Create" > hover over the column name > <Icon icon="play" iconType="solid" />  > "All rows"
+
+Your table should look like this:
+![after success](images/table_after_success.png)
+ <br />
+
+Repeat this process for a few more AI columns:
+
+To see which competitors are mentioned in the call:
+<p align="center">
+  <img src="images/competitors_column.png" alt="competitors" width="550"/>
+</p>
+
+Description:
+```
+Who are the competitors mentioned (if any)?
+```
+
+<br />
+
+To see which features are mentioned in the call:
+
+<p align="center">
+  <img src="images/features_mentioned.png" alt="features mentioned" width="550"/>
+</p>
+
+Description:
+```
+Which features are mentioned in the call
+```
+
+Select options:
+```
+'Customizable Templates', 'Inventory Management', 'Marketing Automation', 'Customer Support Integration', 'Social Media Integration', 'None'
+```
+
+<br />
+Your table should now look like this:
+![final table](images/final_table.png)
+
+## Query Top Features
+Using our AI columns, we can perform further analysis to see which top 2 features were mentioned in successful calls.
+
+We will be using `successful` and `features_mentioned` to do this.
+<br />
+
+Click on "Queries" and create a new query `get_top_features`:
+<p align="center">
+  <img src="images/create_query.png" alt="query" width="550"/>
+</p>
+
+From here, let's create a new node:
+![node](images/node.png)
+
+Copy the SQL query here:
+```
+WITH
+	arrayJoin (features_mentioned) AS feature
+SELECT
+	count() AS total_successful_rows,
+	topK (2) (feature) AS top_features
+FROM
+	sales_calls_analysis
+WHERE
+	successful = TRUE
+```
+
+Click on "Run", then we can get the top 2 features mentioned in successful calls:
+<p align="center">
+  <img src="images/top_features.png" alt="features" width="550"/>
+</p>
+
+## Publish as API endpoint
+To publish this as an API endpoint, simply click:
+
+"Publish" > "View Endpoint"
+
+![api endpoint](images/api.png)
+
+From here, you can use your endpoint in JavaScript, Python, or cUrl by simply copying and pasting.
+
+You can also unpublish your endpoint anytime by clicking "Unpublish".
+
+## Next Steps
+You’ve successfully uploaded data, created AI columns, and extracted insights using Airfold in a few simple steps! This workflow enables intuitive interaction with unstructured data, transforming raw call transcripts into actionable insights.
+
+Check out how to do this through the CLI through [Quickstart (CLI)](/quickstart_cli).
+
+Explore [workspaces](/workspace/workspaces), [sources](/workspace/sources), and [pipes](/workspace/pipes) to learn more about how to interact with Airfold.
+Our the [API](/api-reference) and [CLI](/reference/cli) documentation is also available for further information.

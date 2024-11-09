@@ -62,7 +62,11 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["overview", "quickstart_cli"]
+      "pages": [
+        "overview", 
+        "quickstart_ui",
+        "quickstart_cli"
+      ]
     },
     {
       "group": "Features",

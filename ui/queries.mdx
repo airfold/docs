@@ -1,0 +1,34 @@
+---
+title: 'Queries'
+description: 'Build features over your data'
+icon: "magnifying-glass"
+---
+
+Queries are essentially SQL queries that can be applied to your tables, allowing you to filter, aggregate, and manipulate data flexibly. 
+
+They become especially powerful with AI tables, as you can leverage structured outputs derived from unstructured data, enabling deeper insights with just a few commands.
+
+## Creating a Query
+Navigate to "Queries" on the left menu column, and click on "+":
+<p align="center">
+  <img src="/images/ui_query1.png" alt="data format options" width="550"/>
+</p>
+Enter a name for this query, then press "Create".
+
+## Nodes
+Here, you have a node where you can enter a single SQL `SELECT` statement to query your tables directly. 
+
+These SQL statements can interact with your tables in the same way as standard SQL tables, with additional AI columns you can leverage for deeper insights.
+
+For example, to get the top 2 features mentioned in successful calls:
+![sql query](/images/ui_query2.png)
+
+We can run this by clicking on "Run":
+![sql query](/images/ui_query3.png)
+
+Click on "Save" to save this node, and "Publish" to publish it as an endpoint:
+<p align="center">
+  <img src="/images/ui_query4.png" alt="data format options" width="300"/>
+</p>
+
+See more details on [endpoints](/ui/endpoints).

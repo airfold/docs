@@ -1,0 +1,36 @@
+---
+title: 'Endpoints'
+description: 'Convert pipelines into fast, scalable endpoints'
+icon: "brackets-curly"
+---
+
+To publish your pipe as an API, simply add a name to the `publish` parameter:
+
+```yaml insights.yaml
+nodes:
+  - node1:
+      sql: |
+        WITH
+          arrayJoin(features_mentioned) AS feature
+        SELECT
+          count() AS num_successful_calls,
+          topK(2)(feature) AS top_features
+        FROM
+          analysis
+        WHERE
+          successful = true
+publish: insights
+
+```
+
+Published pipes can parameterize their SQL using Jinja2 via the params field and can be accessed (via FROM) by other pipes.
+
+Upon pushing, you can query results using the API:
+
+```bash
+curl --request GET \
+--url https://api.airfold.co/v1/pipes/insights.json \
+--header 'Authorization: Bearer <use auth token here>'
+```
+
+See more on the API [here](/api-reference).

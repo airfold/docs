@@ -1,20 +1,14 @@
 ---
-title: 'Source'
+title: 'Sources'
 description: 'Bring your data into Airfold'
 icon: "database"
 ---
 
-Akin to tables in a database, sources store data according to a defined schema.
-
-All the workspace data lives inside sources, which can be queried, filtered, aggregated, and joined using SQL.
-
 Data is ingested into sources directly through Airfold's Ingest API or by a [pipe](/workspace/pipes).
-
-Additionally, sources can be enhanced into **AI sources** for transforming unstructured data into structured formats, unlocking powerful analytical potential.
 
 ## Creation
 Define the schema for your source in a YAML file:
-<CodeGroup>
+
 ```yaml sales_calls.yaml
 type: Table
 name: sales_calls
@@ -28,70 +22,18 @@ settings:
   partition_by: tuple()
 ```
 
-```yaml ai_sales_calls.yaml
-type: AITable
-name: ai_sales_calls
-description: AI enhanced version of sales_calls
-ai_cols:
-  - name: successful
-    type: Nullable(Bool)
-    description: Whether this call was successful (which is defined as successfully
-      setting up a follow up call). If the follow up scheduling is successful, the
-      call should include an explicit date/time for the call.
-    default_value: '""'
-    using:
-      - Transcript
-  - name: competitors_mentioned
-    type: Array(String)
-    description: Who are the competitors mentioned (if any)?
-    default_value: '"N/A"'
-    using:
-      - Transcript
-  - name: features_mentioned
-    type: Array(Enum('Customizable Templates', 'Inventory Management', 'Marketing
-      Automation', 'Customer Support Integration', 'Social Media Integration', 'None'))
-    description: Which features are mentioned in the call?
-    default_value: '["None"]'
-    using:
-      - Transcript
-cols:
-  ID: UUID
-  Transcript: String
-```
-</CodeGroup>
-
 <br />
 
 ### Properties
 
 <ResponseField name="type" type="string">
-  Type of source: `Table` or `AITable`
+  Type of source: `Table` or `AITable`, see more on [AI table](/cli/ai_tables)
 </ResponseField>
 <ResponseField name="name" type="string">
   Name of source
 </ResponseField>
 <ResponseField name="description" type="string">
   A brief overview of the source's content or purpose (optional)
-</ResponseField>
-<ResponseField name="ai_cols" type="array">
-  Columns to be filled by the AI source.
-  <Expandable title="ai_cols Properties" defaultOpen="true">
-    <ResponseField name="name" type="string" required>
-      The name of the column.
-    </ResponseField>
-    <ResponseField name="type" type="string" required>
-      The data type of the column.
-    </ResponseField>
-    <ResponseField name="description" type="string" required>
-      A description of the column (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types)).
-    </ResponseField>
-    <ResponseField name="default_value" type="string">
-      The default value of the column.
-    </ResponseField>
-    <ResponseField name="using" type="array" required>
-      The columns to use in the AI transformation.
-    </ResponseField>
-  </Expandable>
 </ResponseField>
 <ResponseField name="cols" type="{name: type}" required>
   Defines the schema of the source as a list of columns where each column name is a key and its data type is the value (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types))

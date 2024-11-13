@@ -5,32 +5,7 @@ description: 'Organize and collaborate on your projects'
 icon: "folder-tree"
 ---
 
-A workspace contains all the resources you need, including [sources](/workspace/sources), [pipes](/workspace/pipes), nodes, API endpoints, and tokens.
-
-Workspaces are commonly used to separate projects and teams, but how you organize them is up to you.
-
-## Creation
-Click on the top-left corner (name of your current workspace), then click on <br />
-"+ New Workspace":
-![creating a workspace](/images/create_workspace_zoomed.png)
-
-That's it! You can now start building, see [sources](/workspace/sources) and [pipes](/workspace/pipes) for next steps.
-
-## Authorization
-From here, you can also access your tokens by clicking on the gear icon:
-![token](/images/token.png)
-
-They are required for any operation performed via the CLI or REST API, and also safeguard the endpoints you publish within Airfold.
-
-### Token Scopes
-The scope of a token determines its access level and capabilities:
-
-- **Admin:** Grants complete access to all tables and methods. Full control over the Airfold environment
-- **Append:** Provides append-only access to all sources. Suitable for ingesting data into Airfold
-- **Fetch:** Offers read-only access to endpoints. Suitable for serving endpoints to applications
-
-A token is required to read endpoints from published pipes.
-
+To create a workspace, see the steps [here](/ui/workspaces).
 
 ## Workspace Files
 A workspace file is a YAML file that describes a resource in Airfold, which collectively make up the source code of your Airfold workspace.
@@ -45,7 +20,7 @@ A workspace file is a YAML file that describes a resource in Airfold, which coll
 Workspace files are not tied to a specific workspace, and can be deployed to any workspace. You can easily create new workspaces from existing ones, or to apply changes to multiple workspaces at once.
 
 ### File Structure
-There are two types of workspace files [pipes](/workspace/pipes) and [sources](/workspace/sources).
+There are two types of workspace files [pipes](/ui/pipes) and [sources](/ui/sources).
 
 Here's an example:
 ```bash
@@ -63,7 +38,7 @@ Here's an example:
 ```
 
 ### Push Files to a Workspace
-Using the CLI command [`af push`](/reference/cli) or [`/push`](/api-reference/workspace/push) API.<br />
+Using the CLI command [`af push`](/cli/cli_reference) or [`/push`](/api-reference/workspace/push) API.<br />
 
 For example, you can push all files in the `pipes` directory with:
 ```bash

@@ -15,7 +15,7 @@ Our steps include:
 * Executing queries to filter, aggregate, and refine the into a top 2 list of features
 * Exposing the top features through an API
 
-## Create a [Workspace](/workspace/workspaces)
+## Create a [Workspace](/cli/workspaces)
 Before we begin, we need to create a workspace to store our data and resources, as well as a token to authenticate our CLI.
 
 1. Go to [Airfold](https://www.app.airfold.co) and create a new workspace.
@@ -24,7 +24,7 @@ Before we begin, we need to create a workspace to store our data and resources, 
 
 The token should look like this: `aft_6eab8fcd902e4cbfb63ba174469989cd.Ds1PME5dQsJKosKQWVcZiBSlRFBbmhzIocvHg8KQddV`.
 
-## Set up the [CLI](/reference/cli)
+## Set up the [CLI](/cli/cli_reference)
 <Note>
 The CLI requires Python 3.10 or higher.
 </Note>
@@ -36,7 +36,7 @@ pip install airfold-cli
 af config
 ```
 
-## Create a [Source](/workspace/sources)
+## Create a [Source](/cli/sources)
 
 First, **<a href="/public/sales_calls.csv" download="sales_calls.csv">download sales_calls.csv</a>**
 
@@ -74,7 +74,7 @@ Verify creation by listing sources:
 af source ls
 ```
 
-## [Ingest Data](/ingest)
+## [Ingest Data](/cli/sources)
 
 With the source set up, ingest the CSV data:
 ```bash
@@ -121,7 +121,7 @@ cols:
 * `competitors_mentioned`: Extracts any competitor names mentioned in the transcript
 * `features_mentioned`: Lists any product features that were discussed
 
-To see more details on the parameters of `ai_cols`, check out [source](/workspace/sources).
+To see more details on the parameters of `ai_cols`, check out [source](/cli/ai_tables).
 
 Push this configuration to create the AI Table:
 ```bash
@@ -129,7 +129,7 @@ af push path/to/analysis.yaml
 ```
 
 ### Ingest Data from `sales_calls` to `analysis`
-Create a [pipe](/workspace/pipes) to transfer data from sales_calls to analysis. 
+Create a [pipe](/cli/pipes) to transfer data from sales_calls to analysis. 
 Pipes in Airfold are used to run sequences of SQL queries that can transform, filter, and aggregate data across tables. 
 Each step in a pipe is called a "node," and each node runs a single SQL statement, allowing for more complex data analysis workflows. <br />
 
@@ -157,7 +157,7 @@ At this point, we have two populated tables:
 * `sales_calls`: containing original data `ID` and `Transcript`
 * `analysis`: containing data from `sales_calls` and additional AI columns
 
-## Further Analysis with [Pipes](/workspace/pipes)
+## Further Analysis with [Pipes](/cli/pipes)
 To identify top-mentioned features in successful calls, create an `insights.yaml` file:
 ```yaml insights.yaml
 nodes:
@@ -193,7 +193,7 @@ curl --request GET \
 --url https://api.airfold.co/v1/pipes/insights.json \
 --header 'Authorization: Bearer <use auth token here>'
 ```
-Or the [CLI](/reference/cli):
+Or the [CLI](/cli/cli_reference):
 ```bash
 af pipe query insights --format json
 ```
@@ -233,5 +233,5 @@ Which should output:
 ## Next Steps
 You've successfully ingested, analyzed, and published data using Airfold in a few simple steps! This workflow enables intuitive interaction with unstructured data, transforming raw call transcripts into actionable insights.
 
-Explore [workspaces](/workspace/workspaces), [sources](/workspace/sources), and [pipes](/workspace/pipes) to learn more about how to interact with Airfold.
-Our the [API](/api-reference) and [CLI](/reference/cli) documentation is also available for further information.
+Explore [workspaces](/cli/workspaces), [sources](/cli/sources), and [pipes](/cli/pipes) to learn more about how to interact with Airfold.
+Our the [API](/api-reference) and [CLI](/cli/cli_reference) documentation is also available for further information.

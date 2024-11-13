@@ -65,20 +65,31 @@
       "pages": [
         "overview", 
         "quickstart_ui",
-        "quickstart_cli"
+        "quickstart_cli",
+        "keys"
       ]
     },
     {
-      "group": "Features",
+      "group": "UI",
       "pages": [
-        "workspace/workspaces",
-        "workspace/sources",
-        "workspace/pipes"
+        "ui/workspaces",
+        "ui/sources",
+        "ui/ai_tables",
+        "ui/queries",
+        "ui/endpoints",
+        "ui/charts",
+        "ui/data_graph"
       ]
     },
     {
       "group": "CLI",
-      "pages": ["reference/cli"]
+      "pages": [      
+      "cli/workspaces",
+      "cli/sources",
+      "cli/ai_tables",
+      "cli/pipes",
+      "cli/endpoints",
+      "cli/cli_reference"]
     },
     {
       "group": "Get Started",

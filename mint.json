@@ -2,8 +2,8 @@
   "$schema": "https://mintlify.com/schema.json",
   "name": "Airfold",
   "logo": {
-    "dark": "/logo/black.png",
-    "light": "/logo/white.png"
+    "dark": "/logo/white.png",
+    "light": "/logo/black.png"
   },
   "favicon": "/favicon.png",
   "colors": {

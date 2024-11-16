@@ -2,10 +2,10 @@
   "$schema": "https://mintlify.com/schema.json",
   "name": "Airfold",
   "logo": {
-    "dark": "/logo/logo.svg",
-    "light": "/logo/logo.svg"
+    "dark": "/logo/white.png",
+    "light": "/logo/black.png"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.png",
   "colors": {
     "primary": "#bd2e51",
     "light": "#e8a0b2",
@@ -62,12 +62,7 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": [
-        "overview", 
-        "quickstart_ui",
-        "quickstart_cli",
-        "keys"
-      ]
+      "pages": ["overview", "quickstart_ui", "quickstart_cli", "keys"]
     },
     {
       "group": "UI",
@@ -83,13 +78,14 @@
     },
     {
       "group": "CLI",
-      "pages": [      
-      "cli/workspaces",
-      "cli/sources",
-      "cli/ai_tables",
-      "cli/pipes",
-      "cli/endpoints",
-      "cli/cli_reference"]
+      "pages": [
+        "cli/workspaces",
+        "cli/sources",
+        "cli/ai_tables",
+        "cli/pipes",
+        "cli/endpoints",
+        "cli/cli_reference"
+      ]
     },
     {
       "group": "Get Started",

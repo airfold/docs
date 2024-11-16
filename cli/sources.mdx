@@ -10,7 +10,6 @@ Data is ingested into sources directly through Airfold's Ingest API or by a [pip
 Define the schema for your source in a YAML file:
 
 ```yaml sales_calls.yaml
-type: Table
 name: sales_calls
 description: sales call transcripts
 cols:
@@ -27,7 +26,7 @@ settings:
 ### Properties
 
 <ResponseField name="type" type="string">
-  Type of source: `Table` or `AITable`, see more on [AI table](/cli/ai_tables)
+  Type of source: `Table` or `AITable`, see more on [AI table](/cli/ai_tables) (Optional)
 </ResponseField>
 <ResponseField name="name" type="string">
   Name of source

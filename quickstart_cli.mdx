@@ -50,8 +50,6 @@ af source create path/to/sales_calls.csv .
 
 The CLI will infer the schema from the CSV file and generate a YAML file with the following contents:
 ```yaml ./sources/sales_calls.yaml
-version: clickhouse.airfold.co/v1
-type: Table
 name: sales_calls
 cols:
   ID: UUID
@@ -86,8 +84,6 @@ To derive insights, we can create AI columns that automatically extract competit
 
 In your workspace, create a `analysis.yaml` file with this configuration:
 ```yaml analysis.yaml
-version: clickhouse.airfold.co/v1
-type: AITable
 name: analysis
 ai_cols:
   - name: successful
@@ -135,7 +131,6 @@ Each step in a pipe is called a "node," and each node runs a single SQL statemen
 
 Define it in a new `pipe_to_analysis.yaml` file:
 ```yaml pipe_to_analysis.yaml
-type: Pipe
 name: pipe_to_analysis
 nodes:
   - transform:

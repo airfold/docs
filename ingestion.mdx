@@ -1,0 +1,106 @@
+---
+title: 'Ingest Data'
+sidebarTitle: 'Ingest Data'
+description: "This section covers how to ingest data in a few simple steps"
+icon: 'arrow-right'
+---
+
+## UI
+Navigate to "Integrations" on the left menu bar, and click on "+":
+<p align="center">
+  <img src="/images/ui_integration_options.png" alt="data format options" width="550"/>
+</p>
+
+Upload your data via your preferred format, then press "Continue".
+
+From here, you can verify that your data was ingested correctly and change the name if needed:
+![verification](/images/ui_integration2.png)
+
+Once you are ready to ingest the rest of your data, press "Click Integration".
+
+Within a few seconds, you should be able to see how many rows were ingested to verify that your data was processed correctly.
+
+![metrics](/images/ui_integration3.png)
+
+## Code
+You can also ingest data through an API call.
+
+Fill in the `<>` with your specific entries.
+
+JavaScript:
+```JavaScript
+const data = [
+  {<key>:<value type>}
+];
+
+fetch('https://api.airfold.co/v1/events/<source name>', {
+  method: 'POST',
+  headers: {
+    Authorization: <use auth token here>,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(data)
+});
+```
+
+Python:
+```Python
+import requests
+
+data = [
+  {<key>:<value type>}
+]
+
+requests.post(
+  'https://api.airfold.co/v1/events/<source name>',
+  headers={
+    'Authorization': <use auth token here>,
+    'Content-Type': 'application/json'
+  },
+  json=data
+)
+```
+
+cUrl:
+```cUrl
+curl --request POST \
+  --url https://api.airfold.co/v1/events/<source name> \
+  --header <use auth token here> \
+  --header 'Content-Type: application/json' \
+  --data '[
+  {<key>:<value type>}
+]'
+```
+
+This is also accesible through the UI in your Sources page, under:
+
+<p align="center">
+  <img src="/images/ingestion_ex.png" alt="data format options" width="200"/>
+</p>
+
+## CLI
+
+Define the schema for your source in a YAML file like so:
+
+```yaml sales_calls.yaml
+name: sales_calls
+description: sales call transcripts
+cols:
+  ID: UUID
+  Transcript: String
+settings:
+  engine: MergeTree()
+  order_by: '`ID`'
+  partition_by: tuple()
+```
+
+Then push using:
+```bash
+af push <your .yaml file name>
+```
+Replacing `<your .yaml file name>` with your actual file name.
+
+For example, for pushing `sales_calls.yaml`:
+```bash
+af push sales_calls.yaml
+```

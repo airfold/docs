@@ -1,0 +1,45 @@
+---
+title: 'Push'
+description: "Push changes through the CLI"
+icon: 'arrow-right-to-line'
+---
+
+Push files to your [workspace](/concepts/workspaces) using the [CLI command](/cli/cli_reference) `af push`.
+
+<ResponseField name="push" type="Command">
+  Push object(s) into the runtime database.
+  <Expandable title="Arguments and Flags">
+    <ResponseField name="path" type="Argument">
+      Target directory to read files from, ('-' will read from stdin). Default: None
+    </ResponseField>
+    <ResponseField name="--dry-run" type="Flag">
+      Show execution plan without executing it.
+    </ResponseField>
+    <ResponseField name="--force" type="Flag">
+      Force delete/overwrite even if data will be lost.
+    </ResponseField>
+    <ResponseField name="--rename" type="Flag">
+      Use `rename` strategy. Specify a single renamed object name and its new name.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+For example, to push `sales_calls.yaml`, run:
+```bash
+af push sales_calls.yaml
+```
+
+To preview what will happen without actually executing the command:
+```bash
+af push sales_calls.yaml --dry-run
+```
+
+To force overwrite the file, even if it overwrites existing data:
+```bash
+af push sales_calls.yaml --force
+```
+
+To rename an object during the push:
+```bash
+af push sales_calls.yaml --rename old_name:new_name
+```

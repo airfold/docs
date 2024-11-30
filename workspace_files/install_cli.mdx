@@ -1,0 +1,26 @@
+---
+title: 'Install CLI'
+description: "Install and Configure the Airfold CLI"
+icon: 'download'
+---
+
+## Create a [Workspace](/concepts/workspaces)
+Before you can start using the Airfold CLI, you'll need to create a workspace to store your data and resources, and generate an Admin token for authentication.
+
+1. Go to [Airfold](https://www.app.airfold.co) and create a new workspace.
+2. Copy an Admin token from the workspace's **Token** page.
+![Token](/images/token.png)
+
+The token should look like this: `aft_6eab8fcd902e4cbfb63ba174469989cd.Ds1PME5dQsJKosKQWVcZiBSlRFBbmhzIocvHg8KQddV`.
+
+## Set up the [CLI](/workspace_files/cli_reference)
+<Note>
+The CLI requires Python 3.10 or higher.
+</Note>
+
+1. Install the CLI using `pip install airfold-cli`.
+2. Run `af config` and paste your token when prompted.
+```
+pip install airfold-cli
+af config
+```

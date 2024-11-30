@@ -1,0 +1,144 @@
+---
+title: 'AI Tables'
+description: 'Transform unstructured data into structured data'
+icon: "table-layout"
+---
+
+AI Tables enable you to extract meaningful insights and make data-driven decisions from unstructured data by providing structured outputs. 
+
+## UI
+
+### Create a Table
+
+This step requires that you have a [source](/concepts/sources) created in your workspace.
+
+Navigate to "Tables" in the left menu bar, and click on "+":
+<p align="center">
+  <img src="/images/ui_aitable1.png" alt="ai table creation" width="550"/>
+</p>
+Select the source you wish to creat this table from, then press "Continue".
+
+Verify that all the data sample is correct and customize the name as you wish:
+![table](/images/ui_aitable2.png)
+
+Press "Create Table".
+
+### Create an AI Column
+To create an AI column, there are two options:
+1. Create a custom column
+2. Use a template
+
+#### 1. Create a Custom Column
+"+ Add column" > Select template: "+ Blank column" > "Next"
+
+In our example of sales call transcripts, we can create a custom column to indicate whether our call was successful (we define a successful call as one that scheduled a follow-up call):
+
+<p align="center">
+  <img src="/images/add_column.png" alt="add column" width="550"/>
+</p>
+
+<br />
+
+`Column name` is the name of your column
+
+`Column type` is the data type of your column (we use "Checkbox" in this case since success can be a true or false value)
+
+`Description` is a detailed description of what you wish to extract
+
+`Default value` is what the value defaults to
+
+`Select related columns` are the columns that are relevant to extracting this data
+<br />
+
+**Column Types**
+
+We offer various column types, ach tailored to match the specific data type of your output:
+- **Text** generates free-text outputs a text output, ideal for extracting keywords or phrases without restriction to predefined options
+- **Checkbox** outputs a boolean (true/false) value, suitable for binary indicators like whether a call was successful
+- **Number** provides an integer output, useful for counts, such as the frequency a feature is mentioned in a call
+- **Currency** outputs a floating-point number, perfect for capturing precise values, like prices mentioned
+- **List** returns a list of strings, ideal for tracking non-standardized items, such as a list of competitor features without a predefined set
+- **Select** outputs a list of predefined strings, making it easier for standardized analysis, such as listing our own features mentioned during a call (this format is recommended for consistent, analyzable data)
+<br />
+
+#### 2. Use a Template
+
+Templates are pre-defined column formats for common use cases, enabling quicker setup and high-quality outputs.
+
+*Note: This feature is currently in progress and will be available soon*
+
+### Run your AI Table
+Upon creating your AI column, hover over the column name and click on <Icon icon="play" iconType="solid" color="#ffffff" />.
+
+We get the following options:
+<p align="center">
+  <img src="/images/ui_aitable3.png" alt="add column" width="550"/>
+</p>
+
+We recommend starting with "First 10 rows" to verify if the output meets your expectations, allowing you to make iterations as needed before processing the rest of your dataset.
+
+Once you're satisfied with the results, proceed to "All rows".
+
+You also have the option to run individual rows, this is useful for testing multiple AI columns at a time.
+
+## CLI
+
+### Edit YAML file
+
+We can create AI tables by simply changing the `type` and adding the `ai_cols` parameter:
+
+```yaml ai_sales_calls.yaml
+description: AI enhanced version of sales_calls
+ai_cols:
+  - name: successful
+    type: Nullable(Bool)
+    description: Whether this call was successful (which is defined as successfully
+      setting up a follow up call). If the follow up scheduling is successful, the
+      call should include an explicit date/time for the call.
+    default_value: '""'
+    using:
+      - Transcript
+  - name: competitors_mentioned
+    type: Array(String)
+    description: Who are the competitors mentioned (if any)?
+    default_value: '"N/A"'
+    using:
+      - Transcript
+  - name: features_mentioned
+    type: Array(Enum('Customizable Templates', 'Inventory Management', 'Marketing
+      Automation', 'Customer Support Integration', 'Social Media Integration', 'None'))
+    description: Which features are mentioned in the call?
+    default_value: '["None"]'
+    using:
+      - Transcript
+cols:
+  ID: UUID
+  Transcript: String
+```
+We have a new parameter:
+<ResponseField name="ai_cols" type="array">
+  Columns to be filled by the AI source.
+  <Expandable title="ai_cols Properties" defaultOpen="true">
+    <ResponseField name="name" type="string" required>
+      The name of the column.
+    </ResponseField>
+    <ResponseField name="type" type="string" required>
+      The data type of the column.
+    </ResponseField>
+    <ResponseField name="description" type="string" required>
+      A description of the column (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types)).
+    </ResponseField>
+    <ResponseField name="default_value" type="string">
+      The default value of the column.
+    </ResponseField>
+    <ResponseField name="using" type="array" required>
+      The columns to use in the AI transformation.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Push
+Push this update by running:
+```
+af push ai_sales_calls.yaml
+```

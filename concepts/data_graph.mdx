@@ -1,0 +1,53 @@
+---
+title: 'Data Graph'
+description: 'Visualize your data flow'
+icon: "diagram-project"
+---
+
+Data Graph provides a clear, visual overview of your data flow—from source to table to query.
+
+## UI
+
+This is accessible via "Data Graph" on the left navigation bar.
+
+![chart](/images/ui_datagraph.png)
+
+
+This feature is especially helpful in complex workspaces with multiple tables and queries, offering an intuitive way to track your data's journey in one view.
+
+You can also interact with elements directly by clicking on them, making it easy to navigate and manage your data pipeline.
+
+## CLI
+
+To get the data graph in JSON format, run:
+
+```
+af graph
+```
+
+For example, this is a data graph snippet for our `sales_calls` workspace:
+
+```JSON
+{
+  "sources": [
+    {
+      "id": "afbf6c5fd16d014dcc8cc3baea21563f7b",
+      "type": "source",
+      "data": {
+        "id": "afbf6c5fd16d014dcc8cc3baea21563f7b",
+        "name": "sales_calls_csv",
+        "kind": "Table",
+        "settings": "MergeTree() PARTITION BY tuple() ORDER BY `ID`",
+        "metadata": {
+          "created_at": "2024-11-13T18:08:07.004181+00:00",
+          "updated_at": "2024-11-13T18:08:07.039955+00:00"
+        },
+        "cols": {
+          "ID": "UUID",
+          "Transcript": "String"
+        }
+      }
+    }
+  ]
+}
+```

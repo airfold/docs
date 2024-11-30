@@ -1,0 +1,70 @@
+---
+title: 'Endpoints'
+description: 'Convert pipelines into fast, scalable endpoints'
+icon: "brackets-curly"
+---
+
+Easily transform any pipeline into a high-performance API that supports low-latency and high concurrency, ready for integration. 
+
+Each API is provided with Swagger documentation for standardized usage, and can be accessed as a shareable REST endpoint.
+
+## UI
+
+### Create an Endpoint
+
+Upon creating a query, we can publish it as an endpoint by clicking on:
+<p align="center">
+  <img src="/images/ui_endpoint1.png" alt="ai table creation" width="150"/>
+</p>
+
+Then "View endpoint":
+![full page](/images/ui_endpoint2.png)
+
+These metrics displayed show how many requests have been made, how much data has been processed, latency, and error rate.
+
+### Use the Endpoint
+
+The code block allows for quick copying and pasting of the API endpoint directly into your code:
+<p align="center">
+  <img src="/images/ui_endpoint4.png" alt="ai table creation" width="550"/>
+</p>
+
+Clicking on the three dots in the top right corner provides additional options:
+<p align="center">
+  <img src="/images/ui_endpoint3.png" alt="ai table creation" width="450"/>
+</p>
+
+- **Share Swagger** takes you to the Swagger page, where you can explore and test the API
+- **Add Parameter** allows you to add custom parameters to tailor your API calls
+- **Duplicate** creates a copy of the current endpoint
+- **Discard changes** reverts any modifications made with parameters
+- **Delete** removes the entire query
+
+## CLI
+
+### Edit YAML file
+
+Simply add a name to the `publish` parameter:
+
+```yaml insights.yaml
+nodes:
+  - node1:
+      sql: |
+        WITH
+          arrayJoin(features_mentioned) AS feature
+        SELECT
+          count() AS num_successful_calls,
+          topK(2)(feature) AS top_features
+        FROM
+          analysis
+        WHERE
+          successful = true
+publish: insights
+
+```
+
+### Push
+Push this update by running:
+```
+af push insights.yaml
+```

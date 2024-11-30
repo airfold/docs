@@ -1,0 +1,21 @@
+---
+title: 'Pull'
+description: "Pull changes through the CLI"
+icon: 'arrow-left-from-line'
+---
+
+Pull files from your [workspace](/concepts/workspaces) using the [CLI command](/cli/cli_reference) `af pull`.
+
+<ResponseField name="pull" type="Command">
+  Pull objects from the runtime database.
+  <Expandable title="Arguments">
+    <ResponseField name="path" type="Argument">
+      Target directory to create files in, ('-' will dump to stdout). Default: '-' (stdout).
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+For example, to pull the latest changes from `sales_calls.yaml`, run:
+```bash
+af pull sales_calls.yaml
+```

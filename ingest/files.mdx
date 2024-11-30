@@ -1,0 +1,60 @@
+---
+title: 'Ingest Files'
+sidebarTitle: 'Files'
+description: "Ingest files through the UI or CLI"
+icon: 'file'
+---
+
+## Data Formats
+We support the following formats:
+- CSV
+- NDJSON
+- JSON
+
+You may upload this data via raw text, file upload, or remote URL.
+
+## UI
+
+Navigate to "Integrations" on the left menu bar, and click on "+":
+<p align="center">
+  <img src="/images/ui_integration_options.png" alt="data format options" width="550"/>
+</p>
+
+Upload your data via your preferred format, then press "Continue".
+
+<br />
+
+From here, you can verify that your data was ingested correctly and change the name if needed:
+![verification](/images/ui_integration2.png)
+
+Once you are ready to ingest the rest of your data, press "Click Integration".
+
+<br />
+
+Within a few seconds, you should be able to see how many rows were ingested to verify that your data was processed correctly.
+
+![metrics](/images/ui_integration3.png)
+
+## CLI
+
+Define the schema for your source in a YAML file:
+
+```yaml sales_calls.yaml
+name: sales_calls
+description: sales call transcripts
+cols:
+  ID: UUID
+  Transcript: String
+settings:
+  engine: MergeTree()
+  order_by: '`ID`'
+  partition_by: tuple()
+```
+
+<br />
+Push sources to your [workspace](/concepts/workspaces) with `af push`.
+
+For example, to push `sales_calls.yaml`, run:
+```bash
+af push sales_calls.yaml
+```

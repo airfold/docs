@@ -1,0 +1,57 @@
+---
+title: 'Handling JSON'
+sidebarTitle: 'JSON'
+description: "This section covers JSONPath"
+icon: 'list-tree'
+---
+
+## Syntax
+- JSONPath expressions start with `$`, which refers to the root of the JSON document
+- Dots `.` indicate traversal to a child property
+- Brackets `[]` can access elements in arrays
+
+## Example
+Given the following data structure:
+```JSON
+{
+  "date": "2015-12-17 17:30:32",
+  "product_id": "632756e2-1aaa-11eb-8aeb-acde48001122",
+  "user_id": "897297",
+  "event": "search",
+  "extra_data": {
+    "city": "Columbia",
+    "country": "USA",
+    "special_note": "Limited edition & exclusive",
+    "discount": {
+      "amount": 5.0,
+      "currency": "USD"
+    }
+  }
+}
+```
+
+This is the corresponding YAML configuration:
+```yaml
+name: shopping_data_with_json_path
+cols:
+    date: DateTime
+    product_id: String
+    user_id: Int64
+    event: String
+    price: Nullable(Float32) $.extra_data.price
+    city: String $.extra_data.city
+    country: String $.extra_data.country
+    special_note: Nullable(String) $.extra_data.special_note
+    tags: Array(String) $.extra_data.tags
+    discount_amount: Nullable(Float32) $.extra_data.discount.amount
+    discount_currency: Nullable(String) $.extra_data.discount.currency
+    promo_code: Nullable(String) $.extra_data.promo_code
+    gift_wrap: Nullable(Bool) $.extra_data.gift_wrap
+    session_id: Nullable(String) $.extra_data.session_id
+```
+
+**Top-Level Fields**: Fields like `product_id` and `event` are mapped directly since they are at the root of the JSON structure
+
+**Nested Fields**: JSONPath is used to extract data from deeper levels of the JSON object:
+- `$.extra_data.city` maps to the `city` column.
+- `$.extra_data.discount.amount` maps to the `discount_amount` column.

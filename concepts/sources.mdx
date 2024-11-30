@@ -1,0 +1,99 @@
+---
+title: 'Sources'
+description: 'Bring your data into Airfold'
+icon: "database"
+---
+
+Akin to tables in a database, sources store data according to a defined schema.
+
+All the workspace data lives inside sources, which can be queried, filtered, aggregated, and joined using SQL.
+
+## UI
+
+### Ingesting Data
+Navigate to "Integrations" on the left menu bar, and click on "+":
+<p align="center">
+  <img src="/images/ui_integration_options.png" alt="data format options" width="550"/>
+</p>
+
+Upload your data via your preferred format, then press "Continue".
+
+<br />
+
+From here, you can verify that your data was ingested correctly and change the name if needed:
+![verification](/images/ui_integration2.png)
+
+Once you are ready to ingest the rest of your data, press "Click Integration".
+
+### Metrics
+Within a few seconds, you should be able to see how many rows were ingested to verify that your data was processed correctly.
+
+![metrics](/images/ui_integration3.png)
+
+From here, "Data" displays all your data. You may also get a detailed look at each item by clicking on its individual cell:
+![detailed view](/images/ui_integration4.png)
+
+You may also use the table's features:
+- `Filters` allows you to filter out certain rows based on a condition
+- `Sort` can be used to order your rows in ascending/descending order based on a specififed column
+- `Group by` is for organizing your rows by a specified column, grouping related rows together based on a shared value in that column
+
+<br />
+
+"Data Graph" shows any tables or queries affiliated with this source. Upon creation, you should just see the source by itself:
+<p align="center">
+  <img src="/images/ui_integration5.png" alt="source by itself" width="450"/>
+</p>
+
+<br />
+
+"Logs" provides details on any errors that occurred during ingestion (if any).
+
+"Ingestion Example" provides the code for ingesting data that you can simply copy and paste. Available in JS, Python, and cUrl.
+
+<br />
+
+## CLI
+
+### Creating a YAML file
+Define the schema for your source in a YAML file:
+
+```yaml sales_calls.yaml
+name: sales_calls
+description: sales call transcripts
+cols:
+  ID: UUID
+  Transcript: String
+settings:
+  engine: MergeTree()
+  order_by: '`ID`'
+  partition_by: tuple()
+```
+
+<br />
+
+### Properties
+
+<ResponseField name="type" type="string">
+  Type of source: `Table` or `AITable`, see more on [AI table](/concepts/ai_tables) (Optional)
+</ResponseField>
+<ResponseField name="name" type="string">
+  Name of source
+</ResponseField>
+<ResponseField name="description" type="string">
+  A brief overview of the source's content or purpose (optional)
+</ResponseField>
+<ResponseField name="cols" type="{name: type}" required>
+  Defines the schema of the source as a list of columns where each column name is a key and its data type is the value (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types))
+</ResponseField>
+<ResponseField name="settings" type="string | {key: value} | array">
+  [ClickHouse table configuration](https://clickhouse.com/docs/en/sql-reference/statements/create/table) for the source, which can include `ORDER BY`, `PARTITION BY`, Table Engine, etc. The settings can be a String, a key-value pair, or an array comprising either or both. Optional.
+</ResponseField>
+
+### Push
+Push sources to your [workspace](/concepts/workspaces) using the [CLI command](/cli/cli_reference) `af push`.
+
+For example, to push `sales_calls.yaml`, run:
+```bash
+af push sales_calls.yaml
+```

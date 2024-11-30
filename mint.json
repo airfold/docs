@@ -62,29 +62,49 @@
   "navigation": [
     {
       "group": "Get Started",
-      "pages": ["overview", "quickstart_ui", "quickstart_cli", "ingestion", "keys"]
-    },
-    {
-      "group": "UI",
       "pages": [
-        "ui/workspaces",
-        "ui/sources",
-        "ui/ai_tables",
-        "ui/queries",
-        "ui/endpoints",
-        "ui/charts",
-        "ui/data_graph"
+        "getting_started/overview", 
+        "getting_started/quickstart_ui", 
+        "getting_started/quickstart_cli"
       ]
     },
     {
-      "group": "CLI",
+      "group": "Concepts",
       "pages": [
-        "cli/workspaces",
-        "cli/sources",
-        "cli/ai_tables",
-        "cli/pipes",
-        "cli/endpoints",
-        "cli/cli_reference"
+        "concepts/workspaces",
+        "concepts/sources",
+        "concepts/pipes",
+        "concepts/endpoints",
+        "concepts/ai_tables",
+        "concepts/keys",
+        "concepts/data_graph",
+        "concepts/charts"
+      ]
+    },
+    {
+      "group": "Ingest",
+      "pages": [
+        "ingest/ingest_api",
+        "ingest/jsonpath",
+        "ingest/errors",
+        "ingest/files"
+      ]
+    },
+    {
+      "group": "Query",
+      "pages": [
+        "query/pipelines"
+      ]
+    },
+    {
+      "group": "Workspace Files",
+      "pages": [
+        "workspace_files/install_cli",
+        "workspace_files/pipe_yaml",
+        "workspace_files/source_yaml",
+        "workspace_files/push",
+        "workspace_files/pull",
+        "workspace_files/cli_reference"
       ]
     },
     {

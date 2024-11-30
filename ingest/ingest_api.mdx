@@ -1,0 +1,159 @@
+---
+title: 'Ingest From API'
+sidebarTitle: 'API'
+description: "How to ingest data using the API"
+icon: 'cloud'
+---
+
+## Post
+
+You can ingest data into a source with a few lines of code.
+
+Simply fill in the `<>` with your specific entries:
+
+<CodeGroup>
+```JavaScript JavaScript
+const data = [
+  {<key>:<value>}
+];
+
+fetch('https://api.airfold.co/v1/events/<source_name>', {
+  method: 'POST',
+  headers: {
+    Authorization: <token>,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(data)
+});
+```
+
+```Python Python
+import requests
+
+data = [
+  {<key>:<value>}
+]
+
+requests.post(
+  'https://api.airfold.co/v1/events/<source_name>',
+  headers={
+    'Authorization': <token>,
+    'Content-Type': 'application/json'
+  },
+  json=data
+)
+```
+
+```cUrl cUrl
+curl --request POST \
+  --url https://api.airfold.co/v1/events/<source_name> \
+  --header <token> \
+  --header 'Content-Type: application/json' \
+  --data '[
+  {<key>:<value>}
+]'
+```
+</CodeGroup>
+
+Here are some examples in practice:
+<CodeGroup>
+```JavaScript JavaScript
+const data = [
+    {
+        "ID":"ed9f19aa-8986-4d9a-8261-3d65bb331944",
+        "Transcript":"Sales Rep: Hi there! Thank you for taking the time to speak with me today. This is Jake from QuickCart. How are you doing? Client: Hi Jake, I'm doing well, thanks! Just busy with the online shop."
+    },
+    {
+        "ID":"bf9d1771-30b1-4817-8385-c13711342405",
+        "Transcript":"ales Rep: Good morning! Thank you for taking the time to speak with me today. My name is Alex from QuickCart. How are you doing? Client: Hi Alex, I’m doing well, thanks. Just busy trying to figure out the best way to improve my online store."
+    }
+];
+
+fetch('https://api.airfold.co/v1/events/sales_calls_csv', {
+  method: 'POST',
+  headers: {
+    Authorization: aft_3paEjG6XBXA0examplekn6auth7tokenKPHSymSP1E,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(data)
+});
+```
+
+```Python Python
+import requests
+
+data = [
+    {
+        "ID":"ed9f19aa-8986-4d9a-8261-3d65bb331944",
+        "Transcript":"Sales Rep: Hi there! Thank you for taking the time to speak with me today. This is Jake from QuickCart. How are you doing? Client: Hi Jake, I'm doing well, thanks! Just busy with the online shop."
+    },
+    {
+        "ID":"bf9d1771-30b1-4817-8385-c13711342405",
+        "Transcript":"ales Rep: Good morning! Thank you for taking the time to speak with me today. My name is Alex from QuickCart. How are you doing? Client: Hi Alex, I’m doing well, thanks. Just busy trying to figure out the best way to improve my online store."
+    }
+]
+
+requests.post(
+  'https://api.airfold.co/v1/events/sales_calls_csv',
+  headers={
+    'Authorization': aft_3paEjG6XBXA0examplekn6auth7tokenKPHSymSP1E,
+    'Content-Type': 'application/json'
+  },
+  json=data
+)
+```
+
+```cUrl cUrl
+curl --request POST \
+  --url https://api.airfold.co/v1/events/sales_calls_csv \
+  --header aft_3paEjG6XBXA0examplekn6auth7tokenKPHSymSP1E \
+  --header 'Content-Type: application/json' \
+  --data '[
+    {
+        "ID":"ed9f19aa-8986-4d9a-8261-3d65bb331944",
+        "Transcript":"Sales Rep: Hi there! Thank you for taking the time to speak with me today. This is Jake from QuickCart. How are you doing? Client: Hi Jake, I'm doing well, thanks! Just busy with the online shop."
+    },
+    {
+        "ID":"bf9d1771-30b1-4817-8385-c13711342405",
+        "Transcript":"ales Rep: Good morning! Thank you for taking the time to speak with me today. My name is Alex from QuickCart. How are you doing? Client: Hi Alex, I’m doing well, thanks. Just busy trying to figure out the best way to improve my online store."
+    }
+]'
+```
+</CodeGroup>
+
+<Note>
+### Rate Limits
+The Ingest API is rate limited to 1000 events/sec per source. If you need to ingest more events, please [contact us](https://www.airfold.co).
+</Note>
+
+## Get
+
+You may also get the data source schema with the following API call:
+<CodeGroup>
+```JavaScript JavaScript
+const options = {method: 'GET', headers: {Authorization: 'Bearer <token>'}};
+
+fetch('https://api.airfold.co/v1/events/<source_name>', options)
+  .then(response => response.json())
+  .then(response => console.log(response))
+  .catch(err => console.error(err));
+```
+
+```Python Python
+import requests
+
+url = "https://api.airfold.co/v1/events/<source_name>"
+
+headers = {"Authorization": "Bearer <token>"}
+
+response = requests.request("GET", url, headers=headers)
+
+print(response.text)
+```
+
+```cUrl cUrl
+curl --request GET \
+  --url https://api.airfold.co/v1/events/<source_name> \
+  --header 'Authorization: Bearer <token>'
+```
+</CodeGroup>

@@ -15,16 +15,16 @@ Our steps include:
 * Executing queries to filter, aggregate, and refine the into a top 2 list of features
 * Exposing the top features through an API
 
-## Create a [Workspace](/cli/workspaces)
+## Create a [Workspace](/concepts/workspaces)
 Before we begin, we need to create a workspace to store our data and resources, as well as a token to authenticate our CLI.
 
 1. Go to [Airfold](https://www.app.airfold.co) and create a new workspace.
 2. Copy an Admin token from the workspace's **Token** page.
-![Token](images/token.png)
+![Token](/images/token.png)
 
 The token should look like this: `aft_6eab8fcd902e4cbfb63ba174469989cd.Ds1PME5dQsJKosKQWVcZiBSlRFBbmhzIocvHg8KQddV`.
 
-## Set up the [CLI](/cli/cli_reference)
+## Set up the [CLI](/workspace_files/cli_reference)
 <Note>
 The CLI requires Python 3.10 or higher.
 </Note>
@@ -36,7 +36,7 @@ pip install airfold-cli
 af config
 ```
 
-## Create a [Source](/cli/sources)
+## Create a [Source](/concepts/sources)
 
 First, **<a href="/public/sales_calls.csv" download="sales_calls.csv">download sales_calls.csv</a>**
 
@@ -72,14 +72,14 @@ Verify creation by listing sources:
 af source ls
 ```
 
-## [Ingest Data](/cli/sources)
+## Ingest Data
 
 With the source set up, ingest the CSV data:
 ```bash
 af source append sales_calls path/to/sales_calls.csv
 ```
 
-## Create an AI Table
+## Create an [AI Table](/concepts/ai_tables)
 To derive insights, we can create AI columns that automatically extract competitor mentions, feature mentions, and success indicators.
 
 In your workspace, create a `analysis.yaml` file with this configuration:
@@ -152,7 +152,7 @@ At this point, we have two populated tables:
 * `sales_calls`: containing original data `ID` and `Transcript`
 * `analysis`: containing data from `sales_calls` and additional AI columns
 
-## Further Analysis with [Pipes](/cli/pipes)
+## Further Analysis with [Pipes](/concepts/pipes)
 To identify top-mentioned features in successful calls, create an `insights.yaml` file:
 ```yaml insights.yaml
 nodes:
@@ -228,5 +228,4 @@ Which should output:
 ## Next Steps
 You've successfully ingested, analyzed, and published data using Airfold in a few simple steps! This workflow enables intuitive interaction with unstructured data, transforming raw call transcripts into actionable insights.
 
-Explore [workspaces](/cli/workspaces), [sources](/cli/sources), and [pipes](/cli/pipes) to learn more about how to interact with Airfold.
-Our the [API](/api-reference) and [CLI](/cli/cli_reference) documentation is also available for further information.
+Feel free to dive deeper into specific concepts, such as [workspaces](/concepts/workspaces), [sources](/concepts/sources), and more!

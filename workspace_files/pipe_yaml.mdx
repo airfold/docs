@@ -1,0 +1,73 @@
+---
+title: 'pipe.yaml'
+description: "Properties of pipe.yaml"
+icon: 'magnifying-glass'
+---
+
+## Properties
+
+Below is an example of a `pipe.yaml` file that defines a pipeline to load logs, filter error messages, and group them by level for aggregation:
+
+```yaml
+description: 'Aggregate error logs by level'
+nodes:
+    - load:
+        description: Load raw logs
+        sql: SELECT timestamp, level, file, message FROM logs
+    - filter:
+        description: Filter error messages
+        sql: SELECT * FROM load WHERE level = 'error'
+    - aggregate:
+        description: Count errors by level
+        sql: |
+            SELECT
+                level,
+                count(*) AS error_count
+            FROM filter
+            GROUP BY level
+publish: error_aggregation
+params:
+    - name: log_level
+      type: string
+      default: error
+```
+
+<ResponseField name="description" type="string">
+  Provides a brief summary of the pipeline’s purpose or functionality. Optional.
+</ResponseField>
+
+<ResponseField name="nodes" type="Node[]" required>
+  The sequence of nodes within the pipe. Each node represents a stage in the data processing workflow.
+  <Expandable title="Node">
+    <ResponseField name="[name]" type="Node" required>
+      An identifier for the node, such as `load` or `filter`.
+      <Expandable title="Properties">
+        <ResponseField name="description" type="string">
+          A brief description of the node’s role or function. Optional but recommended.
+        </ResponseField>
+        <ResponseField name="sql" type="string" required>
+          The SQL query associated with the node. It can retrieve data from sources, published pipes, or preceding nodes in the same pipe. It supports Jinja2 templating for dynamic parameterization via the `params` field.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="publish" type="string">
+  Specifies that this pipe is a published pipe, creating an API endpoint for accessing its results. The value defines the endpoint name. Optional.
+</ResponseField>
+
+<ResponseField name="params" type="Param[]">
+  A list of parameters for dynamic SQL queries, allowing customization of pipeline behavior through Jinja2 templates.
+  <Expandable title="Param">
+    <ResponseField name="name" type="string" required>
+      The name of the parameter, as referenced in the SQL query.
+    </ResponseField>
+    <ResponseField name="type" type="string" required>
+      The data type of the parameter, such as `string` or `Int32`. See [ClickHouse types](https://clickhouse.com/docs/en/sql-reference/data-types).
+    </ResponseField>
+    <ResponseField name="default" type="string">
+      The default value for the parameter if not explicitly provided. Optional.
+    </ResponseField>
+  </Expandable>
+</ResponseField>

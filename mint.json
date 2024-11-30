@@ -28,7 +28,7 @@
   ],
   "topbarCtaButton": {
     "name": "Try for free",
-    "url": "https://api.airfold.co/auth/google?state=https%3A%2F%2Fapp.airfold.co"
+    "url": "https://cal.com/julianofficial/call"
   },
   "tabs": [
     {
@@ -46,17 +46,12 @@
     {
       "name": "Blog",
       "icon": "newspaper",
-      "url": "https://www.airfold.co/blog"
+      "url": "https://blog.airfold.co/"
     },
     {
       "name": "Join our Community",
       "icon": "slack",
       "url": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw"
-    },
-    {
-      "name": "Schedule a demo",
-      "icon": "rocket",
-      "url": "https://cal.com/julianofficial/call"
     }
   ],
   "navigation": [

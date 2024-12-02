@@ -103,6 +103,21 @@
       ]
     },
     {
+      "group": "Management",
+      "pages": [
+        "management/members"
+      ]
+    },
+    {
+      "group": "Production",
+      "pages": [
+        "production/staging_prod",
+        "production/version_control",
+        "production/cicd",
+        "production/optimize_queries"
+      ]
+    },
+    {
       "group": "Get Started",
       "pages": ["api-reference/authentication"]
     },

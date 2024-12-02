@@ -1,0 +1,78 @@
+---
+title: 'CI/CD'
+description: "Use PR-oriented workflows & CI that pushes to Airfold"
+icon: 'infinity'
+---
+
+Airfold integrates seamlessly with CI/CD pipelines, allowing you to automate deployment workflows, validate changes with pull requests, and manage updates to your workspaces efficiently.
+
+## How CI/CD Works
+
+CI/CD (Continuous Integration and Continuous Deployment) automates the process of testing, validating, and deploying changes to your projects.
+
+In a typical CI/CD workflow:
+- **Continuous Integration (CI)** ensures that changes, such as updates to pipelines or configurations, are tested and validated automatically whenever new code is pushed or a pull request is opened
+- **Continuous Deployment (CD)** automates the deployment of validated changes to staging or production environments
+
+## Example
+Let's go through an example of setting up a CI/CD pipeline using GitHub Actions:
+
+```yaml deploy.yaml
+name: Deploy Sales Calls Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - airfold/sales_calls.yaml
+  push:
+    branches:
+      - main
+    paths:
+      - airfold/sales_calls.yaml
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install Airfold CLI
+        uses: airfold/setup-airfold@v1
+        with:
+          api-token: ${{ secrets.AIRFOLD_API_KEY }}
+
+      - name: Validate Changes (Dry Run)
+        if: github.event_name == 'pull_request'
+        run: af push airfold/sales_calls.yaml --dry-run
+
+      - name: Deploy Pipeline
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: af push airfold/sales_calls.yaml
+```
+
+**Trigger Events**:
+- Pull Request Validation: The workflow runs when a pull request affecting `airfold/sales_calls.yaml` is opened or updated
+- Deployment to Production: The workflow runs when changes are pushed to the main branch
+
+**Steps**:
+- Checkout Repository: Fetch the repository to access the updated `sales_calls.yaml` file
+- Set up Python: Install Python 3.11, required to run the Airfold CLI
+- Install Airfold CLI: Set up the Airfold CLI using your API key stored as a GitHub secret `AIRFOLD_API_KEY`
+- Validate Changes (Dry Run): Run `af push --dry-run` during pull requests to check for errors without applying changes
+- Deploy Pipeline: When changes are merged to main, apply the validated changes to the production workspace with `af push`
+
+## Benefits
+
+**1. Validation Before Deployment**: Errors are caught during the pull request process, avoiding production disruptions
+
+**2. Automated Deployments**: No manual effort is required to deploy validated changes once they are merged
+
+**3. Collaboration**: Ensures changes are reviewed by your team before deployment

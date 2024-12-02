@@ -1,0 +1,61 @@
+---
+title: 'Version Control'
+sidebarTitle: 'Version Control'
+description: "Manage your pipelines using Git and YAML"
+icon: 'github'
+---
+
+By using Git repositories and YAML-based version control, you can apply familiar engineering workflows like pull requests, branching, and CI/CD to your projects.
+
+## File Structure
+A typical Airfold project is organized into the following directory structure:
+```
+/.airfold/config.yaml          # Configuration for CLI and workspace
+/pipes                         # YAML files for pipeline definitions
+  /trends_per_country.yaml
+  /sales_metrics.yaml
+/sources                       # YAML files for data sources and materialized views
+  /events.yaml
+  /sales.yaml
+  /sales_metrics_mv.yaml
+/endpoints                     # (Optional) Organized API endpoint definitions
+  /country_trends.yaml
+  /sales_over_time.yaml
+```
+
+**Pipes**: Define the sequence of SQL transformations in your data pipeline
+- Example: /pipes/sales_metrics.yaml
+- See more on [pipe.yaml](/workspace_files/pipe_yaml)
+
+**Sources**: Define data sources
+- Example: /sources/sales.yaml
+- See more on [source.yaml](/workspace_files/source_yaml)
+
+**Endpoints**: (Optional) Define API endpoints for serving pipeline results.
+- Example: /endpoints/sales_over_time.yaml
+
+## Workflow
+
+### Initialize
+
+From your project directory, use Git to initialize version control:
+
+```
+git init
+```
+
+### Commit & Push
+
+Commit existing workspace files to the repository:
+
+```
+git add .
+git commit -m "Initial commit of Airfold workspace files"
+```
+
+Push your repository:
+
+```
+git remote add origin <repository_url>
+git push -u origin main
+```

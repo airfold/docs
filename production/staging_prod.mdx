@@ -1,0 +1,49 @@
+---
+title: 'Staging and Production Workspaces'
+sidebarTitle: 'Staging & Production'
+description: "Separate staging and production workspaces"
+icon: 'shield-check'
+---
+
+Airfold allows you to have separate staging and production workspaces, enabling safe iteration on new features and pipeline testing without risking production stability.
+
+## Staging vs Production
+
+### Staging Workspaces
+- Contain **staging data** and connection settings
+- Serve as **testing environments** to validate changes, perform integration testing, and simulate production behavior
+- Allow teams to iterate on new features or pipeline configurations without affecting live systems
+
+**Use cases**:
+  - Testing a new pipeline or query configuration with mock or limited data before deploying it to production
+  - Debugging and resolving issues that could arise in production without impacting live users
+
+### Production Workspaces
+- Use **live data** and connection settings
+- Serve data to **real users**, powering your production systems
+- Provide a stable and high-performance environment for your pipelines
+
+**Use cases**:
+  - Delivering production-ready API endpoints to customers or applications
+  - Running queries on the full production dataset
+  - Monitoring pipeline performance and ensuring real-time data accuracy for end-users
+
+## Setup
+Staging workspaces can be set up through: [app.staging.airfold.co](https://app.staging.airfold.co/)
+
+Production workspaces can be set up through: [app.airfold.co](https://app.airfold.co/)
+
+## Example Workflow
+
+1. **Develop in Staging**:
+   - Create a new pipeline in the staging workspace (e.g., `success_indicators`) and test it with a subset of data
+
+2. **Validate Results**:
+   - Ensure that the pipeline produces the expected results
+   - Test integration with external systems or mock API calls using staging credentials
+
+3. **Promote to Production**:
+   - Once validated, deploy the same pipeline to the production workspace using live data and credentials
+
+4. **Monitor Production**:
+   - Continuously monitor the production workspace for pipeline performance, data accuracy, and API reliability

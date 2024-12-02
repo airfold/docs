@@ -1,0 +1,64 @@
+---
+title: 'Optimize Queries'
+description: "Optimizing queries with materialized pipes"
+icon: 'magnifying-glass'
+---
+
+Optimizing queries is a crucial part of managing production workloads in Airfold, specifically by precomputing and storing results incrementally through **materialized pipes**.
+
+## What are Materialized Pipes?
+
+Materialized pipes differ from draft and published pipes in that they:
+- **Incrementally process data**: Materialized pipes transform data as it is ingested and write the results to a target source
+- **Precompute and store results**: These results can be queried later, reducing the need for repeated heavy computations
+- **Support high-performance queries**: By serving precomputed data, materialized pipes enable faster responses for downstream use cases
+
+When to Use Materialized Pipes:
+- To reduce latency for queries that involve complex transformations
+- To pre-aggregate data when computing over large datasets
+- For use cases requiring incremental updates to data instead of full recomputations
+
+## Draft to Materialized Pipe
+
+### Define a Draft Pipe
+
+Start by creating a draft pipe to develop and test your pipeline.
+
+```yaml logs_aggregation.yaml
+description: 'Aggregate logs by level'
+nodes:
+  - load:
+      description: Load raw logs
+      sql: select timestamp, level, file, message from logs
+  - aggregate:
+      description: Aggregate log counts by level
+      sql: |
+          select
+              level,
+              countState() as count
+          from load
+          group by level
+to: logs_by_level
+```
+
+Push this draft pipe by running:
+
+```
+af push logs_aggregation.yaml
+```
+
+### Materialize the Draft Pipe
+
+To materialize the pipe, run the `af pipe materialize` command:
+
+```
+af pipe materialize logs_aggregation.yaml
+```
+
+### Query Materialized Data
+After materializing the pipe, the results are stored in the target source `logs_by_level`. 
+
+You can query it directly by running:
+```
+af query logs_by_level
+```

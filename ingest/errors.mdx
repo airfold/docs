@@ -8,7 +8,49 @@ icon: 'scroll'
 In the [Sources](/concepts/sources) page of your UI, the "Logs" tab provides a centralized view of any errors that occurred during the data ingestion process:
 ![logs](/images/logs.png)
 
-Here, you can see detailed information about ingestion errors to help you resolve issues quickly. Each log entry contains the following fields:
-- `timestamp` **(Datetime)**: The exact date and time when the error occurred
-- `error` **(String)**: The type of the error encountered
-- `data` **(String)**: The specific data payload or record that caused the error
+Errors typically occur when there is a **schema mismatch**:
+- Field Type Mismatch: The data type of a field does not match the expected type (e.g., a String instead of Integer)
+- Missing Required Fields: A required field is absent in the data being ingested
+- Unexpected Fields: The data contains fields that are not defined in the schema
+
+## Example
+For example, we can take this sample dataset of customer information:
+```NDJSON
+{"name": "John Doe", "age": 36, "email": "john.doe@test.com"}
+{"name": "Jane Smith", "age": 59, "email": "jane.smith@example.com"}
+{"name": "Emily Johnson", "age": 56, "email": "emily.johnson@demo.net"}
+{"name": "Michael Brown", "age": 52, "email": "michael.brown@test.com"}
+{"name": "Sarah Davis", "age": 27, "email": "sarah.davis@mail.com"}
+...
+{"name": "Harper Baker", "age": 50, "email": "harper.baker@demo.net"}
+{"name": "Noah Nelson", "age": 19, "email": "noah.nelson@test.com"}
+{"name": "Ella Carter", "age": 47, "email": "ella.carter@example.com"}
+{"name": "William Perez", "age": "thirty", "email": "william.perez@test.com"}
+```
+
+With the following schema:
+```
+name: String
+age: Integer
+email: String
+```
+
+Note that the final data entry has "thirty" for `age`, which expects an Integer.
+
+On the "Logs" tab, we can see detailed information about the ingestion error that occured:
+
+`timestamp` **(Datetime)**: The exact date and time when the error occurred
+
+<p align="center">
+  <img src="/images/timestamp.png" alt="data format options" width="180"/>
+</p>
+
+`error` **(String)**: The type of the error encountered
+
+![error col](/images/error.png)
+
+We can see here that the error occured at row 30 specifically for the  `age` value.
+
+`data` **(String)**: The specific data payload that caused the error
+
+![data col](/images/data_all.png)

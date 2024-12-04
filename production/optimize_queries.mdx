@@ -8,15 +8,31 @@ Optimizing queries is a crucial part of managing production workloads in Airfold
 
 ## What are Materialized Pipes?
 
-Materialized pipes differ from draft and published pipes in that they:
-- **Incrementally process data**: Materialized pipes transform data as it is ingested and write the results to a target source
-- **Precompute and store results**: These results can be queried later, reducing the need for repeated heavy computations
-- **Support high-performance queries**: By serving precomputed data, materialized pipes enable faster responses for downstream use cases
+Materialized pipes **precompute** and **store results** as data is ingested. They offer a more efficient way to handle repetitive or resource-intensive queries compared to draft or published pipes.
 
-When to Use Materialized Pipes:
-- To reduce latency for queries that involve complex transformations
-- To pre-aggregate data when computing over large datasets
-- For use cases requiring incremental updates to data instead of full recomputations
+**How they work**:
+- **Incremental Processing**: Materialized pipes compute results as new data flows in, maintaining up-to-date outputs without reprocessing the entire dataset
+- **Precomputed Results**: Instead of executing a query from scratch every time, results are precomputed and stored in a target source
+- **Fast Queries**: Precomputed results are served instantly, avoiding recomputation
+
+## Use Cases
+
+**Frequent Queries**:
+- Ideal for scenarios where the same query is executed repeatedly, such as dashboards or real-time Monitoring
+
+**Recent Data Analysis**:
+- Perfect for use cases where the focus is on recently ingested data
+- Materialized pipes maintain results incrementally as new data arrives
+
+## Caveats
+
+**Immutable Results**:
+- Once data is materialized, you cannot change how the results were computed
+- Any change in logic requires creating a new materialized pipe
+
+**No Retroactive Updates**:
+- Materialized pipes work with newly ingested data and cannot retroactively apply changes to older data
+- This makes them unsuitable for scenarios where historical recalculations are needed
 
 ## Draft to Materialized Pipe
 

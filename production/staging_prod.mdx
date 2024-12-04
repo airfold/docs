@@ -5,9 +5,13 @@ description: "Separate staging and production workspaces"
 icon: 'shield-check'
 ---
 
-Airfold allows you to have separate staging and production workspaces, enabling safe iteration on new features and pipeline testing without risking production stability.
+You can create separate workspaces for staging and production, enabling safe iteration on new features and pipeline testing without risking production stability.
 
-## Staging vs Production
+## Why use Staging and Production?
+
+Using separate workspaces for staging and production is a critical best practice for managing reliable systems.
+
+This separation allows you to isolate development and testing environments to prevent unintended disruptions to live systems.
 
 ### Staging Workspaces
 - Contain **staging data** and connection settings
@@ -28,19 +32,28 @@ Airfold allows you to have separate staging and production workspaces, enabling 
   - Running queries on the full production dataset
   - Monitoring pipeline performance and ensuring real-time data accuracy for end-users
 
-Workspaces can be set up through: [app.airfold.co](https://app.airfold.co/)
-
 ## Example Workflow
 
-1. **Develop in Staging**:
-   - Create a new pipeline in the staging workspace (e.g., `success_indicators`) and test it with a subset of data
+1. **Create Workspaces**:
+   - Set up two workspaces through [app.airfold.co](https://app.airfold.co/)
+      - One for staging, another for production
+   - For example, we may set up staging and production workspaces for `sales_calls` as follows:
 
-2. **Validate Results**:
+<p align="center">
+  <img src="/images/staging_prod.png" alt="data format options" width="300"/>
+</p>
+
+2. **Develop in Staging**:
+   - Create a new pipeline in the staging workspace and test it with a subset of data
+
+3. **Validate Results**:
    - Ensure that the pipeline produces the expected results
    - Test integration with external systems or mock API calls using staging credentials
 
-3. **Promote to Production**:
+4. **Promote to Production**:
    - Once validated, deploy the same pipeline to the production workspace using live data and credentials
 
-4. **Monitor Production**:
+5. **Monitor Production**:
    - Continuously monitor the production workspace for pipeline performance, data accuracy, and API reliability
+
+You may also separate staging and production through branching, as detailed in [Version Control](/production/version_control).

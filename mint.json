@@ -113,7 +113,8 @@
       "pages": [
         "production/staging_prod",
         "production/version_control",
-        "production/optimize_queries"
+        "production/optimize_queries",
+        "production/cicd"
       ]
     },
     {

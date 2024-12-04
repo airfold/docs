@@ -7,6 +7,44 @@ icon: 'github'
 
 By using Git repositories and YAML-based version control, you can apply familiar engineering workflows like pull requests, branching, and CI/CD to your projects.
 
+## Why use Version Control?
+
+**Restore Workspace History**
+
+Each commit represents the exact state of your Airfold workspace at a given point in time.
+
+Easily navigate to and restore any previous version of the workspace to:
+- Revert breaking changes
+- Recover pipeline configurations or source definitions that were accidentally modified
+
+
+**Roll Back Issues**
+
+If a recent change causes unexpected errors, simply roll back to the last known working commit.
+
+This is helpful for avoiding downtime in production by reverting to a stable state with minimal effort.
+
+**Enable Collaboration**
+
+Git enables multiple team members to work on the same workspace simultaneously without conflicts:
+- Avoid overwriting others’ changes (a common risk when using a shared UI), where actions like multiple users pressing `save` on a query edit can accidentally overwrite each other’s changes
+- Git merge enables a structured way to combine contributions, reducing the risk of such conflicts and ensuring every update is reviewed
+
+**Seamless Sharing**
+
+Within your organization:
+- Store your Airfold workspace files in a shared Git repository, ensuring all team members access to latest udpates
+- Team members can work on individual tasks in separate branches, avoiding conflicts with ongoing production or staging workflows
+- Use pull requests to propose changes and review code before merging
+
+You can also open-source your Airfold workspaces just as you would with any Git repository, allowing the broader community to reuse and adapt your workspaces.
+
+**Branch for Production and Staging**
+
+Maintain separate branches for staging and production environments:
+- Use staging for testing new pipelines, changes, or integrations
+- Deploy only validated changes to production
+
 ## File Structure
 A typical Airfold project is organized into the following directory structure:
 ```
@@ -59,3 +97,34 @@ Push your repository:
 git remote add origin <repository_url>
 git push -u origin main
 ```
+
+### Branch for Staging and Production
+
+Create a branch for staging:
+
+```
+git branch staging
+```
+
+Use this `staging` branch to test new changes:
+
+```
+git checkout staging
+```
+
+Once changes are validated, merge into production:
+
+```
+git checkout main
+git merge staging
+```
+
+## Best Practices
+
+Use **pull requests** for any workspace updates:
+- Enable code reviews before merging changes
+
+**Separate branches** for staging and production:
+- `main` for production-ready workspace configurations
+- `staging` for test configurations
+- See more on [Staging and Production](/production/staging_prod)

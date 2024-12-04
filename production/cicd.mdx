@@ -4,7 +4,7 @@ description: "Use PR-oriented workflows & CI that pushes to Airfold"
 icon: 'infinity'
 ---
 
-Airfold integrates seamlessly with CI/CD pipelines, allowing you to automate deployment workflows, validate changes with pull requests, and manage updates to your workspaces efficiently.
+Airfold integrates seamlessly with CI/CD pipelines using [GitHub Actions](https://docs.github.com/en/actions), allowing you to automate deployment workflows and manage updates to your workspaces efficiently.
 
 ## How CI/CD Works
 
@@ -14,65 +14,184 @@ In a typical CI/CD workflow:
 - **Continuous Integration (CI)** ensures that changes, such as updates to pipelines or configurations, are tested and validated automatically whenever new code is pushed or a pull request is opened
 - **Continuous Deployment (CD)** automates the deployment of validated changes to staging or production environments
 
+## How to Write GitHub Actions
+[GitHub Actions](https://docs.github.com/en/actions) enable you to define workflows as code using YAML configuration files in your repository. 
+
+### 1. Define a Workflow
+
+Workflows are defined in `.github/workflows/` and use YAML files to describe the automation.
+
+**Each workflow file specifies**:
+- `name`: The name of the workflow
+- `on`: Events that start the workflow
+- `jobs`: Work executed as part of the workflow
+- More detailed [here](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#about-yaml-syntax-for-workflows)
+
+### 2. Specify Triggers
+
+Workflow triggers are the events defined with `on` that cause a workflow to run.
+
+**Some examples include**:
+- `push`: Runs the workflow whenever changes are pushed to specific branches
+- `pull_request`: Executes the workflow when a pull request is opened, updated, or merged
+- `workflow_dispatch`: Allows workflows to be triggered manually from the GitHub UI
+
+### 3. Define Jobs
+**Each job specifies**:
+- `runs-on`: The environment to run the job (e.g., ubuntu-latest)
+- `steps`: A series of steps to execute
+
+<br />
+See more on the [GitHub Actions Documentation](https://docs.github.com/en/actions).
+
 ## Example
-Let's go through an example of setting up a CI/CD pipeline using GitHub Actions:
+Let's go through an example of setting up a deployment workflow for [AirLang](https://github.com/airfold/airlang):
 
 ```yaml deploy.yaml
-name: Deploy Sales Calls Pipeline
+name: Airfold deploy
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - airfold/sales_calls.yaml
   push:
     branches:
       - main
-    paths:
-      - airfold/sales_calls.yaml
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
 
 jobs:
-  deploy:
+  airfold:
+    name: Plan / Apply
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secrets.DEPLOY_TOKEN }}
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: 3.11
+            python-version: 3.11
 
-      - name: Install Airfold CLI
+      - name: Setup Airfold CLI
         uses: airfold/setup-airfold@v1
         with:
           api-token: ${{ secrets.AIRFOLD_API_KEY }}
 
-      - name: Validate Changes (Dry Run)
+      - name: Airfold diff
+        id: diff
         if: github.event_name == 'pull_request'
-        run: af push airfold/sales_calls.yaml --dry-run
+        run: |
+          af diff airfold
+        continue-on-error: true
 
-      - name: Deploy Pipeline
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: af push airfold/sales_calls.yaml
+      - name: Airfold plan
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: |
+          af push airfold --dry-run
+        continue-on-error: true
+
+      - name: Airfold Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Airfold push and apply
+        if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
+        run: af push airfold
 ```
 
-**Trigger Events**:
-- Pull Request Validation: The workflow runs when a pull request affecting `airfold/sales_calls.yaml` is opened or updated
-- Deployment to Production: The workflow runs when changes are pushed to the main branch
+### `on`
 
-**Steps**:
-- Checkout Repository: Fetch the repository to access the updated `sales_calls.yaml` file
-- Set up Python: Install Python 3.11, required to run the Airfold CLI
-- Install Airfold CLI: Set up the Airfold CLI using your API key stored as a GitHub secret `AIRFOLD_API_KEY`
-- Validate Changes (Dry Run): Run `af push --dry-run` during pull requests to check for errors without applying changes
-- Deploy Pipeline: When changes are merged to main, apply the validated changes to the production workspace with `af push`
+`push`: Runs the workflow whenever changes are pushed to the `main` branch
 
-## Benefits
+`pull_request`: Executes the workflow when a pull request is opened or updated for the main branch
 
-**1. Validation Before Deployment**: Errors are caught during the pull request process, avoiding production disruptions
+`workflow_dispatch`: Allows the workflow to be triggered manually from the Actions tab in GitHub
 
-**2. Automated Deployments**: No manual effort is required to deploy validated changes once they are merged
+### `permissions`
 
-**3. Collaboration**: Ensures changes are reviewed by your team before deployment
+Grants the workflow specific permissions:
+- `id-token`: Required for OIDC authentication
+- `contents`: Allows the workflow to read/write repository contents
+- `pull-requests`: Enables the workflow to comment on pull requests
+
+### `jobs`
+
+`jobs`: Defines a single job named `Plan / Apply`
+
+`runs-on: ubuntu-latest`: Specifies the environment where the job will run
+
+**1. Checkout Repository**
+```yaml
+uses: actions/checkout@v3
+with:
+  fetch-depth: 0
+  submodules: recursive
+  token: ${{ secrets.DEPLOY_TOKEN }}
+```
+- Clones the repository, fetching all commit history and submodules
+- Authenticates using a secret `DEPLOY_TOKEN`
+
+**2. Set Up Python 3.11**
+```yaml
+uses: actions/setup-python@v4
+with:
+    python-version: 3.11
+```
+- Installs and configures Python 3.11 for the workflow
+
+**3. Setup Airfold CLI**
+```yaml
+uses: airfold/setup-airfold@v1
+with:
+  api-token: ${{ secrets.AIRFOLD_API_KEY }}
+```
+- Installs the Airfold CLI and configures it using the API key
+
+**4. Airfold diff**
+```yaml
+id: diff
+if: github.event_name == 'pull_request'
+run: |
+  af diff airfold
+continue-on-error: true
+```
+- Runs `af diff` to compare the current and previous states of the Airfold configuration
+- Executes only for pull requests
+- `continue-on-error: true`: Prevents failures in this step from stopping the workflow
+
+**5. Airfold plan**
+```yaml
+id: plan
+if: github.event_name == 'pull_request'
+run: |
+  af push airfold --dry-run
+continue-on-error: true
+```
+- Performs a dry run of `af push` to simulate changes
+
+**6. Airfold Status**
+```yaml
+if: steps.plan.outcome == 'failure'
+run: exit 1
+```
+- Stops the workflow if the plan step fails, ensuring only valid changes proceed
+
+**7. Airfold push and apply**
+```yaml
+if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
+run: af push airfold
+```
+Pushes changes to Airfold workspace when:
+- Code is pushed to main
+- The workflow is triggered manually through `workflow_dispatch`
+

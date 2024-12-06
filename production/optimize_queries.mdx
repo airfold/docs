@@ -4,13 +4,16 @@ description: "Optimizing queries with materialized pipes"
 icon: 'magnifying-glass'
 ---
 
-Optimizing queries is a crucial part of managing production workloads in Airfold, specifically by precomputing and storing results incrementally through **materialized pipes**.
+Although endpoints alone can handle high volumes, they may slow down at larger scales.
+
+Thus, optimizing queries is a crucial part of managing production workloads in Airfold, specifically by precomputing and storing results incrementally through **materialized pipes**.
 
 ## What are Materialized Pipes?
 
 Materialized pipes **precompute** and **store results** as data is ingested. They offer a more efficient way to handle repetitive or resource-intensive queries compared to draft or published pipes.
 
 **How they work**:
+- **Historical Data Pre-Aggregation**: When creating a materialized pipe, you have the option to pre-aggregate all historical data to create a baseline of results
 - **Incremental Processing**: Materialized pipes compute results as new data flows in, maintaining up-to-date outputs without reprocessing the entire dataset
 - **Precomputed Results**: Instead of executing a query from scratch every time, results are precomputed and stored in a target source
 - **Fast Queries**: Precomputed results are served instantly, avoiding recomputation
@@ -19,6 +22,11 @@ Materialized pipes **precompute** and **store results** as data is ingested. The
 
 **Frequent Queries**:
 - Ideal for scenarios where the same query is executed repeatedly, such as dashboards or real-time monitoring
+
+**Expected Aggregations**:
+- If you know ahead of time which aggregations are needed, such as sales metrics or user activity trends
+
+*Note: Materialized pipes are not suitable for ad hoc queries where the structure of the data or aggregations is determined dynamically*
 
 **Recent Data Analysis**:
 - Perfect for use cases where the focus is on recently ingested data

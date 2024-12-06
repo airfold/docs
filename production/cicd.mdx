@@ -4,7 +4,9 @@ description: "Use PR-oriented workflows & CI that pushes to Airfold"
 icon: 'infinity'
 ---
 
-Airfold integrates seamlessly with CI/CD pipelines using [GitHub Actions](https://docs.github.com/en/actions), allowing you to automate deployment workflows and manage updates to your workspaces efficiently.
+Airfold workspaces are fully defined in YAML files, which enables you to leverage [version control](/production/version_control) and CI/CD similar to tools like **dbt**, **Terraform**, and other **infrastructure as code** systems. 
+
+Your files represent **data pipelines as code** with Airfold.
 
 ## How CI/CD Works
 
@@ -14,38 +16,17 @@ In a typical CI/CD workflow:
 - **Continuous Integration (CI)** ensures that changes, such as updates to pipelines or configurations, are tested and validated automatically whenever new code is pushed or a pull request is opened
 - **Continuous Deployment (CD)** automates the deployment of validated changes to staging or production environments
 
-## How to Write GitHub Actions
-[GitHub Actions](https://docs.github.com/en/actions) enable you to define workflows as code using YAML configuration files in your repository. 
+## Why Use CI/CD?
 
-### 1. Define a Workflow
+Implementing CI/CD for Airfold workspaces is **highly recommended** for production systems as it enables you to:
+- **Automate** the process of testing, validating, and deploying changes to Airfold pipelines
+- **Track changes** by leveraging version control with your CI/CD pipelines
+- **Maintain consistency** across various environments (e.g., staging and production)
 
-Workflows are defined in `.github/workflows/` and use YAML files to describe the automation.
+## GitHub Actions Example
+[GitHub Actions](https://docs.github.com/en/actions) is one way to integrate Airfold with CI/CD pipelines.
 
-**Each workflow file specifies**:
-- `name`: The name of the workflow
-- `on`: Events that start the workflow
-- `jobs`: Work executed as part of the workflow
-- More detailed [here](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#about-yaml-syntax-for-workflows)
-
-### 2. Specify Triggers
-
-Workflow triggers are the events defined with `on` that cause a workflow to run.
-
-**Some examples include**:
-- `push`: Runs the workflow whenever changes are pushed to specific branches
-- `pull_request`: Executes the workflow when a pull request is opened, updated, or merged
-- `workflow_dispatch`: Allows workflows to be triggered manually from the GitHub UI
-
-### 3. Define Jobs
-**Each job specifies**:
-- `runs-on`: The environment to run the job (e.g., ubuntu-latest)
-- `steps`: A series of steps to execute
-
-<br />
-See more on the [GitHub Actions Documentation](https://docs.github.com/en/actions).
-
-## Example
-Let's go through an example of setting up a deployment workflow for [Airlang](https://github.com/airfold/airlang):
+Let's go through an example of setting up a deployment workflow for [Airlang](https://github.com/airfold/airlang) using [GitHub Actions](https://docs.github.com/en/actions):
 
 ```yaml deploy.yaml
 name: Airfold deploy
@@ -195,3 +176,16 @@ Pushes changes to Airfold workspace when:
 - Code is pushed to main
 - The workflow is triggered manually through `workflow_dispatch`
 
+### GitHub Actions
+
+[GitHub Actions](https://docs.github.com/en/actions) enable you to define workflows as code using YAML configuration files in your repository.
+
+**High-level overview of a GitHub Actions workflow**:
+
+1. Define a Workflow
+
+2. Specify Triggers
+
+3. Define Jobs
+
+See more on the [GitHub Actions Documentation](https://docs.github.com/en/actions).

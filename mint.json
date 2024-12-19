@@ -120,8 +120,7 @@
     {
       "group": "Connectors",
       "pages": [
-        "connectors/snowflake",
-        "connectors/s3"
+        "connectors/snowflake"
       ]
     },
     {

@@ -1,24 +1,107 @@
 ---
 title: 'Snowflake'
-description: "Easily integrate with data from Snowflake"
-icon: 'paper-plane'
+description: "Seamlessly integrate your Snowflake data with Airfold"
+icon: 'snowflake'
 ---
 
-Airfold allows you to directly connect to snowflake, and also set up a cron job for continuous updates.
-don't have to download and upload data yourself, it's automatically updated
+Airfold makes it easy to connect with your Snowflake data. It also enables you to automate data updates using scheduled cron jobs.
 
-we'll go through a simple example of how to do this in workspace
+We’ll walk through an example of using a Snowflake connector for your workspace.
 
-## Create Source
-navigate to sources, "+", then "Snowflake"
+## Creation
 
-(picture of source creation page)
+### Create Source
+Navigate to "Sources" > "+" > "Snowflake":
 
-Fill in the information as follows:
-(screenshots of where to get information)
+<p align="center">
+  <img src="/images/snowflake1.png" alt="snowflake" width="500"/>
+</p>
 
-Rest of steps
+### Establish Connection
 
-Now that this has been created, can be treated like any other source. except it's continously updated on its own according to cron expression.
+<p align="center">
+  <img src="/images/snowflake2.png" alt="snowflake" width="500"/>
+</p>
 
-See how to do this with S3 buckets as well.
+**Account**
+
+Prefix before `*.snowflake.computing.com` (e.g., lh10221.us-central1.gcp)
+
+You can also access this with the following commands in Snowflake:
+```
+SELECT CURRENT_ACCOUNT();
+```
+
+```
+SELECT CURRENT_REGION();
+```
+
+**Username**
+
+Username for your Snowflake Account
+
+```
+SELECT CURRENT_USER();
+```
+
+**Password**
+
+Password for your Snowflake Account
+
+**Database**
+Name of your database that you wish to access
+
+```
+SELECT CURRENT_DATABASE();
+```
+
+**Warehouse**
+Name of your warehouse, defaults to `COMPUTE_WH`
+
+```
+SELECT CURRENT_WAREHOUSE();
+```
+
+**Schema**
+Name of your warehouse, defaults to `PUBLIC`
+
+```
+SELECT CURRENT_SCHEMA();
+```
+
+**Role**
+Name of your role
+
+```
+SELECT CURRENT_ROLE();
+```
+
+Click on "Test Connection", and you should see this:
+
+<p align="center">
+  <img src="/images/snowflake3.png" alt="snowflake" width="200"/>
+</p>
+
+### Select Table
+
+Select the table you wish to add from your database:
+
+![snowflake](/images/snowflake4.png)
+
+### Set Up Cron job
+
+Set up automated data updates with a cron expression:
+
+<p align="center">
+  <img src="/images/snowflake5.png" alt="snowflake" width="500"/>
+</p>
+
+### Confirm Schema
+
+Airfold infers schema from Snowflake, so all you have to do is confirm whether it is correct:
+
+<p align="center">
+  <img src="/images/snowflake6.png" alt="snowflake" width="500"/>
+</p>
+
+And that's it! Now you have ingested data using our Snowflake connector, which will also ensure that your data sources are automatically updated.

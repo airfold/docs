@@ -42,9 +42,35 @@ Materialized pipes **precompute** and **store results** as data is ingested. The
 - Materialized pipes work with newly ingested data and cannot retroactively apply changes to older data
 - This makes them unsuitable for scenarios where historical recalculations are needed
 
-## Draft to Materialized Pipe
+## UI
 
-### Define a Draft Pipe
+Upon creating a pipe, navigate to the three dots (`...`) on the top right corner and click "materialize":
+
+<p align="center">
+  <img src="/images/materialize.png" alt="snowflake" width="300"/>
+</p>
+
+Confirm your pipe, then select a compatible target source or "+ Add Source":
+
+<p align="center">
+  <img src="/images/materialize2.png" alt="snowflake" width="500"/>
+</p>
+
+You can also make the pipe refreshable, meaning that it would automatically update at a set time interval. Check "Refreshable" to enable this and customize your interval:
+
+<p align="center">
+  <img src="/images/materialize3.png" alt="snowflake" width="500"/>
+</p>
+
+Click "Materialize" to finish. 
+
+Your materialized pipe will now store and incrementally update results.
+
+## YAML
+
+### Draft to Materialized Pipe
+
+#### Define a Draft Pipe
 
 Start by creating a draft pipe to develop and test your pipeline.
 
@@ -71,7 +97,7 @@ Push this draft pipe by running:
 af push logs_aggregation.yaml
 ```
 
-### Materialize the Draft Pipe
+#### Materialize the Draft Pipe
 
 To materialize the pipe, run the `af pipe materialize` command:
 
@@ -79,7 +105,7 @@ To materialize the pipe, run the `af pipe materialize` command:
 af pipe materialize logs_aggregation.yaml
 ```
 
-### Query Materialized Data
+#### Query Materialized Data
 After materializing the pipe, the results are stored in the target source `logs_by_level`. 
 
 You can query it directly by running:

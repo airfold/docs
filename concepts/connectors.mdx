@@ -1,0 +1,53 @@
+---
+title: 'Connectors'
+description: 'Bring external data into Airfold'
+icon: "merge"
+---
+
+## Overview
+
+Connectors enable seamless integration of external data sources into Airfold. They allow you to treat external data sources as native tables within your Airfold environment.
+
+## Key Features
+
+- Native table-like interface for all connected data sources
+- Support for multiple data source types
+- Configurable refresh strategies
+- Seamless integration with endpoints and queries
+
+## Supported Data Sources
+
+| Data Source | Status | Documentation |
+|------------|---------|---------------|
+| Snowflake  | **Available** | [View](/connectors/snowflake) |
+| Amazon S3  | **Available** | [View ](/connectors/s3) |
+| PostgreSQL | Coming Soon | [View](/connectors/postgres) |
+| MySQL      | Coming Soon | [View](/connectors/mysql) |
+| Kafka      | Coming Soon | [View](/connectors/kafka) |
+
+## Configuration
+
+### Refresh strategy
+
+Each connector requires a defined refresh strategy that determines how data synchronization is handled.
+
+#### Available Strategies
+
+`replace`
+- Replaces entire dataset on each refresh interval
+- Best for complete dataset synchronization
+- Use when maintaining historical data is not required
+
+`append`
+- Adds new records to existing dataset
+- Maintains historical data
+- Ideal for time-series or log data
+- Best when tracking data changes over time
+
+## Error Handling
+
+Connectors implement automatic retry logic and provide detailed error messages for common issues:
+- Connection timeouts
+- Authentication failures
+- Schema validation errors
+- Rate limiting

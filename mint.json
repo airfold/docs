@@ -68,6 +68,7 @@
       "pages": [
         "concepts/workspaces",
         "concepts/sources",
+        "concepts/connectors",
         "concepts/pipes",
         "concepts/endpoints",
         "concepts/ai_tables",
@@ -120,7 +121,8 @@
     {
       "group": "Connectors",
       "pages": [
-        "connectors/snowflake"
+        "connectors/snowflake",
+        "connectors/s3"
       ]
     },
     {

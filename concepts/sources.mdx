@@ -11,46 +11,51 @@ All the workspace data lives inside sources, which can be queried, filtered, agg
 ## UI
 
 ### Ingesting Data
+
 Navigate to "Sources" on the left menu bar, and click on "+":
 
 ![data format options](/images/ui_integration_options.png)
 
-Upload your data via your preferred format, then press "Continue".
+Here you can either create a source by inferring a schema from [Text](/ingest/jsonpath), [File](/ingest/files) or [URL](/ingest/files) sample.<br/>
+Or you can use [Connectors](/concepts/connectors) to ingest data from external sources.
 
-<br />
-
-From here, you can verify that your data was ingested correctly and change the name if needed:
-![verification](/images/ui_integration2.png)
-
-Once you are ready to ingest the rest of your data, press "Click Integration".
+<Note>
+    Inferred sources will be empty. <br/>
+    You can put some data into them using the [Ingest API](/ingest/ingest_api)
+</Note>
 
 ### Metrics
-Within a few seconds, you should be able to see how many rows were ingested to verify that your data was processed correctly.
+
+Each `Source` displays some ingestion metrics and also has a sample of the data in the table.
 
 ![metrics](/images/ui_integration3.png)
 
-From here, "Data" displays all your data. You may also get a detailed look at each item by clicking on its individual cell:
-![detailed view](/images/ui_integration4.png)
-
-You may also use the table's features:
+You may use the table sample features:
 - `Filters` allows you to filter out certain rows based on a condition
-- `Sort` can be used to order your rows in ascending/descending order based on a specififed column
+- `Sort` can be used to order your rows in ascending/descending order based on a specified column
 - `Group by` is for organizing your rows by a specified column, grouping related rows together based on a shared value in that column
 
 <br />
 
-"Data Graph" shows any tables or queries affiliated with this source. Upon creation, you should just see the source by itself:
+There are also tabs on each `Source` page:
+
+- `Schema` provides the table schema and ClickHouse settings.
+
 <p align="center">
-  <img src="/images/ui_integration5.png" alt="source by itself" width="450"/>
+    <img src="/images/source_schema.png" alt="source by itself" width="550"/>
 </p>
 
-<br />
+- `Data Graph` shows all the dependencies for the `Source`
 
-"Logs" provides details on any errors that occurred during ingestion (if any).
+<p align="center">
+    <img src="/images/source_graph.png" alt="source by itself" width="550"/>
+</p>
 
-"Ingestion Example" provides the code for ingesting data that you can simply copy and paste. Available in JS, Python, and cUrl.
+- `Logs` provides error logs. All the ingestion errors can be seen there.
 
-<br />
+<p align="center">
+    <img src="/images/source_logs.png" alt="source by itself" width="550"/>
+</p>
 
 ## CLI
 

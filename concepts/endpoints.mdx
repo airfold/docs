@@ -4,41 +4,96 @@ description: 'Convert pipelines into fast, scalable endpoints'
 icon: "brackets-curly"
 ---
 
-Easily transform any pipeline into a high-performance API that supports low-latency and high concurrency, ready for integration. 
+Transform any pipeline into a high-performance API endpoint that supports low latency and high concurrency, ready for integration.
 
-Each API is provided with Swagger documentation for standardized usage, and can be accessed as a shareable REST endpoint.
+Each API comes with Swagger documentation for standardized usage and can be accessed as a shareable REST endpoint.
 
 ## UI
 
 ### Create an Endpoint
 
-Upon creating a query, we can publish it as an endpoint by clicking on:
+To publish a query as an endpoint:
+
+1. Click the publish button:
 <p align="center">
-  <img src="/images/ui_endpoint1.png" alt="ai table creation" width="150"/>
+    <img src="/images/ui_endpoint1.png" alt="ai table creation" width="150"/>
 </p>
 
-Then "View endpoint":
+2. Select "View endpoint":
 ![full page](/images/ui_endpoint2.png)
 
-These metrics displayed show how many requests have been made, how much data has been processed, latency, and error rate.
+The dashboard displays key metrics including request count, data processed, latency, and error rate.
 
 ### Use the Endpoint
 
-The code block allows for quick copying and pasting of the API endpoint directly into your code:
+Copy the API endpoint directly from the code block to use in your application:
 <p align="center">
-  <img src="/images/ui_endpoint4.png" alt="ai table creation" width="550"/>
+    <img src="/images/ui_endpoint4.png" alt="ai table creation" width="550"/>
 </p>
 
-Clicking on the three dots in the top right corner provides additional options:
+Access additional options through the three-dot menu in the top right corner:
 <p align="center">
-  <img src="/images/ui_endpoint3.png" alt="ai table creation" width="450"/>
+    <img src="/images/ui_endpoint3.png" alt="ai table creation" width="450"/>
 </p>
 
-- **Share Swagger** takes you to the Swagger page, where you can explore and test the API
-- **Add Parameter** allows you to add custom parameters to tailor your API calls
-- **Duplicate** creates a copy of the current endpoint
-- **Discard changes** reverts any modifications made with parameters
-- **Delete** removes the entire query
+- **Share Swagger**: Opens the Swagger documentation page for API exploration and testing
+- **Add Parameter**: Define custom parameters for your API calls
+- **Duplicate**: Create a copy of the endpoint
+- **Discard changes**: Revert parameter modifications
+- **Delete**: Remove the endpoint
+
+### Parameters
+
+Endpoints support [Jinja2](https://jinja.palletsprojects.com/en/stable/templates/) syntax for parameter templating.
+
+Example of a parameterized endpoint:
+<p align="center">
+    <img src="/images/ui_endpoint5.png" alt="endpoint with params" width="450"/>
+</p>
+
+#### Expressions
+
+Use `{{ param_name }}` syntax for expressions.
+
+Example: `SELECT * FROM t LIMIT {{ limit }}`
+
+The internal Jinja engine handles parameter substitution automatically. No need to escape parameters - `WHERE name = {{ name }}` works correctly for string values.
+
+Supported data types:
+- String
+- Int
+- Float
+- Boolean
+- Date
+- Datetime
+
+For other data types, use String and parse within your SQL. For example, create an array from a comma-separated string:
+```sql
+SELECT * FROM t WHERE group IN splitByChar(',', {{ groups }})
+```
+
+All parameters are passed as query strings in the HTTP API:
+```
+https://api.us.airfold.co/v1/pipes/endpoint1?param1=10&param2=foo&param3=c1,c2
+```
+For additional syntax options, refer to the [Jinja2 documentation](https://jinja.palletsprojects.com/en/stable/templates/).
+
+#### Statements
+
+Use `{% if condition %}...{% endif %}` syntax for conditional statements.
+
+Example:
+```
+SELECT
+{% if start_time is defined %}
+    toStartOfInterval({{ start_time }}:: DateTime, INTERVAL {{ interval }} SECONDS)
+{% else %}
+    toStartOfInterval(now() - INTERVAL 1 DAY, INTERVAL {{ interval }} SECONDS)
+{% endif %}
+```
+
+For additional statement options, refer to the  [Jinja2 documentation](https://jinja.palletsprojects.com/en/stable/templates/).
+
 
 ## CLI
 
@@ -68,3 +123,26 @@ Push this update by running:
 ```
 af push insights.yaml
 ```
+
+### Params
+
+In YAML params are placed in the `params` property:
+
+```yaml
+params:
+  - name: start_time
+    type: datetime
+  - name: end_time
+    type: datetime
+  - name: groups
+    type: string
+  - name: models
+    type: string
+  - name: interval
+    type: int
+    default: 300
+```
+
+Params can be used in endpoints and [draft pipes](/concepts/pipes#draft-pipes).
+
+Params cannot be used in [materialized pipes](/concepts/pipes#materialized-pipes).

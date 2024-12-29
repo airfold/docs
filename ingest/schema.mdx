@@ -1,0 +1,101 @@
+---
+title: 'Create source from data samples'
+sidebarTitle: 'Schema inference'
+description: "Create a source schema from data samples in UI or CLI"
+icon: 'file'
+---
+
+## Data Formats
+We support the following formats:
+- CSV
+- NDJSON
+- JSON
+
+You may upload this data via raw text, file upload, or remote URL.
+
+## UI
+
+Navigate to "Sources" on the left menu bar, and click on "+":
+<p align="center">
+  <img src="/images/ui_integration_options.png" alt="data format options" width="550"/>
+</p>
+
+### Infer from a Text sample
+
+Paste a sample `JSON`, `CSV` or `NDJSON` data into the text field. Click `Next`
+
+<p align="center">
+    <img src="/images/text_infer.png" alt="" width="550"/>
+</p>
+
+Validate the schema and give a name to the source
+
+<p align="center">
+    <img src="/images/file_final_infer.png" alt="" width="550"/>
+</p>
+
+Click "Create" when done.
+
+### Infer from a File
+
+Upload your data via your preferred format.
+
+<p align="center">
+    <img src="/images/file_browse_infer.png" alt="" width="550"/>
+</p>
+
+Then press "Next"
+
+<p align="center">
+    <img src="/images/file_selected_infer.png" alt="" width="550"/>
+</p>
+
+Validate the schema and give a name to the source
+
+<p align="center">
+    <img src="/images/file_final_infer.png" alt="" width="550"/>
+</p>
+
+Click "Create" when done.
+
+### Infer from a URL
+
+Paste the public URL into the field.
+
+<p align="center">
+    <img src="/images/url_link_infer.png" alt="" width="550"/>
+</p>
+
+Then press "Next"
+<br/>
+Validate the schema and give a name to the source
+
+<p align="center">
+    <img src="/images/url_final_infer.png" alt="" width="550"/>
+</p>
+
+Click "Create" when done.
+
+## CLI
+
+Define the schema for your source in a YAML file:
+
+```yaml sales_calls.yaml
+name: sales_calls
+description: sales call transcripts
+cols:
+  ID: UUID
+  Transcript: String
+settings:
+  engine: MergeTree()
+  order_by: '`ID`'
+  partition_by: tuple()
+```
+
+<br />
+Push sources to your [workspace](/concepts/workspaces) with `af push`.
+
+For example, to push `sales_calls.yaml`, run:
+```bash
+af push sales_calls.yaml
+```

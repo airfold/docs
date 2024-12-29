@@ -1,7 +1,7 @@
 ---
-title: 'Handling JSON'
-sidebarTitle: 'JSON'
-description: "This section covers JSONPath"
+title: 'Handling JSON mapping'
+sidebarTitle: 'JSON mapping'
+description: "This section covers JSON path as a wya to map JSON fields to schema"
 icon: 'list-tree'
 ---
 
@@ -55,3 +55,34 @@ cols:
 **Nested Fields**: JSONPath is used to extract data from deeper levels of the JSON object:
 - `$.extra_data.city` maps to the `city` column.
 - `$.extra_data.discount.amount` maps to the `discount_amount` column.
+
+## In Airfold UI
+
+To map JSON just use `Source` creation wizard as usual.
+
+Example:
+
+<p align="center">
+    <img src="/images/ui_integration_options.png" alt="data format options" width="550"/>
+</p>
+
+Choose `Text` to create schema from a text sample.<br/>
+Paste your JSON object into the wizard.
+
+<p align="center">
+    <img src="/images/segment_json.png" alt="data format options" width="550"/>
+</p>
+
+Check out the resulting schema.
+
+<p align="center">
+    <img src="/images/segment_yaml.png" alt="data format options" width="550"/>
+</p>
+
+Rename columns if needed. <br/>
+Add name to the source and click `Create` to create the source.
+
+<Note>
+    You can remove lines from YAML to remove field mappings you are not interested in.<br/>
+    You can add new mappings too.
+</Note>

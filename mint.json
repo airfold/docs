@@ -58,8 +58,8 @@
     {
       "group": "Get Started",
       "pages": [
-        "getting_started/overview", 
-        "getting_started/quickstart_ui", 
+        "getting_started/overview",
+        "getting_started/quickstart_ui",
         "getting_started/quickstart_cli"
       ]
     },
@@ -68,6 +68,7 @@
       "pages": [
         "concepts/workspaces",
         "concepts/sources",
+        "concepts/connectors",
         "concepts/pipes",
         "concepts/endpoints",
         "concepts/ai_tables",
@@ -82,7 +83,7 @@
         "ingest/ingest_api",
         "ingest/jsonpath",
         "ingest/errors",
-        "ingest/files"
+        "ingest/schema"
       ]
     },
     {
@@ -120,7 +121,8 @@
     {
       "group": "Connectors",
       "pages": [
-        "connectors/snowflake"
+        "connectors/snowflake",
+        "connectors/s3"
       ]
     },
     {

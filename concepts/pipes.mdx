@@ -92,6 +92,27 @@ nodes:
     </ResponseField>
   </Expandable>
 </ResponseField>
+<ResponseField name="refresh" type="Refresh[]">
+    A refresh schedule definition. Used in [refreshable materialization](/concepts/pipes#refreshable-materialization) where the pipe is executed on schedule. Optional.
+    <Expandable title="Refresh">
+        <ResponseField name="strategy" type="string" required>
+            Refresh strategy, can be `replace` or `append`.
+        </ResponseField>
+        <ResponseField name="interval" type="string" required>
+            The ClickHouse refresh interval. Example: `EVERY 1 HOUR`, `AFTER 30 MINUTE`, etc.
+            For a complete list, click [here](https://clickhouse.com/docs/en/sql-reference/statements/create/view#refresh-schedule)
+        </ResponseField>
+        <ResponseField name="disbled" type="boolean" default="false">
+            Disable refresh or create a pipe in a disabled state. Optional.
+        </ResponseField>
+        <ResponseField name="disabled" type="boolean" default="false">
+            Disable refresh or create a pipe in a disabled state. Optional.
+        </ResponseField>
+        <ResponseField name="refresh_on_create" type="boolean" default="false">
+            Refresh immediately after creation, disabled by default. Optional.
+        </ResponseField>
+    </Expandable>
+</ResponseField>
 
 
 #### Published pipes
@@ -158,8 +179,36 @@ Learn more about [Materialization in ClickHouse](https://clickhouse.com/blog/usi
 ### Best Practices
 Published pipes are batch and compute their results on read, thus they're not suited for intensive data transformations.
 
-Instead, a common pattern is to front a materialized pipe with a published pipe. The materialized pipe incrementally transforms the data as it is ingested and writes it to its source, allowing the published pipe to instantly access the already transformed data from the source on read.
+Instead, a common pattern is to front a published pipe with a materialized pipe.
+The materialized pipe incrementally transforms the data as it is ingested and writes it to its source, allowing the published pipe to instantly access the already transformed data from the source on read.
 </Tip>
+
+### Refreshable Materialization
+
+Some sources are batch in nature, like `prices` table or `products` table.
+And may be refreshed from a [connector](/concepts/connectors) or any other external process.
+
+To work with these sources efficiently and create transformations/queries use a `"refreshable"` materialization.
+
+```yaml refreshable_pipe.yaml
+description: 'Aggregate logs by level'
+nodes:
+    - load:
+        description: Loading logs
+        sql: select timestamp, level, file, message from logs
+    - error:
+        description: Aggregating logs by level
+        sql: |
+            select
+                level,
+                countState() as count
+            from load
+            group by level
+to: logs_by_level
+refresh:
+    strategy: replace
+    interval: EVERY 1 MINUTE
+```
 
 ### Push
 Push pipes to your [workspace](/concepts/workspaces) using the CLI command `af push`.<br />

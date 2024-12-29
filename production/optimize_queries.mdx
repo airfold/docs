@@ -105,6 +105,29 @@ To materialize the pipe, run the `af pipe materialize` command:
 af pipe materialize logs_aggregation.yaml
 ```
 
+#### Refreshable Materialized Pipe
+
+You may also make the materialized pipe refreshable by adding a `refresh` attribute to your YAML file:
+
+```yaml logs_aggregation_refreshable.yaml
+description: 'Aggregate logs by level'
+nodes:
+    - load:
+        description: Loading logs
+        sql: select timestamp, level, file, message from logs
+    - error:
+        description: Aggregating logs by level
+        sql: |
+            select
+                level,
+                countState() as count
+            from load
+            group by level
+to: logs_by_level
+refresh:
+    strategy: replace
+    interval: EVERY 1 MINUTE
+```
 #### Query Materialized Data
 After materializing the pipe, the results are stored in the target source `logs_by_level`. 
 

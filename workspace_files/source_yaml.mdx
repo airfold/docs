@@ -8,15 +8,18 @@ icon: 'database'
 
 The schema for your source is defined a YAML file:
 
-```yaml sales_calls.yaml
-name: sales_calls
-description: sales call transcripts
-cols:
-  ID: UUID
-  Transcript: String
+```yaml product_catalog.yaml
+name: product_catalog
+description: catalog of store products
+  cols:
+  ProductID: String
+  Name: String
+  Category: String
+  Description: String
+  Price: Float64
 settings:
   engine: MergeTree()
-  order_by: '`ID`'
+  order_by: "`ProductID`"
   partition_by: tuple()
 ```
 

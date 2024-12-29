@@ -16,7 +16,8 @@ Navigate to "Sources" on the left menu bar, and click on "+":
 
 ![data format options](/images/ui_integration_options.png)
 
-Here you can either create a source by inferring a schema from [Text](/ingest/jsonpath), [File](/ingest/files) or [URL](/ingest/files) sample.<br/>
+Here you can either create a source by inferring a schema from [Text](/ingest/jsonpath), [File](/ingest/files) or [URL](/ingest/files).<br/>
+
 Or you can use [Connectors](/concepts/connectors) to ingest data from external sources.
 
 <Note>
@@ -24,11 +25,27 @@ Or you can use [Connectors](/concepts/connectors) to ingest data from external s
     You can put some data into them using the [Ingest API](/ingest/ingest_api)
 </Note>
 
+#### Select Type
+
+In this example, we will upload a csv file through `File Upload`:
+
+![catalog upload](/images/catalog_upload.png)
+
+Then, click `Next`.
+
+#### Confirm Schema
+
+Name your source and confirm the schema:
+
+![catalog schema](/images/catalog_schema.png)
+
+Click `Create`.
+
 ### Metrics
 
-Each `Source` displays some ingestion metrics and also has a sample of the data in the table.
+Once your source is successfully created, you can view its ingestion metrics and sample of the data.
 
-![metrics](/images/ui_integration3.png)
+![metrics](/images/product_catalog.png)
 
 You may use the table sample features:
 - `Filters` allows you to filter out certain rows based on a condition
@@ -39,38 +56,34 @@ You may use the table sample features:
 
 There are also tabs on each `Source` page:
 
-- `Schema` provides the table schema and ClickHouse settings.
+`Schema` provides the table schema and ClickHouse settings.
+![metrics](/images/source_schema.png)
 
-<p align="center">
-    <img src="/images/source_schema.png" alt="source by itself" width="550"/>
-</p>
+`Data Graph` shows all the dependencies for the `Source`
 
-- `Data Graph` shows all the dependencies for the `Source`
+![graph](/images/source_graph.png)
 
-<p align="center">
-    <img src="/images/source_graph.png" alt="source by itself" width="550"/>
-</p>
+`Logs` provides error logs. All the ingestion errors can be seen there.
 
-- `Logs` provides error logs. All the ingestion errors can be seen there.
-
-<p align="center">
-    <img src="/images/source_logs.png" alt="source by itself" width="550"/>
-</p>
+![graph](/images/source_logs.png)
 
 ## CLI
 
 ### Creating a YAML file
 Define the schema for your source in a YAML file:
 
-```yaml sales_calls.yaml
-name: sales_calls
-description: sales call transcripts
-cols:
-  ID: UUID
-  Transcript: String
+```yaml product_catalog.yaml
+name: product_catalog
+description: catalog of store products
+  cols:
+  ProductID: String
+  Name: String
+  Category: String
+  Description: String
+  Price: Float64
 settings:
   engine: MergeTree()
-  order_by: '`ID`'
+  order_by: "`ProductID`"
   partition_by: tuple()
 ```
 
@@ -101,3 +114,16 @@ For example, to push `sales_calls.yaml`, run:
 ```bash
 af push sales_calls.yaml
 ```
+
+## Unstructured Data
+
+So far, we've seen examples of ingesting structured data such as `product_catalog` shown above.
+
+However, one of Airfold's key strengths is how it allows you to work with **unstructured data**.
+
+Examples of unstructured data:
+- Sales calls transcripts
+- Customer Reviews
+- Customer Service Tickets
+
+The process for ingesting unstructured data remains the same as with structured data demonstrated above. However, upon ingestion, you can extract meaningful insights from your unstructured data using [AI Tables](/concepts/ai_tables).

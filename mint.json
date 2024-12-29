@@ -56,14 +56,6 @@
   ],
   "navigation": [
     {
-      "group": "Get Started",
-      "pages": [
-        "getting_started/overview", 
-        "getting_started/quickstart_ui", 
-        "getting_started/quickstart_cli"
-      ]
-    },
-    {
       "group": "Concepts",
       "pages": [
         "concepts/workspaces",
@@ -83,7 +75,7 @@
         "ingest/ingest_api",
         "ingest/jsonpath",
         "ingest/errors",
-        "ingest/files"
+        "ingest/schema"
       ]
     },
     {

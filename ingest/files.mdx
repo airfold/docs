@@ -1,7 +1,7 @@
 ---
-title: 'Ingest Files'
-sidebarTitle: 'Files'
-description: "Ingest files through the UI or CLI"
+title: 'Create source from File'
+sidebarTitle: 'Schema from File'
+description: "Create a source schema from file in UI or CLI"
 icon: 'file'
 ---
 
@@ -15,25 +15,30 @@ You may upload this data via raw text, file upload, or remote URL.
 
 ## UI
 
-Navigate to "Integrations" on the left menu bar, and click on "+":
+Navigate to "Sources" on the left menu bar, and click on "+":
 <p align="center">
   <img src="/images/ui_integration_options.png" alt="data format options" width="550"/>
 </p>
 
-Upload your data via your preferred format, then press "Continue".
+Upload your data via your preferred format.
 
-<br />
+<p align="center">
+    <img src="/images/file_browse_infer.png" alt="" width="550"/>
+</p>
 
-From here, you can verify that your data was ingested correctly and change the name if needed:
-![verification](/images/ui_integration2.png)
+Then press "Next"
 
-Once you are ready to ingest the rest of your data, press "Click Integration".
+<p align="center">
+    <img src="/images/file_selected_infer.png" alt="" width="550"/>
+</p>
 
-<br />
+Validate the schema and give a name to the source
 
-Within a few seconds, you should be able to see how many rows were ingested to verify that your data was processed correctly.
+<p align="center">
+    <img src="/images/file_final_infer.png" alt="" width="550"/>
+</p>
 
-![metrics](/images/ui_integration3.png)
+Click "Create" when done.
 
 ## CLI
 

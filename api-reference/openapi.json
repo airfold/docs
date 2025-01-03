@@ -56,6 +56,120 @@
           }
         }
       },
+      "PutUploadRequest": {
+        "type": "object",
+        "required": [
+          "parts",
+          "size"
+        ],
+        "properties": {
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PutUploadRequestPart"
+            }
+          },
+          "size": {
+            "type": "integer",
+            "example": 1024
+          }
+        }
+      },
+      "PutUploadRequestPart": {
+        "type": "object",
+        "required": [
+          "md5",
+          "part_number",
+          "size"
+        ],
+        "properties": {
+          "md5": {
+            "type": "string",
+            "example": "base64-encoded-md5"
+          },
+          "part_number": {
+            "type": "integer",
+            "example": 1
+          },
+          "size": {
+            "type": "integer",
+            "example": 1024
+          }
+        }
+      },
+      "PutUploadResponse": {
+        "type": "object",
+        "required": [
+          "parts",
+          "upload_id"
+        ],
+        "properties": {
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PutUploadResponsePart"
+            }
+          },
+          "upload_id": {
+            "type": "string",
+            "example": "upload_id"
+          }
+        }
+      },
+      "PutUploadResponsePart": {
+        "type": "object",
+        "required": [
+          "part_number",
+          "url"
+        ],
+        "properties": {
+          "part_number": {
+            "type": "integer",
+            "example": 1
+          },
+          "url": {
+            "type": "string",
+            "example": "signed-s3-url"
+          }
+        }
+      },
+      "CommitRequest": {
+        "type": "object",
+        "required": [
+          "parts"
+        ],
+        "properties": {
+          "parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommitRequestPart"
+            }
+          }
+        }
+      },
+      "CommitRequestPart": {
+        "type": "object",
+        "required": [
+          "etag",
+          "part_number"
+        ],
+        "properties": {
+          "etag": {
+            "type": "string",
+            "example": "base64-encoded-md5"
+          },
+          "part_number": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "CommitResponse": {
+        "type": "object"
+      },
+      "AbortResponse": {
+        "type": "object"
+      },
       "UserPermissions": {
         "type": "object",
         "properties": {
@@ -257,6 +371,65 @@
           }
         }
       },
+      "SnowflakeConnectorProfile": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string",
+            "description": "Snowflake username"
+          },
+          "account": {
+            "type": "string",
+            "description": "Snowflake account"
+          },
+          "warehouse": {
+            "type": "string",
+            "description": "Snowflake warehouse",
+            "default": "COMPUTE_WH"
+          },
+          "database": {
+            "type": "string",
+            "description": "Snowflake database"
+          },
+          "role": {
+            "type": "string",
+            "description": "Snowflake role"
+          }
+        },
+        "required": [
+          "user",
+          "account",
+          "database"
+        ]
+      },
+      "Connector": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Connector ID"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "snowflake"
+            ],
+            "description": "Connector type"
+          },
+          "profile": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SnowflakeConnectorProfile"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "profile"
+        ]
+      },
       "ChangeOwner": {
         "type": "object",
         "required": [
@@ -282,6 +455,27 @@
           "name": {
             "type": "string",
             "description": "Organization name"
+          },
+          "credentials": {
+            "type": "object",
+            "description": "External ClickHouse credentials",
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "ClickHouse instance https URL"
+              },
+              "username": {
+                "type": "string",
+                "description": "ClickHouse instance username"
+              },
+              "password": {
+                "type": "string",
+                "description": "ClickHouse instance password"
+              }
+            }
           }
         }
       },
@@ -314,8 +508,33 @@
           "ownerEmail": {
             "type": "string",
             "description": "Organization owner email"
+          },
+          "instanceUrl": {
+            "type": "string",
+            "description": "ClickHouse instance URL"
+          },
+          "instanceUser": {
+            "type": "string",
+            "description": "ClickHouse instance username"
           }
         }
+      },
+      "Instance": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL of the ClickHouse instance/service"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username of the ClickHouse instance/service"
+          }
+        },
+        "required": [
+          "url",
+          "username"
+        ]
       },
       "OrgMember": {
         "type": "object",
@@ -337,6 +556,28 @@
           "email",
           "role"
         ]
+      },
+      "ClickHouseCredentials": {
+        "type": "object",
+        "required": [
+          "url",
+          "username",
+          "password"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "ClickHouse instance https URL"
+          },
+          "username": {
+            "type": "string",
+            "description": "ClickHouse instance username"
+          },
+          "password": {
+            "type": "string",
+            "description": "ClickHouse instance password"
+          }
+        }
       },
       "UpdateOrg": {
         "type": "object",
@@ -566,6 +807,50 @@
           "description": "Object content"
         }
       },
+      "LintResult": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Found errors"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/PipeFile"
+                },
+                {
+                  "$ref": "#/components/schemas/SourceFile"
+                }
+              ]
+            },
+            "description": "Formatted files"
+          },
+          "diff": {
+            "type": "string",
+            "description": "Diff between sent and stored objects"
+          },
+          "pulled_files": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/PipeFile"
+                },
+                {
+                  "$ref": "#/components/schemas/SourceFile"
+                }
+              ]
+            },
+            "description": "Pulled files"
+          }
+        }
+      },
       "ProjectGraph": {
         "type": "object"
       },
@@ -619,6 +904,40 @@
           "sql"
         ]
       },
+      "PipeRefresh": {
+        "type": "object",
+        "properties": {
+          "strategy": {
+            "type": "string",
+            "enum": [
+              "replace",
+              "append"
+            ]
+          },
+          "interval": {
+            "type": "string",
+            "description": "Refresh interval"
+          },
+          "refresh_on_create": {
+            "type": "bool",
+            "default": false,
+            "description": "Refresh on create"
+          },
+          "settings": {
+            "type": "object",
+            "description": "Refresh settings"
+          },
+          "disabled": {
+            "type": "bool",
+            "default": false,
+            "description": "Refresh disabled"
+          }
+        },
+        "required": [
+          "strategy",
+          "interval"
+        ]
+      },
       "PipeFile": {
         "type": "object",
         "properties": {
@@ -652,6 +971,9 @@
             "items": {
               "$ref": "#/components/schemas/PipeParam"
             }
+          },
+          "refresh": {
+            "$ref": "#/components/schemas/PipeRefresh"
           }
         },
         "required": [
@@ -707,93 +1029,6 @@
           "cols"
         ]
       },
-      "SourceStatsBin": {
-        "type": "object",
-        "properties": {
-          "ts": {
-            "type": "string",
-            "description": "Timestamp of the bin."
-          },
-          "uncompressed_bytes": {
-            "type": "integer",
-            "default": 0,
-            "description": "Total size of uncompressed data in bytes."
-          },
-          "uncompressed_bytes_rt": {
-            "type": "integer",
-            "default": 0,
-            "description": "Running total size of uncompressed data in bytes."
-          },
-          "rows": {
-            "type": "integer",
-            "default": 0,
-            "description": "The number of rows."
-          },
-          "rows_rt": {
-            "type": "integer",
-            "default": 0,
-            "description": "Running total number of rows."
-          },
-          "errors": {
-            "type": "integer",
-            "default": 0,
-            "description": "The number of errors."
-          },
-          "errors_rt": {
-            "type": "integer",
-            "default": 0,
-            "description": "Running total number of errors."
-          }
-        },
-        "required": [
-          "uncompressed_bytes_rt",
-          "rows_rt",
-          "errors_rt"
-        ]
-      },
-      "SourceStats": {
-        "type": "object",
-        "properties": {
-          "bins": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SourceStatsBin"
-            }
-          },
-          "compressed_bytes": {
-            "type": "integer",
-            "default": 0,
-            "description": "Total size of compressed data in bytes."
-          },
-          "uncompressed_bytes": {
-            "type": "integer",
-            "default": 0,
-            "description": "Total size of uncompressed data in bytes."
-          },
-          "bytes_on_disk": {
-            "type": "integer",
-            "default": 0,
-            "description": "Total size of all the data in bytes."
-          },
-          "rows": {
-            "type": "integer",
-            "default": 0,
-            "description": "The number of rows."
-          },
-          "errors": {
-            "type": "integer",
-            "default": 0,
-            "description": "The number of errors."
-          }
-        },
-        "required": [
-          "compressed_bytes",
-          "uncompressed_bytes",
-          "bytes_on_disk",
-          "rows",
-          "errors"
-        ]
-      },
       "Template": {
         "type": "object",
         "properties": {
@@ -823,112 +1058,381 @@
           "name"
         ]
       },
-      "BytesMetric": {
+      "BatchJob": {
         "type": "object",
         "properties": {
-          "bytes": {
-            "type": "integer",
-            "default": 0,
-            "description": "Total bytes."
-          }
-        },
-        "required": [
-          "bytes"
-        ]
-      },
-      "AITokens": {
-        "type": "object",
-        "properties": {
-          "prompt_tokens": {
-            "type": "integer",
-            "default": 0,
-            "description": "Prompt tokens."
-          },
-          "completion_tokens": {
-            "type": "integer",
-            "default": 0,
-            "description": "Completion tokens."
-          },
-          "total_tokens": {
-            "type": "integer",
-            "default": 0,
-            "description": "Total tokens."
-          }
-        },
-        "required": [
-          "prompt_tokens",
-          "completion_tokens",
-          "total_tokens"
-        ]
-      },
-      "UsageMetricsBin": {
-        "type": "object",
-        "properties": {
-          "ts": {
+          "id": {
             "type": "string",
-            "description": "Timestamp of the bin."
+            "description": "Job id"
           },
-          "processed_bytes": {
-            "$ref": "#/components/schemas/BytesMetric",
-            "description": "Total processed bytes."
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed",
+              "canceled"
+            ],
+            "description": "Job status"
           },
-          "processed_bytes_rt": {
-            "$ref": "#/components/schemas/BytesMetric",
-            "description": "Running total processed bytes."
+          "created_at": {
+            "type": "string",
+            "description": "Job creation time"
           },
-          "ai_tokens": {
-            "$ref": "#/components/schemas/AITokens",
-            "description": "AI tokens usage."
+          "updated_at": {
+            "type": "string",
+            "description": "Job last update time"
           },
-          "ai_tokens_rt": {
-            "$ref": "#/components/schemas/AITokens",
-            "description": "Running total AI tokens usage."
-          }
-        },
-        "required": [
-          "processed_bytes",
-          "processed_bytes_rt",
-          "ai_tokens",
-          "ai_tokens_rt"
-        ]
-      },
-      "UsageMetrics": {
-        "type": "object",
-        "properties": {
-          "bins": {
+          "error": {
+            "type": "string",
+            "description": "Error string, if any"
+          },
+          "columns": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UsageMetricsBin"
+              "type": "string"
             }
-          },
-          "processed_bytes": {
-            "$ref": "#/components/schemas/BytesMetric",
-            "description": "Total processed bytes."
-          },
-          "stored_bytes": {
-            "$ref": "#/components/schemas/BytesMetric",
-            "description": "Total stored bytes."
-          },
-          "ai_tokens": {
-            "$ref": "#/components/schemas/AITokens",
-            "description": "AI tokens usage."
           }
         },
         "required": [
-          "processed_bytes",
-          "stored_bytes",
-          "ai_tokens"
+          "id",
+          "status",
+          "created_at",
+          "updated_at",
+          "columns"
+        ]
+      },
+      "MaskedRows": {
+        "type": "object",
+        "properties": {
+          "columns": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "description": "Rows queued for batch re-calculation",
+        "required": [
+          "columns"
+        ]
+      },
+      "AITemplateDesc": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Template path id"
+          },
+          "meta": {
+            "type": "object",
+            "description": "Template metadata",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "description": "Template kind"
+              },
+              "description": {
+                "type": "string",
+                "description": "Template description"
+              },
+              "version": {
+                "type": "number",
+                "description": "Template serial version"
+              }
+            }
+          }
+        },
+        "required": [
+          "path",
+          "meta"
+        ]
+      },
+      "AITemplateSchema": {
+        "type": "object"
+      },
+      "SecretMetadata": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Secret id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Secret name"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Secret creation time",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Secret last update time",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "description": "Secret type"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "created_at",
+          "updated_at",
+          "type"
         ]
       }
     }
   },
   "servers": [
     {
-      "url": "https://api.airfold.co",
-      "description": "Production server"
+      "url": "https://api.us.airfold.co",
+      "description": "Airfold US server"
     }
   ],
   "paths": {
+    "/v1/files/{source_name}/{filename}": {
+      "get": {
+        "operationId": "getSourceFileSignedUrl",
+        "summary": "Gets the signed URL for a file.",
+        "description": "Gets the signed URL for a file.",
+        "tags": [
+          "Files"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Row ID",
+            "name": "row_id",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Filename. E.g.: `example.pdf`",
+            "name": "filename",
+            "in": "path",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteSourceFile",
+        "summary": "Deletes a file from a source.",
+        "description": "Deletes a file from a source.",
+        "tags": [
+          "Files"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Row ID",
+            "name": "row_id",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Filename. E.g.: `example.pdf`",
+            "name": "filename",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      },
+      "post": {
+        "operationId": "putSourceFile",
+        "description": "This route has few working modes:\n\n1. Preparing multipart upload. This requires passing `?begin` query parameter.\n2. Committing multipart upload. This requires passing `?commit&upload_id=...`\nquery parameters.\n\nPlease note that these 2 modes require different request body and\nreturn different response body (described in responses).",
+        "tags": [
+          "Files"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Handles upload process",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Indicates URL-generating stage (doesn't require a value)",
+            "name": "begin",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Indicates upload completing stage (doesn't require a value)",
+            "name": "commit",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Upload ID returned by `?begin`",
+            "name": "upload_id",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Row ID",
+            "name": "row_id",
+            "in": "query",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "source_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Filename. E.g.: `example.pdf`",
+            "name": "filename",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/PutUploadRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CommitRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PutUploadResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CommitResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AbortResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      }
+    },
+    "/v1/files/{source_name}": {
+      "get": {
+        "operationId": "listSourceFiles",
+        "summary": "Lists files in a source.",
+        "description": "Lists files in a source.",
+        "tags": [
+          "Files"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      }
+    },
     "/v1/events/{source_name}": {
       "post": {
         "operationId": "sendEvents",
@@ -1083,786 +1587,6 @@
         }
       }
     },
-    "/web/auth/identity": {
-      "get": {
-        "operationId": "getIdentityWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Returns current user data.",
-        "description": "Checks if user is authorized and returns user identity.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/UserProfile"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ProjectProfile"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/web/auth/logout": {
-      "get": {
-        "operationId": "logout",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Logs out the current user.",
-        "description": "Logs out the current user.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/v1/{org_id}/billing/subscription": {
-      "post": {
-        "operationId": "creteSubscription",
-        "tags": [
-          "Billing"
-        ],
-        "summary": "Create organization subscription.",
-        "description": "Returns a Stripe Subscription object.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateSubscription"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      },
-      "patch": {
-        "operationId": "updateSubscription",
-        "tags": [
-          "Billing"
-        ],
-        "summary": "Update organization subscription.",
-        "description": "Returns a Stripe Subscription object.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateSubscription"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/web/{org_id}/billing/subscription": {
-      "post": {
-        "operationId": "createSubscriptionWeb",
-        "tags": [
-          "Web",
-          "Billing"
-        ],
-        "summary": "Create organization subscription.",
-        "description": "Returns a Stripe Subscription object.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateSubscription"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      },
-      "patch": {
-        "operationId": "updateSubscriptionWeb",
-        "tags": [
-          "Web",
-          "Billing"
-        ],
-        "summary": "Update organization subscription.",
-        "description": "Returns a Stripe Subscription object.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateSubscription"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/v1/{org_id}/billing/config": {
-      "get": {
-        "operationId": "getBillingConfig",
-        "tags": [
-          "Billing"
-        ],
-        "summary": "Get billing configuration.",
-        "description": "Returns a dictionary with settings. Use to get publishable key for stripe.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BillingConfig"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/web/{org_id}/billing/config": {
-      "get": {
-        "operationId": "getBillingConfigWeb",
-        "tags": [
-          "Web",
-          "Billing"
-        ],
-        "summary": "Get billing configuration.",
-        "description": "Returns a dictionary with settings. Use to get publishable key for stripe.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BillingConfig"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/v1/{org_id}/billing/customer": {
-      "get": {
-        "operationId": "getOrgCustomer",
-        "tags": [
-          "Billing"
-        ],
-        "summary": "Get the stripe customer id for the organization.",
-        "description": "Returns the customer id.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/web/{org_id}/billing/customer": {
-      "get": {
-        "operationId": "getOrgCustomerWeb",
-        "tags": [
-          "Web",
-          "Billing"
-        ],
-        "summary": "Get the stripe customer id for the organization.",
-        "description": "Returns the customer id.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/v1/{org_id}/billing/retrieve-payment-method": {
-      "get": {
-        "operationId": "retrievePaymentMethod",
-        "tags": [
-          "Billing"
-        ],
-        "summary": "Retrieve a payment method.",
-        "description": "Returns a PaymentMethod object.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "payment_method_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Payment method id",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/web/{org_id}/billing/retrieve-payment-method": {
-      "get": {
-        "operationId": "retrievePaymentMethodWeb",
-        "tags": [
-          "Web",
-          "Billing"
-        ],
-        "summary": "Retrieve a payment method.",
-        "description": "Returns a PaymentMethod object.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "payment_method_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Payment method id",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/v1/{org_id}/billing/retrieve-upcoming-invoice": {
-      "get": {
-        "operationId": "retrieveUpcomingInvoice",
-        "tags": [
-          "Billing"
-        ],
-        "summary": "Retrieve an upcoming invoice.",
-        "description": "Returns an invoice object.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "new_plan_name",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "free",
-                "pro"
-              ]
-            },
-            "description": "New plan name",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "402": {
-            "description": "Payment Required"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/web/{org_id}/billing/retrieve-upcoming-invoice": {
-      "get": {
-        "operationId": "retrieveUpcomingInvoiceWeb",
-        "tags": [
-          "Web",
-          "Billing"
-        ],
-        "summary": "Retrieve an upcoming invoice.",
-        "description": "Returns an invoice object.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "new_plan_name",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "free",
-                "pro"
-              ]
-            },
-            "description": "New plan name",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "402": {
-            "description": "Payment Required"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/v1/{org_id}/billing/retry-invoice": {
-      "post": {
-        "operationId": "retryInvoice",
-        "tags": [
-          "Billing"
-        ],
-        "summary": "Retry an invoice.",
-        "description": "Returns an invoice object.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RetryInvoice"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/web/{org_id}/billing/retry-invoice": {
-      "post": {
-        "operationId": "retryInvoiceWeb",
-        "tags": [
-          "Web",
-          "Billing"
-        ],
-        "summary": "Retry an invoice.",
-        "description": "Returns an invoice object.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RetryInvoice"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
     "/v1/{org_id}/members": {
       "post": {
         "operationId": "addOrgMember",
@@ -1967,110 +1691,6 @@
         }
       }
     },
-    "/web/{org_id}/members": {
-      "post": {
-        "operationId": "addOrgMemberWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Add or update organization member.",
-        "description": "Add or update organization member.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrgMember"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OrgMember"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          }
-        }
-      },
-      "get": {
-        "operationId": "listOrgMembersWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "List organization members.",
-        "description": "List organization members.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OrgMember"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          }
-        }
-      }
-    },
     "/v1/{org_id}/owner": {
       "put": {
         "operationId": "changeOwner",
@@ -2082,65 +1702,6 @@
         "security": [
           {
             "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangeOwner"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChangeOwner"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request data or new owner is not an Admin"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "User not found"
-          }
-        }
-      }
-    },
-    "/web/{org_id}/owner": {
-      "put": {
-        "operationId": "changeOwnerWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Change organization owner.",
-        "description": "Change organization owner.",
-        "security": [
-          {
-            "cookieAuth": []
           }
         ],
         "parameters": [
@@ -2265,82 +1826,6 @@
         }
       }
     },
-    "/web/organizations": {
-      "post": {
-        "operationId": "createOrgWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Create new organization.",
-        "description": "Create new organization.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateOrg"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Organization"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request data"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          }
-        }
-      },
-      "get": {
-        "operationId": "listOrganizationsWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Returns list of organizations.",
-        "description": "Returns list of organizations the current user is member of.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OrgInList"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
     "/v1/{org_id}": {
       "delete": {
         "operationId": "deleteOrg",
@@ -2435,100 +1920,6 @@
         }
       }
     },
-    "/web/{org_id}": {
-      "delete": {
-        "operationId": "deleteOrgWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Delete organization.",
-        "description": "Delete organization.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Organization not found"
-          }
-        }
-      },
-      "post": {
-        "operationId": "updateOrgWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Change organization name.",
-        "description": "Change organization name.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateOrg"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Organization"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request data"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          }
-        }
-      }
-    },
     "/v1/{org_id}/members/{member_email}": {
       "delete": {
         "operationId": "deleteOrgMember",
@@ -2564,98 +1955,23 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Authorization information is missing or invalid."
-          },
-          "404": {
-            "description": "Member not found."
-          }
-        }
-      }
-    },
-    "/web/{org_id}/members/{member_email}": {
-      "delete": {
-        "operationId": "deleteOrgMemberWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Delete organization member.",
-        "description": "Delete organization member.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "member_email",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Member email",
-            "required": true
-          }
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Authorization information is missing or invalid."
-          },
-          "404": {
-            "description": "Member not found."
-          }
-        }
-      }
-    },
-    "/web/templates": {
-      "get": {
-        "operationId": "listTemplatesWeb",
-        "tags": [
-          "Templates"
-        ],
-        "summary": "List all available templates.",
-        "description": "List all available templates.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "list of templates.",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Template"
+                    "$ref": "#/components/schemas/OrgMember"
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Misc error"
-          },
           "401": {
-            "description": "Unauthorized"
+            "description": "Authorization information is missing or invalid."
           },
-          "403": {
-            "description": "Permission denied"
+          "404": {
+            "description": "Member not found."
           }
         }
       }
@@ -2739,107 +2055,6 @@
         "security": [
           {
             "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectStatus"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/web/{org_id}/projects": {
-      "post": {
-        "operationId": "createProjectWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Creates a new project.",
-        "description": "Creates a new project in the organization.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "description": "parameters for project creation",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProjectCreate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "user": {
-                      "$ref": "#/components/schemas/Project"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          }
-        }
-      },
-      "get": {
-        "operationId": "listProjectsWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Returns list of projects in organization.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "description": "Returns list of projects in organization.",
-        "security": [
-          {
-            "cookieAuth": []
           }
         ],
         "responses": {
@@ -2982,126 +2197,6 @@
         }
       }
     },
-    "/web/{org_id}/projects/{proj_id}/keys": {
-      "post": {
-        "operationId": "createProjectKeyWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Creates a new project key.",
-        "description": "Creates a new project key.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "proj_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Project id",
-            "required": true
-          }
-        ],
-        "requestBody": {
-          "description": "parameters for project key",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProjectKeyCreate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProjectKey"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid or missing request parameter"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Role not found"
-          }
-        }
-      },
-      "get": {
-        "operationId": "listProjectKeysWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Returns a list of project API keys.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "proj_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Project id",
-            "required": true
-          }
-        ],
-        "description": "Returns a list of project API keys.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectKey"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
     "/v1/{org_id}/projects/{proj_id}": {
       "delete": {
         "operationId": "deleteProject",
@@ -3184,107 +2279,6 @@
         "security": [
           {
             "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProjectStatus"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/web/{org_id}/projects/{proj_id}": {
-      "delete": {
-        "operationId": "deleteProjectWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Delete project by id.",
-        "description": "Deletes project by id.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "proj_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Project id",
-            "required": true
-          }
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Authorization information is missing or invalid."
-          },
-          "404": {
-            "description": "Project not found or user doesn't have access.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvalidRequest"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "operationId": "getProjectWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Returns project status and properties.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "proj_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Project id",
-            "required": true
-          }
-        ],
-        "description": "Returns project status and properties.",
-        "security": [
-          {
-            "cookieAuth": []
           }
         ],
         "responses": {
@@ -3436,138 +2430,6 @@
         }
       }
     },
-    "/web/{org_id}/projects/{proj_id}/keys/{key_name}": {
-      "delete": {
-        "operationId": "deleteProjectKeyWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Delete project key.",
-        "description": "Deletes project key.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "proj_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Project id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "key_name",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Key name",
-            "required": true
-          }
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Authorization information is missing or invalid."
-          },
-          "404": {
-            "description": "Project key not found or user doesn't have access.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvalidRequest"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "operationId": "updateProjectKeyWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Update project key.",
-        "description": "Update project key.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "proj_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Project id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "key_name",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Key name",
-            "required": true
-          }
-        ],
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "requestBody": {
-          "description": "parameters for project key update",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProjectKeyUpdate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Authorization information is missing or invalid."
-          },
-          "404": {
-            "description": "Project key not found or user doesn't have access.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvalidRequest"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1/{org_id}/projects/keys": {
       "get": {
         "operationId": "listAllProjectKeys",
@@ -3590,50 +2452,6 @@
         "security": [
           {
             "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectKey"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
-    "/web/{org_id}/projects/keys": {
-      "get": {
-        "operationId": "listAllProjectKeysWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Returns a list of all projects API keys.",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          }
-        ],
-        "description": "Returns a list of all projects API keys.",
-        "security": [
-          {
-            "cookieAuth": []
           }
         ],
         "responses": {
@@ -3689,39 +2507,6 @@
         }
       }
     },
-    "/web/projects": {
-      "get": {
-        "operationId": "listAllProjectsWeb",
-        "tags": [
-          "Web"
-        ],
-        "summary": "Returns list of all projects.",
-        "description": "Returns list of all projects.",
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectStatusFull"
-                  }
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Access denied."
-          }
-        }
-      }
-    },
     "/v1/{org_id}/projects/{proj_id}/pull": {
       "get": {
         "operationId": "pullProject",
@@ -3753,6 +2538,15 @@
             },
             "description": "Project id",
             "required": true
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Object name to pull. Can be used multiple times. If not specified, pull all objects.",
+            "required": false
           }
         ],
         "responses": {
@@ -3789,6 +2583,17 @@
         ],
         "summary": "Pull objects from project.",
         "description": "Pull objects from project.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Object name to pull. Can be used multiple times. If not specified, pull all objects.",
+            "required": false
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -4800,6 +3605,16 @@
             },
             "description": "Project id",
             "required": true
+          },
+          {
+            "in": "query",
+            "name": "compact_cols",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "description": "Use compact columns definition. E.g.: `col_name`: `col_type $.json_path`",
+            "required": false
           }
         ],
         "requestBody": {
@@ -5223,242 +4038,6 @@
         }
       }
     },
-    "/v1/{org_id}/projects/{proj_id}/doctor": {
-      "get": {
-        "operationId": "listDoctorChecks",
-        "tags": [
-          "Diagnostic"
-        ],
-        "summary": "List available diagnostic checks.",
-        "description": "List available diagnostic checks.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "proj_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Project id",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "description": "List of available checks"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Misc error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Project not found"
-          }
-        }
-      },
-      "post": {
-        "operationId": "runDoctor",
-        "tags": [
-          "Diagnostic"
-        ],
-        "summary": "Run diagnostic checks.",
-        "description": "Run diagnostic checks.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "org_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Organization id",
-            "required": true
-          },
-          {
-            "in": "path",
-            "name": "proj_id",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Project id",
-            "required": true
-          },
-          {
-            "in": "query",
-            "name": "fix",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            },
-            "description": "Fix issues if possible"
-          },
-          {
-            "in": "query",
-            "name": "checks",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Checks to run"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DoctorRunResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Misc error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Project not found"
-          }
-        }
-      }
-    },
-    "/v1/doctor": {
-      "get": {
-        "operationId": "listDoctorChecksBare",
-        "tags": [
-          "Diagnostic"
-        ],
-        "summary": "List available diagnostic checks.",
-        "description": "List available diagnostic checks.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "description": "List of available checks"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Misc error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Project not found"
-          }
-        }
-      },
-      "post": {
-        "operationId": "runDoctorBare",
-        "tags": [
-          "Diagnostic"
-        ],
-        "summary": "Run diagnostic checks.",
-        "description": "Run diagnostic checks.",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "fix",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            },
-            "description": "Fix issues if possible"
-          },
-          {
-            "in": "query",
-            "name": "checks",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Checks to run"
-          }
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DoctorRunResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Misc error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Project not found"
-          }
-        }
-      }
-    },
     "/v1/metrics": {
       "get": {
         "operationId": "getMetrics",
@@ -5466,7 +4045,7 @@
           "Observability"
         ],
         "summary": "Get source metrics.",
-        "description": "Get source metrics. It returns a map with source name as key and metrics object as value. If neither `from_dt` nor `to_dt` is provided, only total metrics are returned. Binned metrics will be added to the response if `time_interval_s` is specified. If `time_interval_s` is provided, metrics will be binned within the specified time interval.",
+        "description": "Get source/pipe metrics.\nIt returns an array of arrays, with each inner array containing specific source/pipe metrics values.\nThe structure adheres to the ClickHouse JSONCompact format.\nOnly total metrics are returned if neither `from_dt` nor `to_dt` nor `timespan` is provided.\nBinned metrics will be added to the response if `time_interval_s` is specified.\nIf `time_interval_s` is provided, metrics will be binned within the specified time interval.\n",
         "parameters": [
           {
             "in": "query",
@@ -5506,6 +4085,30 @@
             },
             "description": "End date-time for filtering metrics. Should be used in conjunction with `from_dt`.",
             "required": false
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "default": "source",
+              "enum": [
+                "source",
+                "pipe"
+              ]
+            },
+            "description": "Type of metrics to fetch. Can be `source` or `pipe`.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "timespan",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Timespan for metrics in seconds. If provided, `from_dt` and `to_dt` will be ignored.",
+            "required": false
           }
         ],
         "security": [
@@ -5515,14 +4118,61 @@
         ],
         "responses": {
           "200": {
-            "description": "A map of source names to their stats.",
+            "description": "The output structure if `type` is `source`:\n```json\n[\n  [\n    \"source_name_1_val\", \"bytes_on_disk_val\", \"rows_val\", \"errors_val\", \"ingested_bytes_val\", \"ingested_rows_val\", \"ai_prompt_tokens_val\", \"ai_completion_tokens_val\", \"ai_total_tokens_val\", [\n      [\"ts_1\", \"bytes_on_disk_1\", \"rows_1\", \"errors_1\", \"ingested_bytes_1\", \"ingested_rows_1\", \"ai_prompt_tokens_1\", \"ai_completion_tokens_1\", \"ai_total_tokens_1\"],\n      [\"ts_2\", \"bytes_on_disk_2\", \"rows_2\", \"errors_2\", \"ingested_bytes_2\", \"ingested_rows_2\", \"ai_prompt_tokens_2\", \"ai_completion_tokens_2\", \"ai_total_tokens_2\"],\n    ...\n    ]\n  ],\n  [\n    \"source_name_2_val\", \"bytes_on_disk_val\", \"rows_val\", \"errors_val\", \"ingested_bytes_val\", \"ingested_rows_val\", \"ai_prompt_tokens_val\", \"ai_completion_tokens_val\", \"ai_total_tokens_val\", [\n      [\"ts_1\", \"bytes_on_disk_1\", \"rows_1\", \"errors_1\", \"ingested_bytes_1\", \"ingested_rows_1\", \"ai_prompt_tokens_1\", \"ai_completion_tokens_1\", \"ai_total_tokens_1\"],\n      [\"ts_2\", \"bytes_on_disk_2\", \"rows_2\", \"errors_2\", \"ingested_bytes_2\", \"ingested_rows_2\", \"ai_prompt_tokens_1\", \"ai_completion_tokens_1\", \"ai_total_tokens_1\"],\n      ...\n    ],\n  ],\n  ...\n]\n```\nThe output structure if `type` is `pipe`:\n```json\n[\n  [\n    \"pipe_name_1_val\", \"requests_count_val\", \"errors_count_val\", \"avg_resp_latency_val\", \"avg_resp_size_val\", [\n      [\"ts_1\", \"requests_count_1\", \"errors_count_1\", \"avg_resp_latency_1\", \"avg_resp_size_1\"],\n      [\"ts_2\", \"requests_count_2\", \"errors_count_2\", \"avg_resp_latency_2\", \"avg_resp_size_2\"],\n      ...\n    ]\n  ],\n  [\n    \"pipe_name_2_val\", \"requests_count_val\", \"errors_count_val\", \"avg_resp_latency_val\", \"avg_resp_size_val\", [\n      [\"ts_1\", \"requests_count_1\", \"errors_count_1\", \"avg_resp_latency_1\", \"avg_resp_size_1\"],\n      [\"ts_2\", \"requests_count_2\", \"errors_count_2\", \"avg_resp_latency_2\", \"avg_resp_size_2\"],\n      ...\n    ],\n  ],\n  ...\n]\n```\n",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/SourceStats"
-                  }
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/metrics/rmv": {
+      "get": {
+        "operationId": "getRMVMetrics",
+        "tags": [
+          "Observability"
+        ],
+        "summary": "Get refreshable pipe metrics.",
+        "description": "Get refreshable materialized pipe metrics.\nIt returns an array of arrays, with each inner array containing specific pipe metrics values.\nThe structure adheres to the ClickHouse JSONCompact format.\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name or refreshable pipe name. Can be repeated multiple times. If not provided, metrics for refreshable pipes will be returned.",
+            "required": false
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The output structure:\n```json\n[\n  [\n    \"pipe_name_1_val\", \"status\", \"error\", \"retry\", \"progress\", \"read_rows\", \"read_bytes\", \"estimated_rows_to_read\", \"written_rows\", \"written_bytes\",\n    \"last_success_time\", \"last_success_duration_ms\", \"last_refresh_time\", \"next_refresh_time\"\n  ],\n  [\n   \"pipe_name_2_val\", \"status\", \"error\", \"retry\", \"progress\", \"read_rows\", \"read_bytes\", \"estimated_rows_to_read\", \"written_rows\", \"written_bytes\",\n    \"last_success_time\", \"last_success_duration_ms\", \"last_refresh_time\", \"next_refresh_time\"\n  ],\n  ...\n]\n```\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
                 }
               }
             }
@@ -5656,155 +4306,6 @@
         }
       }
     },
-    "/v1/templates": {
-      "get": {
-        "operationId": "listTemplates",
-        "tags": [
-          "Templates"
-        ],
-        "summary": "List all available templates.",
-        "description": "List all available templates.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "list of templates.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Template"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Misc error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Project not found"
-          },
-          "409": {
-            "description": "Read operation conflict or database is locked: please retry"
-          }
-        }
-      },
-      "post": {
-        "operationId": "addTemplate",
-        "tags": [
-          "Templates"
-        ],
-        "summary": "Attach new template to a workspace.",
-        "description": "Attach new template to a workspace.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "description": "template params",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "template name"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Misc error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Project not found"
-          },
-          "409": {
-            "description": "Read operation conflict or database is locked: please retry"
-          }
-        }
-      },
-      "put": {
-        "operationId": "changeTemplateState",
-        "tags": [
-          "Templates"
-        ],
-        "summary": "Change template state.",
-        "description": "Change template state.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "description": "state update",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "subscription": {
-                    "type": "string",
-                    "description": "subscription state",
-                    "enum": [
-                      "start",
-                      "stop"
-                    ],
-                    "default": "start"
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "template name, required for `subscription: start`"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Misc error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Permission denied"
-          },
-          "404": {
-            "description": "Project not found"
-          }
-        }
-      }
-    },
     "/v1/usage": {
       "get": {
         "operationId": "getUsage",
@@ -5812,7 +4313,7 @@
           "Observability"
         ],
         "summary": "Get usage.",
-        "description": "Get usage. It returns a map of usage metrics. Binned metrics will be added to the response if `time_interval_s` is specified. If `time_interval_s` is provided, metrics will be binned within the specified time interval.",
+        "description": "Get usage.\nIt returns array of values.\nThe structure adheres to the ClickHouse JSONCompact format.\nBinned metrics will be added to the response if `time_interval_s` is specified.\nIf `time_interval_s` is provided, metrics will be binned within the specified time interval.\n",
         "parameters": [
           {
             "in": "query",
@@ -5852,14 +4353,11 @@
         ],
         "responses": {
           "200": {
-            "description": "A map of total usage metrics with binned usage metrics if `time_interval_s` is specified.",
+            "description": "The output structure:\n```json\n[\n  \"processed_bytes\", \"stored_bytes\", \"ai_prompt_tokens\", \"ai_completion_tokens\", \"ai_total_tokens\",\n  \"api_requests\", \"api_avg_resp_latency\", \"api_errors\", [\n    [\"time_1\", \"processed_bytes_1\", \"stored_bytes_1\", \"ai_prompt_tokens_1\", \"ai_completion_tokens_1\", \"ai_total_tokens_1\", \"api_requests_1\", \"api_avg_resp_latency_1\", \"api_errors_1\"],\n    [\"time_2\", \"processed_bytes_2\", \"stored_bytes_2\", \"ai_prompt_tokens_2\", \"ai_completion_tokens_2\", \"ai_total_tokens_2\", \"api_requests_2\", \"api_avg_resp_latency_2\", \"api_errors_2\"],\n    ...\n  ]\n]\n```\n",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/UsageMetrics"
-                  }
+                  "type": "object"
                 }
               }
             }
@@ -5938,6 +4436,1688 @@
               "application/json": {
                 "schema": {
                   "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/schemas/ai2": {
+      "post": {
+        "operationId": "getAIData2",
+        "tags": [
+          "Sources"
+        ],
+        "summary": "Get AI processed rows.",
+        "description": "Get AI processed rows.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart message for schema and data.",
+          "content": {
+            "application/x-ndjson": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "application/csv": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/snowflake/sample": {
+      "post": {
+        "operationId": "getSnowflakeDataSample",
+        "tags": [
+          "Snowflake"
+        ],
+        "summary": "Get sample of data from Snowflake.",
+        "description": "Get sample of data from Snowflake.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "description": "Snowflake secret to use"
+                  },
+                  "table": {
+                    "type": "string",
+                    "description": "Snowflake table"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "description": "Snowflake table schema",
+                    "default": "PUBLIC"
+                  },
+                  "sample_size": {
+                    "type": "integer",
+                    "description": "Sample size, rows",
+                    "default": 10
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/snowflake/schema": {
+      "post": {
+        "operationId": "getSnowflakeSchema",
+        "tags": [
+          "Snowflake"
+        ],
+        "summary": "Get Snowflake schema, list of tables.",
+        "description": "Get Snowflake schema, list of tables.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "description": "Snowflake secret to use"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/snowflake/test": {
+      "post": {
+        "operationId": "testSnowflakeCredentials",
+        "tags": [
+          "Snowflake"
+        ],
+        "summary": "Test Snowflake credentials.",
+        "description": "Test Snowflake credentials.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Snowflake credentials",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "type": "string",
+                    "description": "Snowflake username"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Snowflake password"
+                  },
+                  "account": {
+                    "type": "string",
+                    "description": "Snowflake account"
+                  },
+                  "warehouse": {
+                    "type": "string",
+                    "default": "COMPUTE_WH",
+                    "description": "Snowflake warehouse"
+                  },
+                  "database": {
+                    "type": "string",
+                    "description": "Snowflake database"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "default": "public",
+                    "description": "Snowflake schema"
+                  },
+                  "role": {
+                    "type": "string",
+                    "description": "Snowflake role. Optional."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/postgres/sample": {
+      "post": {
+        "operationId": "getPostgresDataSample",
+        "tags": [
+          "PostgreSQL"
+        ],
+        "summary": "Get sample of data from PostgreSQL.",
+        "description": "Get sample of data from PostgreSQL.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "description": "PostgreSQL secret to use"
+                  },
+                  "table": {
+                    "type": "string",
+                    "description": "PostgreSQL table"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "description": "PostgreSQL table schema",
+                    "default": "public"
+                  },
+                  "sample_size": {
+                    "type": "integer",
+                    "description": "Sample size, rows",
+                    "default": 10
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/postgres/schema": {
+      "post": {
+        "operationId": "getPostgresSchema",
+        "tags": [
+          "PostgreSQL"
+        ],
+        "summary": "Get PostgreSQL schema, list of tables.",
+        "description": "Get PostgreSQL schema, list of tables.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "description": "PostgreSQL secret to use"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/postgres/test": {
+      "post": {
+        "operationId": "testPostgresCredentials",
+        "tags": [
+          "PostgreSQL"
+        ],
+        "summary": "Test PostgreSQL credentials.",
+        "description": "Test PostgreSQL credentials.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "PostgreSQL credentials",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "type": "string",
+                    "description": "PostgreSQL username"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "PostgreSQL password"
+                  },
+                  "host": {
+                    "type": "string",
+                    "description": "PostgreSQL hostname"
+                  },
+                  "port": {
+                    "type": "string",
+                    "default": 5432,
+                    "description": "PostgreSQL TCP port"
+                  },
+                  "database": {
+                    "type": "string",
+                    "description": "PostgreSQL database"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "default": "public",
+                    "description": "PostgreSQL schema"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/postgres/table": {
+      "post": {
+        "operationId": "suggestPostgresTableSchema",
+        "tags": [
+          "PostgreSQL"
+        ],
+        "summary": "Get suggested PostgreSQL table schema.",
+        "description": "Get suggested PostgreSQL table schema.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "description": "PostgreSQL secret to use"
+                  },
+                  "table": {
+                    "type": "string",
+                    "description": "PostgreSQL table"
+                  },
+                  "schema": {
+                    "type": "string",
+                    "description": "PostgreSQL table schema, optional"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/s3/sample": {
+      "post": {
+        "operationId": "getS3DataSample",
+        "tags": [
+          "S3"
+        ],
+        "summary": "Get sample of data from S3.",
+        "description": "Get sample of data from S3.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "description": "S3 secret to use"
+                  },
+                  "bucket": {
+                    "type": "string",
+                    "description": "S3 bucket"
+                  },
+                  "path": {
+                    "type": "string",
+                    "description": "S3 path"
+                  },
+                  "role_arn": {
+                    "type": "string",
+                    "description": "S3 role ARN"
+                  },
+                  "external_id": {
+                    "type": "string",
+                    "description": "S3 role external ID"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/sources/{src_name}/jobs": {
+      "get": {
+        "operationId": "getSourceJobs",
+        "tags": [
+          "Sources"
+        ],
+        "summary": "Get all batch jobs for a source.",
+        "description": "Get all batch jobs for a source.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "src_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name to connect from",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found or pipe not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/cron/jobs": {
+      "get": {
+        "operationId": "getCronJobs",
+        "tags": [
+          "Sources"
+        ],
+        "summary": "Get all scheduled jobs.",
+        "description": "Get all scheduled jobs.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found or pipe not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/sources/{src_name}/connect/{tgt_name}": {
+      "get": {
+        "operationId": "connectSources",
+        "tags": [
+          "Sources"
+        ],
+        "summary": "Get a pipe to connect two sources.",
+        "description": "Get a pipe to connect two sources.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "src_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name to connect from",
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "tgt_name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Source name to connect to",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/PipeFile"
+                      },
+                      {
+                        "$ref": "#/components/schemas/SourceFile"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found or pipe not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/transforms/{name}": {
+      "post": {
+        "operationId": "recalculateTransform",
+        "tags": [
+          "Transforms"
+        ],
+        "summary": "Recalculate transformed columns.",
+        "description": "Recalculate transformed columns.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Transform name",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Recalc config",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "description": "Columns to recalculate",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/transforms/{name}/jobs": {
+      "get": {
+        "operationId": "listTransformJobs",
+        "tags": [
+          "Transforms"
+        ],
+        "summary": "List transform jobs.",
+        "description": "List transform jobs.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Transform name",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BatchJob"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/transforms/jobs": {
+      "get": {
+        "operationId": "listTransformJobs",
+        "tags": [
+          "Transforms"
+        ],
+        "summary": "List transform jobs.",
+        "description": "List transform jobs.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BatchJob"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/transforms/jobs/{job_id}": {
+      "get": {
+        "operationId": "getTransformJob",
+        "tags": [
+          "Transforms"
+        ],
+        "summary": "Get transform job by id.",
+        "description": "Get transform job by id.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Job id",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchJob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/transforms/{name}/rows": {
+      "get": {
+        "operationId": "getMaskedRows",
+        "tags": [
+          "Transforms"
+        ],
+        "summary": "Get masked rows.",
+        "description": "Get masked rows.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Transform name",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaskedRows"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/tmpl": {
+      "get": {
+        "operationId": "listAITemplates",
+        "tags": [
+          "AITemplates"
+        ],
+        "summary": "List AI templates.",
+        "description": "List AI templates.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AITemplateDesc"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/tmpl/schema/{proxy+}": {
+      "get": {
+        "operationId": "getAITemplateSchema",
+        "tags": [
+          "AITemplates"
+        ],
+        "summary": "Get AI template schema.",
+        "description": "Get AI template schema.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AITemplateSchema"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/tmpl/render/{proxy+}": {
+      "post": {
+        "operationId": "renderAITemplateSchema",
+        "tags": [
+          "AITemplates"
+        ],
+        "summary": "Render AI template schema.",
+        "description": "Render AI template schema.",
+        "requestBody": {
+          "description": "Template params",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/secrets/add/{name}": {
+      "post": {
+        "operationId": "addSecret",
+        "tags": [
+          "Secrets"
+        ],
+        "summary": "Add or update secret.",
+        "description": "Add or update secret.",
+        "requestBody": {
+          "description": "Template params",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "Secret type"
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/lint": {
+      "post": {
+        "operationId": "lintProject",
+        "tags": [
+          "Projects"
+        ],
+        "summary": "Lint project files.",
+        "description": "Lint project files.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "diff",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Do files diff."
+          },
+          {
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "description": "Do push dry-run."
+          }
+        ],
+        "requestBody": {
+          "description": "parameters for project push",
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "description": "Object to push in JSON format"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "description": "List of objects to push in JSON format"
+                    }
+                  }
+                ]
+              }
+            },
+            "application/yaml": {
+              "schema": {
+                "type": "string",
+                "description": "Object(s) to push in YAML format"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LintResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "409": {
+            "description": "Read operation conflict or database is locked: please retry"
+          }
+        }
+      }
+    },
+    "/v1/secrets": {
+      "get": {
+        "operationId": "listSecrets",
+        "tags": [
+          "Secrets"
+        ],
+        "summary": "List all saved secrets.",
+        "description": "List all saved secrets.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretMetadata"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/secrets/{secret_id}": {
+      "delete": {
+        "operationId": "deleteSecret",
+        "tags": [
+          "Secrets"
+        ],
+        "summary": "Delete secret.",
+        "description": "Delete secret.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Secret not found"
+          }
+        }
+      }
+    },
+    "/v1/aws/external_id": {
+      "get": {
+        "operationId": "getExternalId",
+        "tags": [
+          "S3"
+        ],
+        "summary": "Get AWS external id.",
+        "description": "Get AWS external id.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "external_id": {
+                      "type": "string",
+                      "description": "AWS external id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          }
+        }
+      }
+    },
+    "/v1/mysql/sample": {
+      "post": {
+        "operationId": "getMysqlDataSample",
+        "tags": [
+          "MySQL"
+        ],
+        "summary": "Get sample of data from MySQL.",
+        "description": "Get sample of data from MySQL.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "description": "MySQL secret to use"
+                  },
+                  "table": {
+                    "type": "string",
+                    "description": "MySQL table"
+                  },
+                  "sample_size": {
+                    "type": "integer",
+                    "description": "Sample size, rows",
+                    "default": 10
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/mysql/schema": {
+      "post": {
+        "operationId": "getMysqlSchema",
+        "tags": [
+          "MySQL"
+        ],
+        "summary": "Get MySQL schema, list of tables.",
+        "description": "Get MySQL schema, list of tables.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "description": "MySQL secret to use"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/mysql/test": {
+      "post": {
+        "operationId": "testMysqlCredentials",
+        "tags": [
+          "MySQL"
+        ],
+        "summary": "Test MySQL credentials.",
+        "description": "Test MySQL credentials.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "MySQL credentials",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "type": "string",
+                    "description": "MySQL username"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "MySQL password"
+                  },
+                  "host": {
+                    "type": "string",
+                    "description": "MySQL hostname"
+                  },
+                  "port": {
+                    "type": "string",
+                    "default": 3306,
+                    "description": "MySQL TCP port"
+                  },
+                  "database": {
+                    "type": "string",
+                    "description": "MySQL database"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Misc error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Project not found"
+          }
+        }
+      }
+    },
+    "/v1/mysql/table": {
+      "post": {
+        "operationId": "suggestMysqlTableSchema",
+        "tags": [
+          "MySQL"
+        ],
+        "summary": "Get suggested MySQL table schema.",
+        "description": "Get suggested MySQL table schema.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "secret": {
+                    "type": "string",
+                    "description": "MySQL secret to use"
+                  },
+                  "table": {
+                    "type": "string",
+                    "description": "MySQL table"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              },
+              "application/yaml": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }

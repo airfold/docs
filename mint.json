@@ -100,7 +100,7 @@
         "workspace_files/source_yaml",
         "workspace_files/push",
         "workspace_files/pull",
-        "workspace_files/cli_reference"
+        "cli/cli_reference"
       ]
     },
     {

@@ -11,7 +11,7 @@ A node is esssentially a single SQL `SELECT` statement.
 
 Nodes live within pipes and are executed sequentially in the order they are defined in the pipe.
 
-Each node can read data from [sources](/workspace/sources), published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe.
+Each node can read data from [sources](/cli/sources), published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe.
 
 The schema of the last node in the pipe determines the pipe's schema.
 
@@ -56,7 +56,7 @@ nodes:
           A brief description of the node's role or function. Optional.
         </ResponseField>
         <ResponseField name="sql" type="string" required>
-          The SQL query associated with the node. It can only retrieve data (via `FROM`) from [sources](/workspace/sources), published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe. It supports Jinja2 templating for dynamic SQL parameterization via the `params` field e.g. `{{ param }}`.
+          The SQL query associated with the node. It can only retrieve data (via `FROM`) from [sources](/cli/sources), published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe. It supports Jinja2 templating for dynamic SQL parameterization via the `params` field e.g. `{{ param }}`.
         </ResponseField>
       </Expandable>
     </ResponseField>
@@ -152,7 +152,7 @@ Instead, a common pattern is to front a materialized pipe with a published pipe.
 </Tip>
 
 ## Push
-Push pipes to your [workspace](/workspace/workspaces) using the CLI command [`af push`](/reference/cli) or [`/push`](/api-reference/workspace/push) API.<br />
+Push pipes to your [workspace](/cli/workspaces) using the CLI command [`af push`](/cli/cli_reference#param-push) or [`/push`](/api-reference/workspace/push) API.<br />
 
 For example, to push `draft_pipe.yaml`:
 ```bash

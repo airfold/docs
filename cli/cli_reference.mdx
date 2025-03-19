@@ -140,6 +140,26 @@ When output is redirected, it automatically switches to JSON format when possibl
         </ResponseField>
       </Expandable>
     </ResponseField>
+    <ResponseField name="run" type="Subcommand">
+      Run pipe and get data.
+      <Expandable title="Arguments and Flags">
+        <ResponseField name="name" type="Argument" required>
+          Pipe name.
+        </ResponseField>
+        <ResponseField name="path" type="Argument">
+          Path to a local object file(s), ('-' will read objects from stdin). By default will look for a pushed pipe.
+        </ResponseField>
+        <ResponseField name="--format" type="Flag">
+          Output data format. Options: json, ndjson. Default: ndjson.
+        </ResponseField>
+        <ResponseField name="--param" type="Flag">
+          Set pipe parameters in the form of `name=value`. Can be repeated.
+        </ResponseField>
+        <ResponseField name="--node" type="Flag">
+            Node name. Run only this node. By default, all nodes are run.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
   </Expandable>
 </ResponseField>
 

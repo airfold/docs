@@ -64,6 +64,14 @@
       ]
     },
     {
+      "group": "Manage your Workspace",
+      "pages": [
+        "concepts/workspaces",
+        "concepts/keys",
+        "management/members"
+      ]
+    },
+    {
       "group": "Ingest your data",
       "pages": [
         "concepts/sources",
@@ -90,14 +98,6 @@
       "group": "Publish your data",
       "pages": [
         "concepts/endpoints"
-      ]
-    },
-    {
-      "group": "Manage your Workspace",
-      "pages": [
-        "concepts/workspaces",
-        "concepts/keys",
-        "management/members"
       ]
     },
     {

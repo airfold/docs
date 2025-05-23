@@ -66,36 +66,53 @@
     {
       "group": "Ingest your data",
       "pages": [
-        "concepts/workspaces",
         "concepts/sources",
         "concepts/connectors",
-        "concepts/pipes",
-        "concepts/endpoints",
-        "concepts/ai_tables",
-        "concepts/keys",
-        "concepts/data_graph",
-        "concepts/charts"
+        "ingest/ingest_api",
+        "ingest/jsonpath",
+        "ingest/errors",
+        "concepts/charts",
+        "connectors/snowflake",
+        "connectors/s3"
       ]
     },
     {
       "group": "Transform your data",
       "pages": [
-        "ingest/ingest_api",
-        "ingest/jsonpath",
-        "ingest/errors",
-        "ingest/schema"
+        "concepts/pipes",
+        "query/pipelines",
+        "ingest/schema",
+        "concepts/ai_tables",
+        "concepts/data_graph"
       ]
     },
     {
       "group": "Publish your data",
       "pages": [
-        "query/pipelines"
+        "concepts/endpoints"
       ]
     },
     {
       "group": "Manage your Workspace",
       "pages": [
-        "workspace_files/install_cli",
+        "concepts/workspaces",
+        "concepts/keys",
+        "management/members"
+      ]
+    },
+    {
+      "group": "Production Best Practices",
+      "pages": [
+        "production/staging_prod",
+        "production/version_control",
+        "production/optimize_queries",
+        "production/cicd",
+        "workspace_files/install_cli"
+      ]
+    },
+    {
+      "group": "CLI Config Reference",
+      "pages": [
         "workspace_files/pipe_yaml",
         "workspace_files/source_yaml",
         "workspace_files/push",
@@ -104,25 +121,9 @@
       ]
     },
     {
-      "group": "Airfold in Production",
-      "pages": [
-        "management/members"
-      ]
-    },
-    {
       "group": "How-To Guides",
       "pages": [
-        "production/staging_prod",
-        "production/version_control",
-        "production/optimize_queries",
-        "production/cicd"
-      ]
-    },
-    {
-      "group": "Connectors",
-      "pages": [
-        "connectors/snowflake",
-        "connectors/s3"
+        "connectors/snowflake"
       ]
     },
     {

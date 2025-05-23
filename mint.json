@@ -64,7 +64,7 @@
       ]
     },
     {
-      "group": "Concepts",
+      "group": "Ingest your data",
       "pages": [
         "concepts/workspaces",
         "concepts/sources",
@@ -78,7 +78,7 @@
       ]
     },
     {
-      "group": "Ingest",
+      "group": "Transform your data",
       "pages": [
         "ingest/ingest_api",
         "ingest/jsonpath",
@@ -87,13 +87,13 @@
       ]
     },
     {
-      "group": "Query",
+      "group": "Publish your data",
       "pages": [
         "query/pipelines"
       ]
     },
     {
-      "group": "Workspace Files",
+      "group": "Manage your Workspace",
       "pages": [
         "workspace_files/install_cli",
         "workspace_files/pipe_yaml",
@@ -104,13 +104,13 @@
       ]
     },
     {
-      "group": "Management",
+      "group": "Airfold in Production",
       "pages": [
         "management/members"
       ]
     },
     {
-      "group": "Production",
+      "group": "How-To Guides",
       "pages": [
         "production/staging_prod",
         "production/version_control",

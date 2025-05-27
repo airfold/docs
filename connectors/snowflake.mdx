@@ -4,47 +4,75 @@ description: "Seamlessly integrate your Snowflake data with Airfold"
 icon: 'snowflake'
 ---
 
-Airfold makes it easy to connect with your Snowflake data. It also enables you to automate data updates using scheduled cron jobs.
+Airfold makes it easy to connect with data that you have stored in Snowflake. It also enables you to automate data updates using scheduled cron jobs.
 
 We’ll walk through an example of using a Snowflake connector for your workspace.
 
 ## Creation
 
 ### Create Source
-Navigate to `Sources`, and click on `+`
+Navigate to `Sources` and click on `Create new Source`. Alternatively, click on the `+` next to `Sources` in the lefthand tool bar. 
 
-<p align="center">
-    <img src="/images/ui_integration_options.png" alt="data format options" width="550"/>
-</p>
+![snowflake](/images/create_source.png)
 
-Click on `Snowflake`
 
-<p align="center">
-  <img src="/images/snowflake1.png" alt="snowflake" width="500"/>
-</p>
+In the popup window, click on `Snowflake`
 
-### Establish Connection
 
-<p align="center">
-  <img src="/images/snowflake2.png" alt="snowflake" width="500"/>
-</p>
+![snowflake](/images/ui_integration_options.png)
+
+### Connection Details
+
+The next window in the pop up will ask you for some information from your Snowflake account.
+
+![snowflake](/images/snowflake_connection_details.png)
 
 **Account**
 
-Prefix before `*.snowflake.computing.com` (e.g., lh10221.us-central1.gcp)
+`Account` requires several pieces of information:
 
-You can also access this with the following commands in Snowflake:
-```
-SELECT CURRENT_ACCOUNT();
-```
+`<your_account_id>.<your-snowflake-region>.<your_cloud_provider>` 
+
+(e.g., lh10221.us-central1.gcp)
+
+To generate this value, navigate to your Snowflake account, open a SQL worksheet, and run the following query:
+
 
 ```
-SELECT CURRENT_REGION();
+SELECT
+  LOWER(CURRENT_ACCOUNT()) || '.' ||
+    CASE 
+      WHEN SPLIT_PART(CURRENT_REGION(), '_', 1) = 'AWS' THEN 
+        LOWER(SPLIT_PART(CURRENT_REGION(), '_', 2) || '-' || SPLIT_PART(CURRENT_REGION(), '_', 3) || '-' || SPLIT_PART(CURRENT_REGION(), '_', 4) || '.aws')
+
+      WHEN SPLIT_PART(CURRENT_REGION(), '_', 1) = 'AZURE' THEN 
+        LOWER(REPLACE(SPLIT_PART(CURRENT_REGION(), '_', 2), ' ', '') || '.azure')
+
+      WHEN SPLIT_PART(CURRENT_REGION(), '_', 1) = 'GCP' THEN 
+        LOWER(SPLIT_PART(CURRENT_REGION(), '_', 2) || '-' || SPLIT_PART(CURRENT_REGION(), '_', 3) || '.gcp')
+
+      ELSE LOWER(CURRENT_REGION()) || '.unknown'
+    END AS airfold_connector_account_field
 ```
+
+Copy the result of this query and paste into the Airfold UI where needed. If this query fails to generate the `Account` value as needed, you can piece together the correct value from the query below:
+
+```
+SELECT
+    CURRENT_REGION(),
+    CURRENT_ACCOUNT()
+```
+
+For example, if the above query returned:
+
+
+![snowflake](/images/snowflake_account_query.png)
+
+Then the correct value for `Account` would be `gu81828.us-east-2.aws'
 
 **Username**
 
-Username for your Snowflake Account
+This is the username that you use to login to your Snowflake account. You can obtain this by running the following query:
 
 ```
 SELECT CURRENT_USER();
@@ -52,16 +80,20 @@ SELECT CURRENT_USER();
 
 **Password**
 
-Password for your Snowflake Account
+The password that you use to login to your Snowflake Account. If this is unknown, contact your Snowflake administrator.
 
 **Database**
-Name of your database that you wish to access
+
+Name of that database that you wish to access.
 
 ```
 SELECT CURRENT_DATABASE();
 ```
 
+**Optional Settings:**
+
 **Warehouse**
+
 Name of your warehouse, defaults to `COMPUTE_WH`
 
 ```
@@ -69,13 +101,15 @@ SELECT CURRENT_WAREHOUSE();
 ```
 
 **Schema**
-Name of your warehouse, defaults to `PUBLIC`
+
+The schema name of the data you wish to ingest into Airfold, defaults to `PUBLIC`
 
 ```
 SELECT CURRENT_SCHEMA();
 ```
 
 **Role**
+
 Name of your role
 
 ```
@@ -85,14 +119,25 @@ SELECT CURRENT_ROLE();
 Click on "Test Connection", and you should see this:
 
 <p align="center">
-  <img src="/images/snowflake3.png" alt="snowflake" width="200"/>
+  <img src="/images/test_snowflake_connection.png" alt="Successful test connection" width="200"/>
 </p>
 
 ### Select Table
 
-Select the table you wish to add from your database:
+Select the table you wish to add from your database. A Snowflake connection can only have one table. If you wish to join the data from multiple tables together, you will need to create a `Source` for each table and then join the data using a downstream `Pipe`.
 
 ![snowflake](/images/snowflake4.png)
+
+
+
+### User and Role
+
+This section will require you to run administrative queries in your Snowflake account that will create a `Role` and a `User` and then grant permissions for those new resources to the database that you are syncing data from.
+
+![snowflake](/images/snowflake_admin_queries.png)
+
+Run these queries one by one in your Snowflake account. Once each query has successfully run, click the `Mark as Done` checkbox and then `Next`.
+
 
 ### Set Up Cron job
 
@@ -102,12 +147,13 @@ Set up automated data updates with a cron expression:
   <img src="/images/snowflake5.png" alt="snowflake" width="500"/>
 </p>
 
+
 ### Confirm Schema
 
-Airfold infers schema from Snowflake, so all you have to do is confirm whether it is correct:
+Airfold will automatically infer a schema from Snowflake, but you have the opportunity to make any changes. Remember - once a source is created, the table settings cannot be altered. If you wish to alter the table at a later stage, all the data will have to be dropped which could cause issues in your downstream, production APIs. Source settings, such as the `Engine` type and the `Primary Key`, are critical for optimal query performance - it's a great idea to slow down at this stage and make sure your Source settings are configured optimally!
 
 <p align="center">
   <img src="/images/snowflake6.png" alt="snowflake" width="500"/>
 </p>
 
-And that's it! Now you have ingested data using our Snowflake connector, which will also ensure that your data sources are automatically updated.
+Click on `Confirm Schema` and that's it, you have successfuly connected your Snowflake table with Airfold. The data should populate into Airfold as per your cron schedule and you should now see your new connection under `Sources`.

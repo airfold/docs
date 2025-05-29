@@ -4,36 +4,112 @@ description: 'Build features over your data'
 icon: "magnifying-glass"
 ---
 
-Pipes are a sequence of one or more SQL queries (Nodes) that are executed in order, and they result in either a published or materialized pipe.
+Pipes are a sequence of one or more SQL queries (Nodes) that are executed in order, and they result in either a **Published** or **Materialized** pipe.
+
+### Published Pipes
+**Published** pipes serve as endpoints, where users can call the API and Airfold runs the SQL associated with API and responds with the results of the query.
+
+### Materialized Pipes
+**Materialized** pipes can be either incremental or refreshable, materialized pipes can be queried instead of the source table to optimize query performance.
+There are two types of materialized pipes:
+#### Incremental Materialized Pipes
+An incremental materialized view enables shifting the computational workload from query time to data insertion time.
+This results in significantly faster SELECT operations, as the view is continuously updated with only the new or changed data.
+#### Refreshable Materialized Pipes
+A refreshable materialized view works similarly in concept but updates its contents by periodically re-running the full underlying query on the entire dataset.
+The refreshed results are stored in a dedicated target table, which can then be queried directly for improved read performance.
 
 ## UI
 
-### Creating a Query
-Navigate to "Queries" on the left menu column, and click on "+":
-<p align="center">
-  <img src="/images/ui_query1.png" alt="data format options" width="550"/>
-</p>
+### Creating Draft pipe
+Navigate to "Pipes" on the left menu column, and click on "+":
+![create pipe](/images/pipes_creation.gif)
 Enter a name for this query, then press "Create".
 
-### Nodes
 Here, you have a node where you can enter a single SQL `SELECT` statement to query your tables directly. 
 
 These SQL statements can interact with your tables in the same way as standard SQL tables, with additional AI columns you can leverage for deeper insights.
 
-For example, to get the top 2 features mentioned in successful calls:
-![sql query](/images/ui_query2.png)
+For example, to get the top referrers as in our quickstart example we can run the following command.
+
+```sql
+SELECT
+  referrer,
+  COUNT() AS num_referrers
+FROM web_events
+GROUP BY referrer
+ORDER BY num_referrers DESC
+LIMIT 3
+```
 
 We can run this by clicking on "Run":
-![sql query](/images/ui_query3.png)
+
+This is your Draft pipe, you can run SQL queries against your database for testing sql's you can use the draft pipe.
+
+### Creating Published pipe
 
 Click on "Save" to save this node, and "Publish" to publish it as an [endpoint](/concepts/endpoints):
-<p align="center">
-  <img src="/images/ui_query4.png" alt="data format options" width="250"/>
-</p>
+
+That's it, your draft pipe just became a publihsed pipe, you can go to view endpoints and use any of the Javascript, Python or curl command to ping the endpoint.
+
+![publish pipe](/images/publish_endpoints.gif)
+
+### Creating Incremental Materialized pipe
+
+Let's say we want to get the signup, purchases and page_views metrics along with total_events from the web events data.
+we could run the query below to get the metrics per day.
+
+```sql
+SELECT
+    toDate(timestamp) AS date,
+    countState(event_id) AS total_events,
+    countIfState(event_type = 'signup') AS signups,
+    countIfState(event_type = 'purchase') AS purchases,
+    countIfState(event_type = 'page_view') AS page_views
+FROM web_events
+GROUP BY date
+```
+
+This runs fine for smaller dataset, but as no. of rows increases, the above query will take large amount of time to query all the rows and calculate the metrics.
+We can use an incremental materialized pipe here, and store the aggregated data on a new source as the data is being inserted and have the API query the new source.
+This significantly decreases the number of rows queries and hence the time taken for the query to run.
+
+<Note>
+Note the materialized pipe example uses `countIfState()` instead of `countIf()`.
+
+Airfold uses [ClickHouse](https://clickhouse.com/) under the hood which requires appending `State` to aggregate functions when used in a materialized pipe.
+
+Fortunately, Airfold does it automatically when materializing a draft pipe using `af materialize <pipe_name>`.
+
+Learn more about [Materialization in ClickHouse](https://clickhouse.com/blog/using-materialized-views-in-clickhouse#speed-up-aggregations-using-materialized-views), about the [`*State` combinator](https://clickhouse.com/docs/en/sql-reference/aggregate-functions/combinators#-state).
+</Note>
+
+![incremental mv](/images/incremental_mv.gif)
+
+
+### Creating Refreshable Materialized pipe
+
+Let's consider example, if we want to get the top_pages visited by unique visitors per page_url, we can do it by the following command.
+
+```sql
+SELECT
+    page_url,
+    count(event_id) AS total_visits,
+    uniqExact(user_id) AS unique_visitors
+FROM web_events
+WHERE event_type = 'page_view'
+GROUP BY page_url
+```
+
+This will eventually take a long time to load when the data increases, this computation should be performed on the whole dataset and 
+hence we will use refreshable materialized pipe.
+
+![refreshable mv](/images/refreshable_mv.gif)
+
+
 
 ## CLI
-### Creation
-#### Draft pipes
+### Creating Draft pipe
 
 These are the starting point for all pipes, similar to database views in functionality.
 
@@ -115,7 +191,7 @@ nodes:
 </ResponseField>
 
 
-#### Published pipes
+### Creating Published pipes
 
 This creates an API endpoint that serves the result of your pipe, the result is accessible in JSON, NDJSON, CSV, and Parquet formats.
 
@@ -141,7 +217,7 @@ params:
       default: error
 ```
 
-#### Materialized pipes
+#### Creating Incremental Materialized pipe
 
 Differing from the batch nature of draft and published pipes, materialized pipes stand out for their ability to incrementally transform data as it is ingested and append their results to a designated source.
 
@@ -177,13 +253,13 @@ Learn more about [Materialization in ClickHouse](https://clickhouse.com/blog/usi
 
 <Tip>
 ### Best Practices
-Published pipes are batch and compute their results on read, thus they're not suited for intensive data transformations.
+Published pipes operate in batch mode and compute their results on read; therefore, they are not suited for intensive data transformations.
 
-Instead, a common pattern is to front a published pipe with a materialized pipe.
-The materialized pipe incrementally transforms the data as it is ingested and writes it to its source, allowing the published pipe to instantly access the already transformed data from the source on read.
+Instead, a common pattern is to place a published pipe in front of a materialized pipe.
+The materialized pipe incrementally transforms data as it is ingested and writes it to the source, enabling the published pipe to instantly access the pre-transformed data during reads.
 </Tip>
 
-### Refreshable Materialization
+### Creating Refreshable Materialized pipe
 
 Some sources are batch in nature, like `prices` table or `products` table.
 And may be refreshed from a [connector](/concepts/connectors) or any other external process.

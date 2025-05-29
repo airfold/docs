@@ -1,3 +1,4 @@
 /.idea
 /.venv
 .airfold
+.DS_Store

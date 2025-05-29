@@ -1,6 +1,6 @@
 ---
-title: 'Sources'
-description: 'Bring your data into Airfold'
+title: "Sources"
+description: "Bring your data into Airfold"
 icon: "database"
 ---
 
@@ -9,7 +9,6 @@ Akin to tables in a database, sources store data according to a defined schema.
 All the workspace data lives inside sources, which can be queried, filtered, aggregated, and joined using SQL.
 
 ## UI
-
 ### Ingesting Data
 
 Navigate to "Sources" on the left menu bar, and click on "+":
@@ -21,23 +20,23 @@ Here you can either create a source by inferring a schema from [Text](/ingest/js
 Or you can use [Connectors](/concepts/connectors) to ingest data from external sources.
 
 <Note>
-    Inferred sources will be empty. <br/>
-    You can put some data into them using the [Ingest API](/ingest/ingest_api)
+  Inferred sources will be empty. <br />
+  You can put some data into them using the [Ingest API](/ingest/ingest_api)
 </Note>
 
-#### Select Type
+### Select Type
 
 In this example, we will upload a csv file through `File Upload`:
 
-![catalog upload](/images/catalog_upload.png)
+![catalog upload](/images/file_upload.png)
 
 Then, click `Next`.
 
-#### Confirm Schema
+### Confirm Schema
 
-Name your source and confirm the schema:
+Name your source, check ingest data box and confirm the schema:
 
-![catalog schema](/images/catalog_schema.png)
+![catalog schema](/images/file_upload_schema.png)
 
 Click `Create`.
 
@@ -45,9 +44,10 @@ Click `Create`.
 
 Once your source is successfully created, you can view its ingestion metrics and sample of the data.
 
-![metrics](/images/product_catalog.png)
+![metrics](/images/file_upload_data.png)
 
 You may use the table sample features:
+
 - `Filters` allows you to filter out certain rows based on a condition
 - `Sort` can be used to order your rows in ascending/descending order based on a specified column
 - `Group by` is for organizing your rows by a specified column, grouping related rows together based on a shared value in that column
@@ -70,21 +70,24 @@ There are also tabs on each `Source` page:
 ## CLI
 
 ### Creating a YAML file
+
 Define the schema for your source in a YAML file:
 
-```yaml product_catalog.yaml
-name: product_catalog
-description: catalog of store products
-  cols:
-  ProductID: String
-  Name: String
-  Category: String
-  Description: String
-  Price: Float64
-settings:
+```yaml web_events.yaml
+type: Table
+name: web_events
+description: Events data of a website
+cols:
+  event_id: Int64
+  user_id: Int64
+  event_type: String
+  page_url: String
+  timestamp: DateTime
+  referrer: String
+settings: 
   engine: MergeTree()
-  order_by: "`ProductID`"
-  partition_by: tuple()
+  partition_by: toYYYYMM(timestamp)
+  order_by: `event_id`
 ```
 
 <br />
@@ -92,7 +95,8 @@ settings:
 ### Properties
 
 <ResponseField name="type" type="string">
-  Type of source: `Table` or `AITable`, see more on [AI table](/concepts/ai_tables) (Optional)
+  Type of source: `Table` or `AITable`, see more on [AI
+  table](/concepts/ai_tables) (Optional)
 </ResponseField>
 <ResponseField name="name" type="string">
   Name of source
@@ -101,29 +105,32 @@ settings:
   A brief overview of the source's content or purpose (optional)
 </ResponseField>
 <ResponseField name="cols" type="{name: type}" required>
-  Defines the schema of the source as a list of columns where each column name is a key and its data type is the value (see [Data Types](https://clickhouse.com/docs/en/sql-reference/data-types))
+  Defines the schema of the source as a list of columns where each column name
+  is a key and its data type is the value (see [Data
+  Types](https://clickhouse.com/docs/en/sql-reference/data-types))
 </ResponseField>
 <ResponseField name="settings" type="string | {key: value} | array">
-  [ClickHouse table configuration](https://clickhouse.com/docs/en/sql-reference/statements/create/table) for the source, which can include `ORDER BY`, `PARTITION BY`, Table Engine, etc. The settings can be a String, a key-value pair, or an array comprising either or both. Optional.
+  [ClickHouse table
+  configuration](https://clickhouse.com/docs/en/sql-reference/statements/create/table)
+  for the source, which can include `ORDER BY`, `PARTITION BY`, Table Engine,
+  etc. The settings can be a String, a key-value pair, or an array comprising
+  either or both. Optional.
 </ResponseField>
 
 ### Push
+
 Push sources to your [workspace](/concepts/workspaces) using the [CLI command](/cli/cli_reference) `af push`.
 
-For example, to push `sales_calls.yaml`, run:
+For example, to push `web_events.yaml`, run:
+
 ```bash
-af push sales_calls.yaml
+af push web_events.yaml
 ```
 
 ## Unstructured Data
 
-So far, we've seen examples of ingesting structured data such as `product_catalog` shown above.
+So far, we've seen examples of ingesting structured data such as `web_events` shown above.
 
 However, one of Airfold's key strengths is how it allows you to work with **unstructured data**.
-
-Examples of unstructured data:
-- Sales calls transcripts
-- Customer Reviews
-- Customer Service Tickets
 
 The process for ingesting unstructured data remains the same as with structured data demonstrated above. However, upon ingestion, you can extract meaningful insights from your unstructured data using [AI Tables](/concepts/ai_tables).

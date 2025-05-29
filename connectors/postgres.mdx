@@ -1,0 +1,87 @@
+---
+title: "Postgres"
+description: "Seamlessly integrate your postgres data with Airfold"
+icon: "database"
+---
+
+Airfold makes it easy to connect with data that you have stored in postgres.
+Airfold uses the postgres Change Data Capture (CDC) to ingest data, so ensure that your postgres database's **wal_level** is set to `logical`.
+
+We’ll walk through an example of using a Postgres connector withing your Airfold workspace.
+
+### Create Source
+
+Navigate to `Sources` and Click on the `+` next to `Sources` in the lefthand tool bar.
+
+In the popup window, click on `Postgres`
+
+![data format options](/images/ui_integration_options.png)
+
+### Connection Details
+
+In the next window, you'll be prompted to provide connection details for your Postgres database.
+Fill in the fields and click **Next**. This will validate the connection and establish a link to the database.
+
+![postgres](/images/postgres_connection_details.png)
+
+`Host`: The server address where your PostgreSQL database is running.
+
+`Port`: The network port PostgreSQL listens on. Default is 5432.
+
+`Use SSL` **(optional)**: Enables encrypted connections between your client and the PostgreSQL server. Recommended for production and remote connections to protect data in transit.
+
+`User`: The username of PostgreSQL for authentication. This is a database user account (like `postgres`, `admin`, or `myapp_user`).
+
+`Password`: The password for the specified PostgreSQL user account.
+
+`Database`: The specific database name within the PostgreSQL instance you want to connect to.
+
+`Publication` **(optional)**: Used for logical replication. This identifies a set of tables whose changes you want to replicate to other PostgreSQL instances. Only needed if you're setting up replication.
+
+`Slot` **(optional)**: Used for logical replication. A replication slot ensures changes aren't lost if the subscriber temporarily disconnects. It maintains a position in the transaction log.
+
+### Select table
+
+Once connected, you'll see a list of available tables in the database.
+Select the desired table and click **Next**.
+
+![postgres](/images/postgres_select_table.png)
+
+### Finalize
+
+Review the schema that Airfold has generated for the selected table.
+You can make changes if needed. Click **Create** to connect Airfold to the Postgres database.
+As new data is ingested into Postgres, Airfold will automatically receive the updates.
+
+```yaml web_events.yaml
+cols:
+  - name: event_id
+    type: Int32
+  - name: user_id
+    type: Nullable(Int32)
+  - name: event_type
+    type: Nullable(String)
+  - name: page_url
+    type: Nullable(String)
+  - name: timestamp
+    type: Nullable(DateTime64(6))
+  - name: referrer
+    type: Nullable(String)
+settings:
+  engine: MergeTree
+  primary_key: (`event_id`)
+  order_by: (`event_id`)
+postgres_cdc:
+  table: web_events
+  schema: public
+  secret: pg
+  strategy: append
+  publication: airfold
+  slot: airfold
+```
+
+![postgres](/images/postgres_finalize.png)
+
+<Note>
+  The wal_level of postgres should be set to logical for this connector to work with Airfold.
+</Note>

@@ -1,6 +1,6 @@
 ---
-title: 'Connectors'
-description: 'Bring external data into Airfold'
+title: "Connectors Overview"
+description: "Bring external data into Airfold"
 icon: "merge"
 ---
 
@@ -17,13 +17,13 @@ Connectors enable seamless integration of external data sources into Airfold. Th
 
 ## Supported Data Sources
 
-| Data Source | Status | Documentation |
-|------------|---------|---------------|
-| Snowflake  | **Available** | [View](/connectors/snowflake) |
-| Amazon S3  | **Available** | [View ](/connectors/s3) |
-| PostgreSQL | Coming Soon | [View](/connectors/postgres) |
-| MySQL      | Coming Soon | [View](/connectors/mysql) |
-| Kafka      | Coming Soon | [View](/connectors/kafka) |
+| Data Source | Status        | Documentation                 |
+| ----------- | ------------- | ----------------------------- |
+| Snowflake   | **Available** | [View](/connectors/snowflake) |
+| Amazon S3   | **Available** | [View ](/connectors/s3)       |
+| PostgreSQL  | **Available** | [View](/connectors/postgres)  |
+| MySQL       | Coming Soon   | Coming Soon     |
+| Kafka       | Coming Soon   | Coming Soon     |
 
 ## Configuration
 
@@ -34,11 +34,13 @@ Each connector requires a defined refresh strategy that determines how data sync
 #### Available Strategies
 
 `replace`
+
 - Replaces entire dataset on each refresh interval
 - Best for complete dataset synchronization
 - Use when maintaining historical data is not required
 
 `append`
+
 - Adds new records to existing dataset
 - Maintains historical data
 - Ideal for time-series or log data
@@ -47,6 +49,7 @@ Each connector requires a defined refresh strategy that determines how data sync
 ## Error Handling
 
 Connectors implement automatic retry logic and provide detailed error messages for common issues:
+
 - Connection timeouts
 - Authentication failures
 - Schema validation errors

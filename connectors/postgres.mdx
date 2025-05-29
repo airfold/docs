@@ -53,33 +53,6 @@ Review the schema that Airfold has generated for the selected table.
 You can make changes if needed. Click **Create** to connect Airfold to the Postgres database.
 As new data is ingested into Postgres, Airfold will automatically receive the updates.
 
-```yaml web_events.yaml
-cols:
-  - name: event_id
-    type: Int32
-  - name: user_id
-    type: Nullable(Int32)
-  - name: event_type
-    type: Nullable(String)
-  - name: page_url
-    type: Nullable(String)
-  - name: timestamp
-    type: Nullable(DateTime64(6))
-  - name: referrer
-    type: Nullable(String)
-settings:
-  engine: MergeTree
-  primary_key: (`event_id`)
-  order_by: (`event_id`)
-postgres_cdc:
-  table: web_events
-  schema: public
-  secret: pg
-  strategy: append
-  publication: airfold
-  slot: airfold
-```
-
 ![postgres](/images/postgres_finalize.png)
 
 <Note>

@@ -36,7 +36,6 @@
       "url": "api-reference"
     }
   ],
-
   "anchors": [
     {
       "name": "Home",
@@ -75,13 +74,27 @@
       "group": "Ingest your data",
       "pages": [
         "concepts/sources",
-        "concepts/connectors",
+        {
+          "group": "Connectors",
+          "icon": "plug",
+          "pages": [
+            "concepts/connectorsoverview",
+            "connectors/snowflake",
+            "connectors/s3",
+            "connectors/postgres"
+          ]
+        },
         "ingest/ingest_api",
+        {
+          "group": "Schema",
+          "icon": "sitemap",
+          "pages": [
+            "ingest/inference",
+            "ingest/reference"
+          ]
+        },
         "ingest/jsonpath",
-        "ingest/errors",
-        "concepts/charts",
-        "connectors/snowflake",
-        "connectors/s3"
+        "ingest/errors"
       ]
     },
     {
@@ -89,7 +102,6 @@
       "pages": [
         "concepts/pipes",
         "query/pipelines",
-        "ingest/schema",
         "concepts/ai_tables",
         "concepts/data_graph"
       ]
@@ -128,11 +140,16 @@
     },
     {
       "group": "Get Started",
-      "pages": ["api-reference/authentication"]
+      "pages": [
+        "api-reference/authentication"
+      ]
     },
     {
       "group": "Ingest",
-      "pages": ["api-reference/ingest/ingest", "api-reference/ingest/schema"]
+      "pages": [
+        "api-reference/ingest/ingest",
+        "api-reference/ingest/schema"
+      ]
     },
     {
       "group": "Workspace",
@@ -164,7 +181,10 @@
     },
     {
       "group": "Diagnostic",
-      "pages": ["api-reference/diagnostic/list", "api-reference/diagnostic/run"]
+      "pages": [
+        "api-reference/diagnostic/list",
+        "api-reference/diagnostic/run"
+      ]
     },
     {
       "group": "Legal",

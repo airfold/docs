@@ -81,6 +81,7 @@
             "concepts/connectorsoverview",
             "connectors/snowflake",
             "connectors/s3",
+            "connectors/s3_from_snowflake",
             "connectors/postgres"
           ]
         },

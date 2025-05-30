@@ -6,18 +6,7 @@ icon: "magnifying-glass"
 
 Pipes are a sequence of one or more SQL queries (Nodes) that are executed in order, and they result in either a **Published** or **Materialized** pipe.
 
-### Published Pipes
-**Published** pipes serve as endpoints, where users can call the API and Airfold runs the SQL associated with API and responds with the results of the query.
-
-### Materialized Pipes
-**Materialized** pipes can be either incremental or refreshable, materialized pipes can be queried instead of the source table to optimize query performance.
-There are two types of materialized pipes:
-#### Incremental Materialized Pipes
-An incremental materialized view enables shifting the computational workload from query time to data insertion time.
-This results in significantly faster SELECT operations, as the view is continuously updated with only the new or changed data.
-#### Refreshable Materialized Pipes
-A refreshable materialized view works similarly in concept but updates its contents by periodically re-running the full underlying query on the entire dataset.
-The refreshed results are stored in a dedicated target table, which can then be queried directly for improved read performance.
+This page dives deeper into the structure and usage of individual pipes. For an introduction to how pipes are composed into pipelines, see [pipelines](/query/pipelines).
 
 ## UI
 
@@ -217,7 +206,7 @@ params:
       default: error
 ```
 
-#### Creating Incremental Materialized pipe
+### Creating Incremental Materialized pipe
 
 Differing from the batch nature of draft and published pipes, materialized pipes stand out for their ability to incrementally transform data as it is ingested and append their results to a designated source.
 
@@ -225,7 +214,7 @@ To materialize a draft pipe, set the `to` field to the name of the target source
 
 Although materialized pipes themselves cannot be accessed (via `FROM`) by other pipes, the source they write to is accessible like any other source.
 
-```yaml materialized_pipe.yaml
+```yaml incremental_pipe.yaml
 description: 'Aggregate logs by level'
 nodes:
     - load:
@@ -290,6 +279,20 @@ refresh:
 Push pipes to your [workspace](/concepts/workspaces) using the CLI command `af push`.<br />
 
 For example, to push `draft_pipe.yaml`:
-```bash
+<CodeGroup>
+```bash draft_pipe
 af push draft_pipe.yaml
 ```
+
+```bash published_pipe
+af push published_pipe.yaml
+```
+
+```bash incremental_pipe
+af push incremental_pipe.yaml
+```
+
+```bash refreshable_pipe
+af push refreshable_pipe.yaml
+```
+</CodeGroup>

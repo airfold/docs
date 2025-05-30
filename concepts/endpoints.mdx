@@ -15,9 +15,7 @@ Each API comes with Swagger documentation for standardized usage and can be acce
 To publish a query as an endpoint:
 
 1. Click the publish button:
-<p align="center">
-    <img src="/images/ui_endpoint1.png" alt="ai table creation" width="150"/>
-</p>
+![publish button](/images/ui_query4.png)
 
 2. Select "View endpoint":
 ![full page](/images/ui_endpoint2.png)
@@ -27,14 +25,10 @@ The dashboard displays key metrics including request count, data processed, late
 ### Use the Endpoint
 
 Copy the API endpoint directly from the code block to use in your application:
-<p align="center">
-    <img src="/images/ui_endpoint4.png" alt="ai table creation" width="550"/>
-</p>
+![endpoint code](/images/ui_endpoint4.png)
 
 Access additional options through the three-dot menu in the top right corner:
-<p align="center">
-    <img src="/images/ui_endpoint3.png" alt="ai table creation" width="450"/>
-</p>
+![endpoint three dots](/images/ui_endpoint3.png)
 
 - **Share Swagger**: Opens the Swagger documentation page for API exploration and testing
 - **Add Parameter**: Define custom parameters for your API calls
@@ -47,9 +41,7 @@ Access additional options through the three-dot menu in the top right corner:
 Endpoints support [Jinja2](https://jinja.palletsprojects.com/en/stable/templates/) syntax for parameter templating.
 
 Example of a parameterized endpoint:
-<p align="center">
-    <img src="/images/ui_endpoint5.png" alt="endpoint with params" width="450"/>
-</p>
+![endpoint three dots](/images/ui_endpoint5.png)
 
 #### Expressions
 
@@ -78,19 +70,36 @@ https://api.us.airfold.co/v1/pipes/endpoint1?param1=10&param2=foo&param3=c1,c2
 ```
 For additional syntax options, refer to the [Jinja2 documentation](https://jinja.palletsprojects.com/en/stable/templates/).
 
-#### Statements
+#### Parameter Examples
 
-Use `{% if condition %}...{% endif %}` syntax for conditional statements.
-
-Example:
-```
-SELECT
-{% if start_time is defined %}
-    toStartOfInterval({{ start_time }}:: DateTime, INTERVAL {{ interval }} SECONDS)
+<CodeGroup>
+```sql NO DEFAULT
+{% if param is defined %}
+	SELECT {{ param }}
 {% else %}
-    toStartOfInterval(now() - INTERVAL 1 DAY, INTERVAL {{ interval }} SECONDS)
+	SELECT 1
 {% endif %}
 ```
+
+```sql FILTER
+SELECT * FROM table WHERE column = {{ param }}
+```
+
+```sql CONDITIONAL
+SELECT * FROM table
+{% if param > 5 %}
+	WHERE column > {{ param }}
+{% else %}
+	WHERE column < 5
+{% endif %}
+```
+
+```sql PAGINATION
+SELECT * FROM table
+LIMIT {{page_size}}
+OFFSET {{page * page_size}}
+```
+</CodeGroup>
 
 For additional statement options, refer to the  [Jinja2 documentation](https://jinja.palletsprojects.com/en/stable/templates/).
 
@@ -101,46 +110,52 @@ For additional statement options, refer to the  [Jinja2 documentation](https://j
 
 Simply add a name to the `publish` parameter:
 
-```yaml insights.yaml
+```yaml top_referrers.yaml
 nodes:
   - node1:
       sql: |
-        WITH
-          arrayJoin(features_mentioned) AS feature
         SELECT
-          count() AS num_successful_calls,
-          topK(2)(feature) AS top_features
-        FROM
-          analysis
-        WHERE
-          successful = true
-publish: insights
+          referrer,
+          COUNT() AS num_referrers
+        FROM web_events
+        WHERE timestamp BETWEEN {{ start_date }} && {{ end_date }}
+        GROUP BY referrer
+        ORDER BY num_referrers DESC
+        LIMIT 3
+publish: top_referrers
 
 ```
 
 ### Push
 Push this update by running:
 ```
-af push insights.yaml
+af push top_referrers.yaml
 ```
 
 ### Params
 
 In YAML params are placed in the `params` property:
 
-```yaml
+```yaml top_referrers_with_parameters.yaml
+nodes:
+  - node1:
+      sql: |
+        SELECT
+          referrer,
+          COUNT() AS num_referrers
+        FROM web_events
+        WHERE timestamp BETWEEN {{ start_date }} AND {{ end_date }}
+        GROUP BY referrer
+        ORDER BY num_referrers DESC
+        LIMIT 3
+publish: top_referrers
 params:
-  - name: start_time
-    type: datetime
-  - name: end_time
-    type: datetime
-  - name: groups
+  - name: start_date
     type: string
-  - name: models
+    default: 2025-01-01
+  - name: end_date
     type: string
-  - name: interval
-    type: int
-    default: 300
+    default: 2025-12-31
 ```
 
 Params can be used in endpoints and [draft pipes](/concepts/pipes#draft-pipes).

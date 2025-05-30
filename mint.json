@@ -101,9 +101,8 @@
     {
       "group": "Transform your data",
       "pages": [
-        "concepts/pipes",
         "query/pipelines",
-        "concepts/ai_tables",
+        "concepts/pipes",
         "concepts/data_graph"
       ]
     },

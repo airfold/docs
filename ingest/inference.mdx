@@ -92,6 +92,25 @@ settings:
   partition_by: tuple()
 ```
 
+### Properties
+<ResponseField name="description" type="string">
+  Name of source
+</ResponseField>
+<ResponseField name="description" type="string">
+  A brief overview of the source's content or purpose (optional)
+</ResponseField>
+<ResponseField name="cols" type="{name: type}" required>
+  Defines the schema of the source as a list of columns where each column name
+  is a key and its data type is the value (see [Data
+  Types](/ingest/reference))
+</ResponseField>
+<ResponseField name="settings" type="string | {key: value} | array">
+  [Engine Types](/ingest/reference)
+  for the source, which can include `ORDER BY`, `PARTITION BY`, Table Engine,
+  etc. The settings can be a String, a key-value pair, or an array comprising
+  either or both. Optional.
+</ResponseField>
+
 <br />
 Push sources to your [workspace](/concepts/workspaces) with `af push`.
 

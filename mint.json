@@ -86,14 +86,8 @@
           ]
         },
         "ingest/ingest_api",
-        {
-          "group": "Schema",
-          "icon": "sitemap",
-          "pages": [
-            "ingest/inference",
-            "ingest/reference"
-          ]
-        },
+        "ingest/optimize_your_schema",
+        "ingest/reference",
         "ingest/jsonpath",
         "ingest/errors"
       ]

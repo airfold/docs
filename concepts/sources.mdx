@@ -4,49 +4,111 @@ description: "Bring your data into Airfold"
 icon: "database"
 ---
 
-Akin to tables in a database, sources store data according to a defined schema.
 
-All the workspace data lives inside sources, which can be queried, filtered, aggregated, and joined using SQL.
+## What is a Source?
 
-## UI
-### Ingesting Data
+In Airfold, a Source is the foundational storage unit, comparable to a table in a traditional database. It stores structured data in rows and columns based on a predefined schema and serves as the entry point for data ingestion into the platform.
+
+Once data is ingested, it’s stored in a Source and made immediately available for querying with SQL.
+
+Sources power all downstream transformations and API endpoints in Airfold, making them a critical part of your analytics workflow. They are designed for speed, schema clarity, and reliability, helping ensure your data remains fresh, queryable, and production-ready.
+
+## Ingesting Data into a Source
+
+To ingest your data into a source, you have two options:
+
+
+
+
+<CardGroup cols={2}>
+  <Card
+    title="Airfold Connectors"
+    icon="database"
+    href="/concepts/connectorsoverview"
+  >
+  Seamlessly sync data from your existing systems into Airfold using built-in connectors for platforms like S3, Postgres, or Snowflake. Ideal for scheduled or high-volume ingestion.
+  </Card>
+  <Card
+    title="Airfold API"
+    icon="filter"
+    href="/ingest/ingest_api"
+  >
+  Push data directly to Airfold in real time using our API. Instantly populate your Source and begin querying; perfect for syncing event data as it happens, with no batching required.
+  </Card>
+</CardGroup>
+
+Whether you ingest data with a connector or through the Airfold API, once your data lands in a source, it is instanly queryable and ready to power your analytics pipelines.
+
+## Schema
+
+Each Source has its own [schema](/ingest/inference) that defines the table's columns, data-types, and table settings.
+
+![catalog schema](/images/file_upload_schema.png)
+
+Defining a clear, well-structured schema for your Source is key to ensuring fast, efficient queries with minimal latency and resource usage.
+There are several Airfold specific things that you need to take into consideration when finalizing your schema such as:
+
+* Table settings
+  * Each Source must have an `engine type` (required)
+  * The `Primary Key` defines how data is stored on disc (required)
+  * Table `Partitions` - Used mainly for data management (optional)
+
+* `Data types` There are many data types in Airfold that you might not find in other platforms that can help to cut down on storage cost and query efficiency. 
+
+Having an optimized schema is crucial, especially when your Source is storing data at scale. What's more, your schema settings cannot be changed once the table is created. We strongly recommend
+reading the [schema](/ingest/inference) section in the docs!
+
+## Creating a Source
+
+To create a source, you can either use the [Airfold UI](#creating-a-source-in-the-ui) (simplest and quickest method) or you can define your Source details in YAML files and then push to your workspace using the [Airfold CLI](#creating-a-source-with-the-cli). Below we have shared an example of using either method.
+
+
+### Creating a Source in the UI
+
 
 Navigate to "Sources" on the left menu bar, and click on "+":
 
 ![data format options](/images/ui_integration_options.png)
 
-Here you can either create a source by inferring a schema from [Text](/ingest/jsonpath), [File](/ingest/schema) or [URL](/ingest/schema).<br/>
 
-Or you can use [Connectors](/concepts/connectors) to ingest data from external sources.
+From this window, you can either choose to create a Source that uses a [connector](/concepts/connectors) or to create a Source that will infer a schema from a text snippet, a file upload, or an external URL.
 
-<Note>
-  Inferred sources will be empty. <br />
-  You can put some data into them using the [Ingest API](/ingest/ingest_api)
-</Note>
+> 💡 **Tip:**
+> If you plan on ingesting data using the Airfold API, you need to create a source *without* a connector. Selecting the `Text` option in this window will allow you to create a *unconnected* Source, but still define its schema - ready for data to be ingested into.
 
-### Select Type
 
-In this example, we will upload a csv file through `File Upload`:
+Below is an example of creating a Source using a `file upload`. This will create an *unconnected* Source that will infer its schema from the file uploaded. You can choose whether or not to actually ingest the data from the file OR to just use the file as a means of infering a schema.
+
+#### Upload a File
+
+After clicking `File Upload`, you will be asked to specify the file.
 
 ![catalog upload](/images/file_upload.png)
 
-Then, click `Next`.
 
-### Confirm Schema
+#### Confirm Schema
 
-Name your source, check ingest data box and confirm the schema:
+on the next page, you can confirm the `Name`of your Source. The Source name is how you will reference your data in your SQL queries - so make sure to select a SQL friendly name!
+
+You can also choose whether or not to actually ingest the data from the file (or just infer its schema). Check the box if you want to ingest the data from the uploaded file into your Source.
 
 ![catalog schema](/images/file_upload_schema.png)
 
-Click `Create`.
+In this window, you can also modify the `schema` and the `table settings`. You can update names of columns, data types, engine type etc. Refer to the [schema](/ingest/inference) page of these docs for best practices. 
 
-### Metrics
+Click Create to finalize the Source.
 
-Once your source is successfully created, you can view its ingestion metrics and sample of the data.
+#### UI Features 
+
+Once your source is successfully created, the UI has several tabs that allow you to see useful information: 
 
 ![metrics](/images/file_upload_data.png)
 
-You may use the table sample features:
+The graphs at the top of the page show your `Usage metrics` so that you can monitor your key Source metrics. The tabs below the graph:
+
+`Data` 
+
+Gives you a preview of your data. You can explore the data by using:
 
 - `Filters` allows you to filter out certain rows based on a condition
 - `Sort` can be used to order your rows in ascending/descending order based on a specified column
@@ -54,24 +116,24 @@ You may use the table sample features:
 
 <br />
 
-There are also tabs on each `Source` page:
 
 `Schema` provides the table schema and ClickHouse settings.
 ![metrics](/images/source_schema.png)
 
-`Data Graph` shows all the dependencies for the `Source`
+`Data Graph` shows all the dependencies for the Source. As you build downstream analytics from the Source, using [Pipes](/concepts/pipes), the dependancy chart will populate showing all nodes that reference this source.
 
 ![graph](/images/source_graph.png)
 
-`Logs` provides error logs. All the ingestion errors can be seen there.
+`Logs` provides error logs. Any ingestion errors can be seen there.
 
 ![graph](/images/source_logs.png)
 
-## CLI
+### Creating a Source with the CLI
 
-### Creating a YAML file
+#### Creating a YAML file
 
-Define the schema for your source in a YAML file:
+If you are using the CLI, Sources are defined with YAML files - usually in your `/Sources` directory. For a Source that isn't using a connector, your YAML should look like this:
+
 
 ```yaml web_events.yaml
 type: Table
@@ -92,10 +154,13 @@ settings:
 
 <br />
 
-### Properties
+#### Properties
 
-<ResponseField name="description" type="string">
-  Name of source
+<ResponseField name="type" type="string">
+  The type of table that gets created. For Sources that don't use connectors, this value should be `Table` 
+</ResponseField>
+<ResponseField name="name" type="string">
+  The name given to the Source 
 </ResponseField>
 <ResponseField name="description" type="string">
   A brief overview of the source's content or purpose (optional)
@@ -112,7 +177,7 @@ settings:
   either or both. Optional.
 </ResponseField>
 
-### Push
+#### Push
 
 Push sources to your [workspace](/concepts/workspaces) using the [CLI command](/cli/cli_reference) `af push`.
 
@@ -122,10 +187,6 @@ For example, to push `web_events.yaml`, run:
 af push web_events.yaml
 ```
 
-## Unstructured Data
+Once you have succesfully pushed your new Source, it should be visible in the UI and ready to ingest data!
 
-So far, we've seen examples of ingesting structured data such as `web_events` shown above.
-
-However, one of Airfold's key strengths is how it allows you to work with **unstructured data**.
-
-The process for ingesting unstructured data remains the same as with structured data demonstrated above. However, upon ingestion, you can extract meaningful insights from your unstructured data using [AI Tables](/concepts/ai_tables).
+For your next steps, try writing some SQL queries against your new Source in a [Pipe](/concepts/pipes).

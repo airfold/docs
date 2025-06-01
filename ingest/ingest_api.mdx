@@ -1,15 +1,22 @@
 ---
-title: "Ingest From API"
+title: "Airfold API"
 sidebarTitle: "API"
 description: "How to ingest data using the API"
 icon: "cloud"
 ---
 
+Use the Aitfold API to send data directly to your workspace. No intermediary database, storage, or batching layer required!
+
+## Create a Source
+
+Before you can send data to your workspace, you first need to create a Source and define its schema. Follow the steps in the page dedicated to
+[Sources](/concepts/sources) to find out how to create a Source with either the UI or through CLI commands.
+
 ## Ingest
 
-You can ingest data into a source with a few lines of code.
+Now that you have your Source, you can ingest data into it with a few lines of code.
 
-Simply fill in the source_name and api_key inside `<>` with your specific entries:
+Simply fill in the source_name and [api_key](/concepts/keys) inside `<>` with your specific entries. The data that you wish to ingest should go into the `data` variable:
 
 <CodeGroup>
 ```JavaScript JavaScript
@@ -56,6 +63,12 @@ curl --request POST \
 ```
 
 </CodeGroup>
+
+
+<Note>
+Sources can ingest data in JSON format easily! check out the page on [JSON mapping](/ingest/jsonpath) to see how you can configure your Source schema to be able to ingest nested JSON.
+</Note>
+
 
 Here are some examples in practice:
 

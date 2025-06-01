@@ -95,15 +95,9 @@
     {
       "group": "Transform your data",
       "pages": [
-        "query/pipelines",
-        "concepts/pipes",
+        "query/query_your_data",
+        "concepts/endpoints",
         "concepts/data_graph"
-      ]
-    },
-    {
-      "group": "Publish your data",
-      "pages": [
-        "concepts/endpoints"
       ]
     },
     {

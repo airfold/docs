@@ -96,6 +96,7 @@
       "group": "Transform your data",
       "pages": [
         "query/query_your_data",
+        "production/optimize_queries",
         "concepts/endpoints",
         "concepts/parameters",
         "concepts/data_graph"
@@ -106,7 +107,6 @@
       "pages": [
         "production/staging_prod",
         "production/version_control",
-        "production/optimize_queries",
         "production/cicd",
         "workspace_files/install_cli"
       ]

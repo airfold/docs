@@ -1,0 +1,157 @@
+---
+title: 'Parameters'
+description: 'Query your database like a Pro'
+icon: "sliders"
+---
+
+## Parameters
+
+Published pipes support [Jinja2](https://jinja.palletsprojects.com/en/stable/templates/) syntax for parameter templating.
+
+Parameters help you write dynamic queries and provide more control over the results your queries return.
+In dashboards, you can prompt users for filter values and use those filters to query the data, returning only the relevant results.
+
+Example of a parameterized endpoint:
+![parameter three dots](/images/ui_parameter1.png)
+
+#### Data Types
+Airfold allows the following data types for the value of the parameters.
+Supported data types:
+- String
+- Int
+- Float
+- Boolean
+- Date
+- Datetime
+
+To use the parameters in you SQL, just add the parameter name inside two curly braces like this `{{ params }}`
+
+Example: `SELECT * FROM t LIMIT {{ limit }}`
+
+The internal Jinja engine handles parameter substitution automatically. No need to escape parameters - `WHERE name = {{ name }}` works correctly for string values.
+
+#### Endpoint calls
+
+All parameters are passed as query strings in the HTTP API.
+```
+https://api.us.airfold.co/v1/pipes/endpoint1?param1=10&param2=foo&param3=c1,c2
+```
+For additional syntax options, refer to the [Jinja2 documentation](https://jinja.palletsprojects.com/en/stable/templates/).
+
+#### More Examples
+
+<CodeGroup>
+```sql NO DEFAULT
+{% if param is defined %}
+	SELECT {{ param }}
+{% else %}
+	SELECT 1
+{% endif %}
+```
+
+```sql FILTER
+SELECT * FROM table WHERE column = {{ param }}
+```
+
+```sql CONDITIONAL
+SELECT * FROM table
+{% if param > 5 %}
+	WHERE column > {{ param }}
+{% else %}
+	WHERE column < 5
+{% endif %}
+```
+
+```sql PAGINATION
+SELECT * FROM table
+LIMIT {{page_size}}
+OFFSET {{page * page_size}}
+```
+</CodeGroup>
+
+For additional statement options, refer to the  [Jinja2 documentation](https://jinja.palletsprojects.com/en/stable/templates/).
+
+# UI
+
+### Create the Draft Pipe
+
+Follow normal steps you would follow to create a draft pipe (refer [Draft Pipes](/concepts/pipes#creating-draft-pipe)), make sure the query has the parameters enclosed in two curly braces like this: `{{ params }}`
+
+![draft pipe](/images/params_1.png)
+
+### Add parameters
+
+Go to the three dots on top right corner and select "Add Parameter" and then select the Parameter Name, Data Type and and Default value.
+
+![params creation](/images/params_2.png)
+
+![params page](/images/params_3.png)
+
+### Run the query
+
+Once all the parameters are defined, you can just run the command and the query runs with the default values.
+
+![params assign](/images/params_4.png)
+
+You can set the values for parameters just by assigning the value to the params.
+
+## CLI
+
+### Edit YAML file
+
+Once the query is ready simply add `{{ params }}` where required and set the `publish` property
+
+```yaml top_referrers.yaml
+nodes:
+  - node1:
+      sql: |
+        SELECT
+          referrer,
+          COUNT() AS num_referrers
+        FROM web_events
+        WHERE timestamp BETWEEN {{ start_date }} AND {{ end_date }}
+        GROUP BY referrer
+        ORDER BY num_referrers DESC
+        LIMIT 3
+publish: top_referrers
+
+```
+
+### Add Params
+
+To define the parameters in the SQL query, we need to add the `params` property and define parameter name, type and default value.
+
+```yaml top_referrers_with_parameters.yaml
+nodes:
+  - node1:
+      sql: |
+        SELECT
+          referrer,
+          COUNT() AS num_referrers
+        FROM web_events
+        WHERE timestamp BETWEEN {{ start_date }} AND {{ end_date }}
+        GROUP BY referrer
+        ORDER BY num_referrers DESC
+        LIMIT 3
+publish: top_referrers
+params:
+  - name: start_date
+    type: string
+    default: 2025-01-01
+  - name: end_date
+    type: string
+    default: 2025-12-31
+```
+
+### Push
+
+Once the config file is ready, you can use the push command to push the changes to your workspace.
+
+Push this update by running:
+```
+af push top_referrers.yaml
+```
+
+Params can be used in endpoints and [draft pipes](/concepts/pipes#draft-pipes).
+
+Params cannot be used in [materialized pipes](/concepts/pipes#materialized-pipes).

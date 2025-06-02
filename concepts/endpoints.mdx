@@ -4,13 +4,12 @@ description: 'Convert pipelines into fast, scalable endpoints'
 icon: "brackets-curly"
 ---
 
-Transform any pipeline into a high-performance API endpoint that supports low latency and high concurrency, ready for integration.
+Once the pipe is published, you can use Airfold APIs to call the published pipe and get results, 
+these endpoints can be integrated directly into your dashboard or application's logic to display desired results.
 
 Each API comes with Swagger documentation for standardized usage and can be accessed as a shareable REST endpoint.
 
-## UI
-
-### Create an Endpoint
+## Create an Endpoint
 
 To publish a query as an endpoint:
 
@@ -22,7 +21,7 @@ To publish a query as an endpoint:
 
 The dashboard displays key metrics including request count, data processed, latency, and error rate.
 
-### Use the Endpoint
+## Use the Endpoint
 
 Copy the API endpoint directly from the code block to use in your application:
 ![endpoint code](/images/ui_endpoint4.png)
@@ -36,128 +35,3 @@ Access additional options through the three-dot menu in the top right corner:
 - **Discard changes**: Revert parameter modifications
 - **Delete**: Remove the endpoint
 
-### Parameters
-
-Endpoints support [Jinja2](https://jinja.palletsprojects.com/en/stable/templates/) syntax for parameter templating.
-
-Example of a parameterized endpoint:
-![endpoint three dots](/images/ui_endpoint5.png)
-
-#### Expressions
-
-Use `{{ param_name }}` syntax for expressions.
-
-Example: `SELECT * FROM t LIMIT {{ limit }}`
-
-The internal Jinja engine handles parameter substitution automatically. No need to escape parameters - `WHERE name = {{ name }}` works correctly for string values.
-
-Supported data types:
-- String
-- Int
-- Float
-- Boolean
-- Date
-- Datetime
-
-For other data types, use String and parse within your SQL. For example, create an array from a comma-separated string:
-```sql
-SELECT * FROM t WHERE group IN splitByChar(',', {{ groups }})
-```
-
-All parameters are passed as query strings in the HTTP API:
-```
-https://api.us.airfold.co/v1/pipes/endpoint1?param1=10&param2=foo&param3=c1,c2
-```
-For additional syntax options, refer to the [Jinja2 documentation](https://jinja.palletsprojects.com/en/stable/templates/).
-
-#### Parameter Examples
-
-<CodeGroup>
-```sql NO DEFAULT
-{% if param is defined %}
-	SELECT {{ param }}
-{% else %}
-	SELECT 1
-{% endif %}
-```
-
-```sql FILTER
-SELECT * FROM table WHERE column = {{ param }}
-```
-
-```sql CONDITIONAL
-SELECT * FROM table
-{% if param > 5 %}
-	WHERE column > {{ param }}
-{% else %}
-	WHERE column < 5
-{% endif %}
-```
-
-```sql PAGINATION
-SELECT * FROM table
-LIMIT {{page_size}}
-OFFSET {{page * page_size}}
-```
-</CodeGroup>
-
-For additional statement options, refer to the  [Jinja2 documentation](https://jinja.palletsprojects.com/en/stable/templates/).
-
-
-## CLI
-
-### Edit YAML file
-
-Simply add a name to the `publish` parameter:
-
-```yaml top_referrers.yaml
-nodes:
-  - node1:
-      sql: |
-        SELECT
-          referrer,
-          COUNT() AS num_referrers
-        FROM web_events
-        WHERE timestamp BETWEEN {{ start_date }} && {{ end_date }}
-        GROUP BY referrer
-        ORDER BY num_referrers DESC
-        LIMIT 3
-publish: top_referrers
-
-```
-
-### Push
-Push this update by running:
-```
-af push top_referrers.yaml
-```
-
-### Params
-
-In YAML params are placed in the `params` property:
-
-```yaml top_referrers_with_parameters.yaml
-nodes:
-  - node1:
-      sql: |
-        SELECT
-          referrer,
-          COUNT() AS num_referrers
-        FROM web_events
-        WHERE timestamp BETWEEN {{ start_date }} AND {{ end_date }}
-        GROUP BY referrer
-        ORDER BY num_referrers DESC
-        LIMIT 3
-publish: top_referrers
-params:
-  - name: start_date
-    type: string
-    default: 2025-01-01
-  - name: end_date
-    type: string
-    default: 2025-12-31
-```
-
-Params can be used in endpoints and [draft pipes](/concepts/pipes#draft-pipes).
-
-Params cannot be used in [materialized pipes](/concepts/pipes#materialized-pipes).

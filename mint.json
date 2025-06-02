@@ -97,6 +97,7 @@
       "pages": [
         "query/query_your_data",
         "concepts/endpoints",
+        "concepts/parameters",
         "concepts/data_graph"
       ]
     },

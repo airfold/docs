@@ -50,30 +50,46 @@ Airfold uses ClickHouse data types and table engines as its foundation. This pag
 
 ## Table Engines
 
-### Engine Families
+### MergeTree
 
-Airfold supports multiple table engine families, with **MergeTree** being the most commonly used for analytical workloads.
+`MergeTree` is the foundational table engine in ClickHouse, designed to efficiently store and query massive volumes of data. It supports fast data insertion, indexing through primary keys, and background merging of data parts.
 
-#### MergeTree Family
-
-**MergeTree**
+**Key Characteristics**:
 - Primary table engine for high data ingest rates and large data volumes
-- Supports data sorting, partitioning, and primary keys
+- Stores data sorted by a **primary key**, enabling fast range queries
+- Uses **granules** (blocks of ~8192 rows) for efficient indexing
+- Supports **partitioning** for better data management and query performance
+- Background **merging** of table parts to reduce duplication and optimize storage
 - Optimized for analytical workloads
+- Does not deduplicate or aggregate data—stores all rows as-is
 
-**ReplacingMergeTree**
-- Based on MergeTree but removes duplicate entries
+### ReplacingMergeTree
+
+`ReplacingMergeTree` is a variant of MergeTree that can automatically deduplicate rows with the same sorting key during background merges. This engine is useful when updates or corrections to existing data are common.
+
+**Key Characteristics**:
+- Based on `MergeTree` but removes duplicate entries
 - Deduplication occurs for rows with the same sorting key (`ORDER BY`)
-- Note: Uses sorting key, not `PRIMARY KEY` for deduplication
+- Deduplication only happens during **background merges**, not at insert time
+- Note: Uses the **sorting key**, not the `PRIMARY KEY`, for deduplication
 
-**AggregatingMergeTree**
+### AggregatingMergeTree
+
+`AggregatingMergeTree` is a specialized engine designed to store pre-aggregated data using aggregate function states. It merges data by combining rows with the same primary key using specified aggregation functions.
+
+**Key Characteristics**:
 - Replaces rows with the same primary key with a single aggregated row
-- Stores combination of aggregate function states
-- Useful for pre-aggregated data storage
+- Stores combinations of **aggregate function states** (e.g., `sumState()`, `avgState()`)
+- During background merges, it combines states using merge functions (e.g., `sumMerge()`)
+- Great for **materialized views** and **rollups**
+- Useful for **pre-aggregated data storage**
+- Reduces storage and query computation costs
+- Not suitable for raw event-level data; designed for pre-aggregated datasets
 
-### Key Concepts
 
-#### ORDER BY vs PRIMARY KEY
+## Key Concepts
+
+### ORDER BY vs PRIMARY KEY
 
 **ORDER BY**
 - Defines the sorting order of data within each data part
@@ -97,7 +113,7 @@ ORDER BY (timestamp, id)
 PRIMARY KEY timestamp
 ```
 
-#### PARTITION BY
+### PARTITION BY
 
 **Partitioning**
 - Divides data into logical parts based on partition expression

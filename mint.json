@@ -114,8 +114,6 @@
     {
       "group": "CLI Config Reference",
       "pages": [
-        "workspace_files/pipe_yaml",
-        "workspace_files/source_yaml",
         "workspace_files/push",
         "workspace_files/pull",
         "cli/cli_reference"

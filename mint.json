@@ -74,6 +74,7 @@
       "group": "Ingest your data",
       "pages": [
         "concepts/sources",
+        "ingest/ingest_api",
         {
           "group": "Connectors",
           "icon": "plug",
@@ -85,7 +86,6 @@
             "connectors/postgres"
           ]
         },
-        "ingest/ingest_api",
         "ingest/optimize_your_schema",
         "ingest/reference",
         "ingest/jsonpath",

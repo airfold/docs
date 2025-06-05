@@ -1,115 +1,155 @@
 ---
-title: 'Optimize Queries'
-description: "Optimizing queries with materialized pipes"
+title: 'Optimize your Queries'
+description: "When data grows n-folds, use Airfold's Materialized pipe to optimize your queries"
 icon: 'magnifying-glass'
 ---
 
-Although endpoints alone can handle high volumes, they may slow down at larger scales.
 
-Thus, optimizing queries is a crucial part of managing production workloads in Airfold, specifically by precomputing and storing results incrementally through **materialized pipes**.
+As your data grows, analytical queries can become increasingly slower. This is where **materialized views** help optimize performance. They allow you to define transformations on your data that are either applied at the time of insertion (**[incremental](#incremental-materialization)**) or periodically (**[refreshable](#refreshable-materialization)**). API endpoints can then query these materialized pipes directly, resulting in significantly faster execution.
 
-## What are Materialized Pipes?
 
-Materialized pipes **precompute** and **store results** as data is ingested. They offer a more efficient way to handle repetitive or resource-intensive queries compared to draft or published pipes.
+## Incremental Materialization
 
-**How they work**:
-- **Historical Data Pre-Aggregation**: When creating a materialized pipe, you have the option to pre-aggregate all historical data to create a baseline of results
-- **Incremental Processing**: Materialized pipes compute results as new data flows in, maintaining up-to-date outputs without reprocessing the entire dataset
-- **Precomputed Results**: Instead of executing a query from scratch every time, results are precomputed and stored in a target source
-- **Fast Queries**: Precomputed results are served instantly, avoiding recomputation
+Airfold’s materialized pipes support incremental data transformation by automatically ingesting new data as it arrives. This model ensures your pipeline only processes fresh data ideal for time-series logs, user activity streams, or continuously growing datasets, Enabling near-real-time aggregations and rollups  
 
-## Use Cases
+<Note>
+Note: Incremental Materialized Pipes in Airfold are designed to process only newly arriving data. If historical data already exists in your target tables, you must perform a backfill to ensure completeness.
 
-**Frequent Queries**:
-- Ideal for scenarios where the same query is executed repeatedly, such as dashboards or real-time monitoring
+Backfilling refers to the process of reprocessing or re-ingesting historical data so that it is captured by the incremental materialization logic. Without this step, pre-existing data will be excluded from downstream views and analytics.
 
-**Expected Aggregations**:
-- If you know ahead of time which aggregations are needed, such as sales metrics or user activity trends
+To learn how to perform a backfill, see [Backfill Your Data](/concepts/query_your_data).
+</Note>
 
-*Note: Materialized pipes are not suitable for ad hoc queries where the structure of the data or aggregations is determined dynamically*
+### UI
 
-**Recent Data Analysis**:
-- Perfect for use cases where the focus is on recently ingested data
-- Materialized pipes maintain results incrementally as new data arrives
+Let's say we want to get the signup, purchases and page_views metrics along with total_events from the web events data.
+we could run the query below to get the metrics per day.
 
-## Caveats
+```sql
+SELECT
+    toDate(timestamp) AS date,
+    countState(event_id) AS total_events,
+    countIfState(event_type = 'signup') AS signups,
+    countIfState(event_type = 'purchase') AS purchases,
+    countIfState(event_type = 'page_view') AS page_views
+FROM web_events
+GROUP BY date
+```
 
-**Immutable Results**:
-- Once data is materialized, you cannot change how the results were computed
-- Any change in logic requires creating a new materialized pipe
+This runs fine for smaller dataset, but as no. of rows increases, the above query will take large amount of time to query all the rows and calculate the metrics.
+We can use an incremental materialized pipe here, and store the aggregated data on a new source as the data is being inserted and have the API query the new source.
+This significantly decreases the number of rows queries and hence the time taken for the query to run.
 
-**No Retroactive Updates**:
-- Materialized pipes work with newly ingested data and cannot retroactively apply changes to older data
-- This makes them unsuitable for scenarios where historical recalculations are needed
+<Note>
+Note the materialized pipe example uses `countIfState()` instead of `countIf()`.
 
-## UI
+Airfold uses [ClickHouse](https://clickhouse.com/) under the hood which requires appending `State` to aggregate functions when used in a materialized pipe.
 
-Upon creating a pipe, navigate to the three dots (`...`) on the top right corner and click "materialize":
+Fortunately, Airfold does it automatically when materializing a draft pipe using `af materialize <pipe_name>`.
 
-<p align="center">
-  <img src="/images/materialize.png" alt="snowflake" width="300"/>
-</p>
+Learn more about [Materialization in ClickHouse](https://clickhouse.com/blog/using-materialized-views-in-clickhouse#speed-up-aggregations-using-materialized-views), about the [`*State` combinator](https://clickhouse.com/docs/en/sql-reference/aggregate-functions/combinators#-state).
+</Note>
 
-Confirm your pipe, then select a compatible target source or "+ Add Source":
+![incremental mv](/images/incremental_mv.gif)
 
-<p align="center">
-  <img src="/images/materialize2.png" alt="snowflake" width="500"/>
-</p>
+### CLI
 
-You can also make the pipe refreshable, meaning that it would automatically update at a set time interval. Check "Refreshable" to enable this and customize your interval:
+To materialize a draft pipe, set the `to` field to the name of the target source.
 
-<p align="center">
-  <img src="/images/materialize3.png" alt="snowflake" width="500"/>
-</p>
+Although materialized pipes themselves cannot be accessed (via `FROM`) by other pipes, the source they write to is accessible like any other source.
 
-Click "Materialize" to finish. 
-
-Your materialized pipe will now store and incrementally update results.
-
-## YAML
-
-### Draft to Materialized Pipe
-
-#### Define a Draft Pipe
-
-Start by creating a draft pipe to develop and test your pipeline.
-
-```yaml logs_aggregation.yaml
+```yaml incremental_pipe.yaml
+name: agg_logs_mv
 description: 'Aggregate logs by level'
 nodes:
-  - load:
-      description: Load raw logs
-      sql: select timestamp, level, file, message from logs
-  - aggregate:
-      description: Aggregate log counts by level
-      sql: |
-          select
-              level,
-              countState() as count
-          from load
-          group by level
+    - load:
+        description: Loading logs
+        sql: select timestamp, level, file, message from logs
+    - error:
+        description: Aggregating logs by level
+        sql: |
+            select
+                level,
+                countState() as count
+            from load
+            group by level
 to: logs_by_level
 ```
 
-Push this draft pipe by running:
+<ResponseField name="name" type="string">
+  The name of the pipe. *Optional*
+</ResponseField>
+<ResponseField name="description" type="string">
+  A brief description of the pipe's purpose or functionality. *Optional*
+</ResponseField>
+<ResponseField name="nodes" type="Node[]" required>
+  The sequence of nodes within the pipe. Each node represents a stage in data processing.
+  <Expandable title="Node">
+    <ResponseField name="[name]" type="Node" required>
+      An identifier for the node.
+      <Expandable title="Properties">
+        <ResponseField name="description" type="string">
+          A brief description of the node's role or function. *Optional*
+        </ResponseField>
+        <ResponseField name="sql" type="string" required>
+          The SQL query associated with the node. It can only retrieve data (via `FROM`) from [sources](/concepts/sources), published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe. It supports Jinja2 templating for dynamic SQL parameterization via the `params` field e.g. `{{ param }}`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="to" type="string">
+  Specifies the target source for appending the incremental results. When set, it converts the pipe into a materialized pipe. This option cannot be used with publish and requires the final node’s schema to match the provided source schema. *Optional*
+</ResponseField>
+<ResponseField name="params" type="Param[]">
+  A list of parameters for parameterizing node SQL queries through Jinja2 templating e.g. `{{ param }}`. These parameters are passed via the API and can be used to dynamically alter the pipe's behavior. *Optional*
+  <Expandable title="Param">
+    <ResponseField name="name" type="string" required>
+      The name of the parameter.
+    </ResponseField>
+    <ResponseField name="type" type="string" required>
+      The ClickHouse data type of the parameter (e.g., UInt8, String). See [ClickHouse types](https://clickhouse.com/docs/en/sql-reference/data-types).
+    </ResponseField>
+    <ResponseField name="default" type="string">
+      The default value of the parameter. Parameters with defaults are optional in the API. *Optional*
+    </ResponseField>
+  </Expandable>
+</ResponseField>
 
+<Tip>
+## Best Practices
+Published pipes operate in batch mode and compute their results on read; therefore, they are not suited for intensive data transformations.
+
+Instead, a common pattern is to place a published pipe in front of a materialized pipe.
+The materialized pipe incrementally transforms data as it is ingested and writes it to the source, enabling the published pipe to instantly access the pre-transformed data during reads.
+</Tip>
+
+## Refreshable Materialization
+
+### UI
+
+Let's consider an example, if we want to get the top_pages visited by unique visitors per page_url, we can do it by the following command.
+
+```sql
+SELECT
+    page_url,
+    count(event_id) AS total_visits,
+    uniqExact(user_id) AS unique_visitors
+FROM web_events
+WHERE event_type = 'page_view'
+GROUP BY page_url
 ```
-af push logs_aggregation.yaml
-```
 
-#### Materialize the Draft Pipe
+This will eventually take a long time to load when the data increases, this computation should be performed on the whole dataset and 
+hence we will use refreshable materialized pipe.
 
-To materialize the pipe, run the `af pipe materialize` command:
+![refreshable mv](/images/refreshable_mv.gif)
 
-```
-af pipe materialize logs_aggregation.yaml
-```
+### CLI
 
-#### Refreshable Materialized Pipe
+To create a refreshable materialized pipe using the CLI in Airfold, simply add the `refresh` block to the YAML definition of the incremental materialized pipe and fill in the refresh strategy and interval.
 
-You may also make the materialized pipe refreshable by adding a `refresh` attribute to your YAML file:
-
-```yaml logs_aggregation_refreshable.yaml
+```yaml refreshable_pipe.yaml
 description: 'Aggregate logs by level'
 nodes:
     - load:
@@ -128,10 +168,50 @@ refresh:
     strategy: replace
     interval: EVERY 1 MINUTE
 ```
-#### Query Materialized Data
-After materializing the pipe, the results are stored in the target source `logs_by_level`. 
 
-You can query it directly by running:
-```
-af pipe query logs_by_level
-```
+<ResponseField name="name" type="string">
+  The name of the pipe. *Optional*
+</ResponseField>
+<ResponseField name="description" type="string">
+  A brief description of the pipe's purpose or functionality. *Optional*
+</ResponseField>
+<ResponseField name="nodes" type="Node[]" required>
+  The sequence of nodes within the pipe. Each node represents a stage in data processing.
+  <Expandable title="Node">
+    <ResponseField name="[name]" type="Node" required>
+      An identifier for the node.
+      <Expandable title="Properties">
+        <ResponseField name="description" type="string">
+          A brief description of the node's role or function. *Optional*
+        </ResponseField>
+        <ResponseField name="sql" type="string" required>
+          The SQL query associated with the node. It can only retrieve data (via `FROM`) from [sources](/concepts/sources), published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe. It supports Jinja2 templating for dynamic SQL parameterization via the `params` field e.g. `{{ param }}`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="to" type="string">
+  Specifies the target source for appending the incremental results. When set, it converts the pipe into a materialized pipe. This option cannot be used with publish and requires the final node’s schema to match the provided source schema. *Optional*
+</ResponseField>
+<ResponseField name="refresh" type="Refresh[]">
+    A refresh schedule definition. Used in [refreshable materialization](/concepts/pipes#refreshable-materialization) where the pipe is executed on schedule. *Optional*
+    <Expandable title="Refresh">
+        <ResponseField name="strategy" type="string" required>
+            Refresh strategy, can be `replace` or `append`.
+        </ResponseField>
+        <ResponseField name="interval" type="string" required>
+            The ClickHouse refresh interval. Example: `EVERY 1 HOUR`, `AFTER 30 MINUTE`, etc.
+            For a complete list, click [here](https://clickhouse.com/docs/en/sql-reference/statements/create/view#refresh-schedule)
+        </ResponseField>
+        <ResponseField name="disbled" type="boolean" default="false">
+            Disable refresh or create a pipe in a disabled state. *Optional*
+        </ResponseField>
+        <ResponseField name="disabled" type="boolean" default="false">
+            Disable refresh or create a pipe in a disabled state. *Optional*
+        </ResponseField>
+        <ResponseField name="refresh_on_create" type="boolean" default="false">
+            Refresh immediately after creation, disabled by default. *Optional*
+        </ResponseField>
+    </Expandable>
+</ResponseField>

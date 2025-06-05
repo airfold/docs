@@ -74,6 +74,7 @@
       "group": "Ingest your data",
       "pages": [
         "concepts/sources",
+        "ingest/ingest_api",
         {
           "group": "Connectors",
           "icon": "plug",
@@ -85,7 +86,6 @@
             "connectors/postgres"
           ]
         },
-        "ingest/ingest_api",
         "ingest/optimize_your_schema",
         {
           "group": "Reference",
@@ -124,8 +124,6 @@
     {
       "group": "CLI Config Reference",
       "pages": [
-        "workspace_files/pipe_yaml",
-        "workspace_files/source_yaml",
         "workspace_files/push",
         "workspace_files/pull",
         "cli/cli_reference"

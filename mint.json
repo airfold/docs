@@ -87,9 +87,19 @@
         },
         "ingest/ingest_api",
         "ingest/optimize_your_schema",
-        "ingest/reference",
-        "ingest/jsonpath",
-        "ingest/errors"
+        {
+          "group": "Reference",
+          "icon": "plug",
+          "pages": [
+            "ingest/reference",
+            "ingest/data_types",
+            "ingest/table_engines",
+            "ingest/orderby_primarykey",
+            "ingest/partitionby",
+            "ingest/jsonpath",
+            "ingest/errors"
+          ]
+        }
       ]
     },
     {

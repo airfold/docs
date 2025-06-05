@@ -13,49 +13,33 @@ Airfold Pipes are the go-to component for interacting with your data. They provi
 
 A **Pipe** is a data processing workflow that takes your data, processes it through one or more steps, and returns a meaningful output. Pipes are designed to be:
 
-- **Flexible** – Load, transform, and aggregate data with ease  
-- **Powerful** – Build complex analytics workflows, including AI-driven transformations  
+- **Flexible** – Transform, and aggregate data with ease  
+- **Powerful** – Build complex analytics workflows 
 - **Modular** – Break down logic into manageable, testable units  
 
-Each Pipe is made up of **Nodes** and a defined **Flow** of execution.
+Each Pipe is made up of one or more **Nodes** 
 
 ### Nodes: The Building Blocks
 
+![postgres](/images/query_your_data_nodes.png)
+
 **Nodes** are the fundamental units within a Pipe. Each Node contains a single **SELECT** query representing a specific step in the data processing workflow.
+Nodes are:
 
 - **Standalone or Connected**: Nodes can operate independently or as part of a chain
 - **Like CTEs, but Better**: They resemble Common Table Expressions, but can be executed and debugged individually
 - **Composable**: Output from one Node can be referenced by another downstream Node
 
 Nodes can reference data **FROM** 
+  - Airfold Sources 
   - Previous nodes
-  - Sources like s3, postgres, snowflake
-  - Other Published pipes
+  - Other Published Pipes
 
-This design enables you to build scalable, readable, and testable SQL pipelines.
-
-### Flow: Executing the Pipeline
-
-The **Flow** in a Pipe determines the order of Node execution:
-
-- In a **single-node Pipe**, one query runs against the data source and returns results.
-- In a **multi-node Pipe**, each Node passes its output to the next, enabling layered, complex transformations.
-
-```
-## Can remove
-# Why Use Pipes?
-
-Airfold Pipes offer several key advantages:
-
-- Modular and maintainable structure  
-- Easier testing through individual Node execution  
-- Reusability of intermediate results  
-- Scalable for both simple tasks and advanced analytics  
-
-Whether you're writing basic queries or building full analytical pipelines, **Airfold Pipes** provide a clear and flexible foundation for working with your data.
-```
-
+When a Pipe is triggered, the order in which the Nodes execute is determined by the lineage defined in your **FROM** statements—Nodes are executed only after all their dependencies have been resolved, ensuring a logical and efficient flow of data through the pipeline.
 # Types of Pipes
+
+Pipes can be created and managed using either the UI or the CLI. This page outlines how to work with each type of Pipe through both interfaces.
+
 
 ## Draft Pipes
 
@@ -93,11 +77,7 @@ This is your Draft pipe, you can test SQL queries against your database using th
 
 ### CLI
 
-These are the starting point for all pipes, similar to database views in functionality.
-
-They cannot be referenced by other pipes using the `FROM` clause.
-
-Draft pipes are temporary and primarily used for development. Once finalized, a draft pipe can be transitioned into either a published or a materialized pipe, but not both.
+Pipes are created and managed through YAML files. To create a draft pipe by using the CLI, create a YAML file as below: 
 
 
 ```yaml draft_pipe.yaml
@@ -139,17 +119,25 @@ nodes:
   </Expandable>
 </ResponseField>
 
+Once you have created your YAML file, push to your workspace by running:
+
+```bash
+af push <your_yaml_path>
+```
+
+Check out the [CLI Quickstart](/getting_started/quickstart_cli) page for more info on using the Airfold CLI tool.
+
 ## Published Pipes
 Published pipes create API endpoints that expose query results in multiple formats like JSON and CSV
 - Accessible via endpoints and usable in other pipes
 - Supports parameterized SQL using Jinja2 templates
 - Results are computed on read
 
-**Use Case**: Building reusable pipelines that other queries or systems can consume
+**Use Case**: Serve your transformed analytics data to dashboards, reports, or downstream tools.
 
 ### UI
 
-Click on "Save" to save this node, and "Publish" to publish it as an [endpoint](/concepts/endpoints):
+Click on "Save" to save the SQL in your pipe, then click "Publish" to publish it as an [endpoint](/concepts/endpoints):
 
 That's it, your draft pipe just became a publihsed pipe, you can go to view endpoints and use any of the Javascript, Python or curl command to ping the endpoint.
 

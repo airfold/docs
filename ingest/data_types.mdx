@@ -12,6 +12,241 @@ Understanding how each type behaves is essential for getting the most out of Air
 ## Data types you should know (but may not have used before!)
 
 ClickHouse has many unique data types, combinations of types, and specialized wrappers. We recommend exploring the official [ClickHouse documentation](https://clickhouse.com/docs/sql-reference/data-types) for a full reference.
-This page highlights a few data types you might not have used before—but will likely encounter when working with Airfold.
+This page highlights a few data types you might not have used before but will likely encounter when working with Airfold.
 
-### AggregateFunction()
+### AggregateFunction Type
+
+`AggregateFunction` might sound like a function but it is actually a data type, most likely used in an [incramental materilized view](/production/optimize_queries). This type doesn't store a final value like a number or string. Instead, it stores the intermediate state of an aggregation—something that can be merged later.
+\
+For example, say you have an incrmental view with a function like:
+
+ ```sql
+sumState(messages_sent) AS sent_state
+ ```
+
+In the above example, `messages_sent` is an Int64 column. This function doesn’t store the result as an Int64 like you might expect. Instead, it produces a column of type:
+
+```
+AggregateFunction(sum, Int64)
+```
+
+This is where the AggregateFunction data type comes in. It stores that state in a way that supports efficient merging across batches when it's time to query the data.
+\
+An AggregateFunction requires two positional arguments:
+* The aggregation function (e.g., `sum`, `uniqExact`)
+* The data type of the column being aggregated (e.g., `Int64`, `String`).
+
+### simpleAggregateFunction
+
+The younger brother to `AggregateFunction`, `SimpleAggregateFunction` stores the final result of an aggregation, rather than its intermediate state. It’s a simpler alternative to AggregateFunction, and while less powerful, it can be useful when you don’t need to merge partial states across batches.
+Use SimpleAggregateFunction when:
+* You only need the final result of an aggregation (like a total count or sum)
+* You don’t need to merge partial results across batches
+* You want to store an aggregated value that behaves like a regular column in your queries
+
+
+### LowCardinality(T)
+
+`LowCardinality()` is a wrapper type that can be applied to certain data types to optimize performance and reduce storage. For example, `LowCardinality(String)` behaves like a regular string—but under the hood, it’s optimized for columns with repeated values.
+
+Instead of storing the full string value in every row, ClickHouse builds a dictionary of unique values and stores small integer references in the actual column. This is similar to dictionary encoding and can significantly reduce memory usage and speed up operations like filtering and grouping.
+
+If you have a column with fewer than ~10,000 distinct values and an eligible base type, using LowCardinality can radically improve query performance and reduce storage costs compared to the equivalent non-encoded type.
+
+You can wrap the following types with LowCardinality(...):
+* String
+* FixedString(N)
+* UUID
+* Any Integer type (Int8 to Int64, UInt8 to UInt64)
+* Date
+* DateTime
+
+You cannot use LowCardinality with:
+* Float32, Float64
+* Array(...)
+* Tuple(...)
+* Map(...)
+* Nullable(...)
+
+So for example, say you had the following column:
+
+```yaml
+col:
+    customer_name : string
+```
+
+If there are fewer than 10,000 distinct customer_name values, you can optimize performance and storage by changing the column to:
+
+```yaml
+col:
+    customer_name : LowCardinality(string)
+```
+
+### enum8/enum16
+
+At first glance, LowCardinality(String) might seem similar to ClickHouse’s Enum8 or Enum16, since both are optimized for repeated categorical values. They serve different purposes however:
+
+The Enum data type is great for when you have a small, fixed set of valid string values that won’t change - like `status`, `role`, or `priority`. It offers excellent performance and enforces strict value validation at insert time:
+
+```yaml
+col:
+  status:
+    type: Enum8('pending' = 1, 'approved' = 2, 'rejected' = 3)
+  priority:
+    type: Enum8('low' = 1, 'medium' = 2, 'high' = 3)
+```
+
+When using the enum type, you must specify both the string and its corresponding integer value. Enum8 supports up to 255 distinct values but use Enum16 if you need more (up to 65,535).
+In your queries, you can still filter by string value:
+
+```sql
+WHERE status = 'approved'
+```
+
+Behind the scenes, ClickHouse stores these as compact integers but when you query with the corresponding string value, everything still works as intended.
+
+So if you have a fixed set of string options (likely for a categorical column) that won’t change, Enum is best.
+But if you need more flexibility—like supporting new values over time, handling user-generated input, or working with dynamic data—LowCardinality(String) is a safer and more adaptable choice.
+
+### Nullable(...)
+
+In ClickHouse, nullability is explicit. If a column can contain NULL, its type must be wrapped in Nullable(...). For example:
+
+```yaml
+col:
+  Nullable(Int64)
+  Nullable(String)
+```
+
+This is different from databases like Postgres or Snowflake, where nullability is often just a column attribute. In ClickHouse, it's part of the type system.
+This is because in ClickHouse, NULL isn’t just a value, it’s a distinct representation that must be accounted for at the type level. Under the hood, a Nullable(T) column stores two things:
+
+* The underlying value (e.g., an Int64)
+
+* A parallel bitmap that tracks which rows are NULL
+
+This explicit design allows ClickHouse to optimize storage and performance, but it also means you have to be precise about when nulls are allowed.
+A common pitfall in ClickHouse is when you try to join or filter on a nullable column without accounting for nulls, you may get unexpected results (e.g., rows silently dropped).
+
+### UUID
+
+ClickHouse includes a native UUID type for storing universally unique identifiers. It’s ideal for identifying entities like user_id, message_id, or org_id with high uniqueness guarantees and efficient performance.
+Unlike some databases that store UUIDs as strings, ClickHouse treats UUID as a dedicated binary type, offering several advantages such as compact storage (16 bytes instead of 36+ for a string) and more performant querying (faster filtering, joining, and sorting)
+
+```yaml
+columns:
+  user_id:
+    type: UUID
+  message_id:
+    type: UUID
+```
+
+Where UUID types offer performance and storage benefits, there are a few pitfalls thta must be accounted for. For example, when joining or filtering you must always ensure a type match of `UUID = UUID`, not `UUID = String`.
+
+```sql
+-- Cast string to UUID
+WHERE user_id = toUUID('3fa85f64-5717-4562-b3fc-2c963f66afa6')
+
+-- Joining on a UUID column with a string column
+SELECT *
+FROM messages m
+JOIN users u
+ON m.user_id = toUUID(u.user_id_string)
+
+-- Convert back to string
+SELECT toString(user_id) AS user_id_str
+```
+
+### Nested and Semi-Structured Data
+
+ClickHouse is primarily a columnar database, but it also supports working with nested and semi-structured data. This is especially useful when dealing with grouped values, JSON objects, or event logs where one row may represent multiple related values.
+The most common types you’ll see in Airfold for handling this kind of data are:
+
+#### Array(T)
+
+Array(T) is a container type that stores a list of values, where all elements share the same type T. Arrays are commonly used in ClickHouse to represent grouped data, batched events, or multi-valued fields.
+
+```yaml
+columns:
+  top_tags:
+    type: Array(String)
+  event_counts_by_hour:
+    type: Array(Int64)
+```
+
+There are many [array functions](https://clickhouse.com/docs/sql-reference/functions/array-functions) that can be used in conjunction with array type columns. For example, a common requirement is to explode an array into indivual rows (from wide to tall data):
+
+```sql
+-- Original table: one row per user, with an array of message_ids
+SELECT user_id, arrayJoin(message_ids) AS message_id
+FROM (
+  SELECT user_id, groupArray(message_id) AS message_ids
+  FROM messages
+  GROUP BY user_id
+)
+```
+* First, `groupArray(message_id)` collects all message IDs per user into an array.
+* Then, `arrayJoin()` explodes the array so that each message_id gets its own row—flattening the structure.
+
+<Note>
+Tip: This is especially useful when working with grouped metrics, multi-event logs, or compact API responses that store arrays in a single row.
+</Note>
+
+
+#### Tuple(T1, T2, ...)
+
+Stores a fixed set of values of different types. Kind of like a mini-row inside a column.
+
+```yaml
+columns:
+  event_summary:
+    type: Tuple(String, Int64, UInt8)
+    description: [event_type, count, user_initiated]
+```
+
+In this example:
+
+* String is for the event type (e.g., "click", "open")
+* Int64 is the count of how many times it occurred
+* UInt8 is used to represent a boolean (0 = false, 1 = true) — Type bool in ClickHouse is internally stored as UInt8. Possible values are true (1), false (0).
+
+#### JSON
+
+The JSON data type lets you store and query full JSON documents natively in ClickHouse. Unlike storing JSON as a plain String, this type understands the structure of your data—allowing for typed access to nested fields, support for subcolumns, and efficient querying across complex, hierarchical data.
+
+```yaml
+columns:
+  event_data:
+    type: JSON
+    description: Full JSON payload of the incoming event
+```
+
+This allows you to store raw JSON documents like:
+
+```json
+{
+  "event_type": "click",
+  "user": {
+    "id": "abc123",
+    "is_verified": true
+  },
+  "metadata": {
+    "source": "email_campaign",
+    "tags": ["promo", "summer"]
+  }
+}
+```
+
+Once you’ve stored data in a JSON column, you can query nested fields directly—without needing to parse the JSON manually.
+Access nested fields using dot notation in your SQL query:
+
+```sql
+SELECT
+  event_data.event_type AS event_type,
+  event_data.user.id AS user_id,
+  event_data.metadata.source AS source
+FROM events
+```
+
+Alternatively, you can think of it the other way around: instead of parsing JSON fields at query time, you can extract and structure them during data ingestion. This approach can simplify querying and improve performance.
+See the [JSON Mapping](/ingest/jsonpath) page for more details.

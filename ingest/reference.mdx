@@ -48,70 +48,10 @@ Airfold uses ClickHouse data types and table engines as its foundation. This pag
 | `AggregateFunction` | Stores intermediate state of aggregate functions |
 | `SimpleAggregateFunction` | Simplified version for basic aggregations |
 
-## Table Engines
 
-### MergeTree
-
-`MergeTree` is the foundational table engine in ClickHouse, designed to efficiently store and query massive volumes of data. It supports fast data insertion, indexing through primary keys, and background merging of data parts.
-
-**Key Characteristics**:
-- Primary table engine for high data ingest rates and large data volumes
-- Stores data sorted by a **primary key**, enabling fast range queries
-- Uses **granules** (blocks of ~8192 rows) for efficient indexing
-- Supports **partitioning** for better data management and query performance
-- Background **merging** of table parts to reduce duplication and optimize storage
-- Optimized for analytical workloads
-- Does not deduplicate or aggregate data—stores all rows as-is
-
-### ReplacingMergeTree
-
-`ReplacingMergeTree` is a variant of MergeTree that can automatically deduplicate rows with the same sorting key during background merges. This engine is useful when updates or corrections to existing data are common.
-
-**Key Characteristics**:
-- Based on `MergeTree` but removes duplicate entries
-- Deduplication occurs for rows with the same sorting key (`ORDER BY`)
-- Deduplication only happens during **background merges**, not at insert time
-- Note: Uses the **sorting key**, not the `PRIMARY KEY`, for deduplication
-
-### AggregatingMergeTree
-
-`AggregatingMergeTree` is a specialized engine designed to store pre-aggregated data using aggregate function states. It merges data by combining rows with the same primary key using specified aggregation functions.
-
-**Key Characteristics**:
-- Replaces rows with the same primary key with a single aggregated row
-- Stores combinations of **aggregate function states** (e.g., `sumState()`, `avgState()`)
-- During background merges, it combines states using merge functions (e.g., `sumMerge()`)
-- Great for **materialized views** and **rollups**
-- Useful for **pre-aggregated data storage**
-- Reduces storage and query computation costs
-- Not suitable for raw event-level data; designed for pre-aggregated datasets
 
 
 ## Key Concepts
-
-### ORDER BY vs PRIMARY KEY
-
-**ORDER BY**
-- Defines the sorting order of data within each data part
-- Required for all MergeTree family engines
-- Used for data organization and query optimization
-- Determines deduplication logic in ReplacingMergeTree
-
-**PRIMARY KEY**
-- Creates a sparse index for faster data access
-- If not specified, defaults to ORDER BY expression
-- Should be a prefix of ORDER BY columns
-- Used for data skipping and query pruning
-
-```sql
-CREATE TABLE example (
-    id UInt64,
-    timestamp DateTime,
-    value String
-) ENGINE = MergeTree()
-ORDER BY (timestamp, id)
-PRIMARY KEY timestamp
-```
 
 ### PARTITION BY
 

@@ -1,0 +1,44 @@
+---
+title: 'ORDER BY and PRIMARY KEY'
+sidebarTitle: 'Order by & Primary key'
+icon: 'key'
+---
+
+## Selecting `ORDER BY` and `PRIMARY KEY`
+Selecting an appropriate `ORDER BY` and `PRIMARY KEY` during table creation in Clickhouse is critical, as it directly influences how data is physically stored on disk and significantly impacts query performance. These definitions are not just structural choices, they are foundational to how efficiently Clickhouse can filter, aggregate, and retrieve data at scale.
+
+In ClickHouse, the `PRIMARY KEY` is primarily used for query optimization, enabling fast range scans and index-based filtering. However, unlike traditional relational databases, the `PRIMARY KEY` in ClickHouse does not enforce uniqueness. Instead, it serves as an index built over the `ORDER BY` expression. The `ORDER BY` clause defines the actual sort order of data within each data part on disk, which is essential for data skipping and reducing the amount of data read during query execution.
+
+Because ClickHouse is a columnar, append-only database optimized for high-performance analytical queries, both `ORDER BY` and `PRIMARY KEY` are immutable once the table is created and data is ingested. Modifying either requires creating a new table with the desired configuration and reingesting the data, a process that can be resource-intensive and time-consuming. Therefore, it is crucial to plan ahead, understand your data access patterns, and choose these keys thoughtfully from the outset.
+
+## Practical Considerations
+- Using only `ORDER BY`: When defined without an explicit `PRIMARY KEY`, the `ORDER BY` expression implicitly becomes the `PRIMARY KEY`. This is the most common case and works well for many analytical workloads.
+
+- Using both `ORDER BY` and `PRIMARY KEY`: Offers the flexibility to sort data in a way that optimizes both performance and query semantics. For example, you might choose to order data by (event_date, user_id) but define a `PRIMARY KEY` on just event_date to optimize date-range filtering.
+
+## Key Takeaways
+Choosing the right combination of `ORDER BY` and `PRIMARY KEY` is not just a best practice, it's a critical architectural decision. A well-chosen configuration leads to smaller data reads, lower resource usage, and faster query response times. Conversely, a poor configuration can lead to performance bottlenecks and operational overhead when data needs to be migrated to a newly designed table.
+
+### ORDER BY
+- Defines the sorting order of data within each data part
+- Required for all MergeTree family engines
+- Used for data organization and query optimization
+- Determines deduplication logic in ReplacingMergeTree
+
+### PRIMARY KEY
+- Creates a sparse index for faster data access
+- If not specified, defaults to ORDER BY expression
+- Should be a prefix of ORDER BY columns
+- Used for data skipping and query pruning
+
+### Example
+```sql
+CREATE TABLE example (
+    id UInt64,
+    timestamp DateTime,
+    value String
+) ENGINE = MergeTree()
+ORDER BY (timestamp, id)
+PRIMARY KEY timestamp
+```
+

@@ -31,6 +31,8 @@ Choosing the right combination of `ORDER BY` and `PRIMARY KEY` is not just a bes
 - Should be a prefix of ORDER BY columns
 - Used for data skipping and query pruning
 
+## Understanding `ORDER BY` and `PRIMARY KEY`
+
 ### Example
 ```sql
 CREATE TABLE example (
@@ -41,4 +43,32 @@ CREATE TABLE example (
 ORDER BY (timestamp, id)
 PRIMARY KEY timestamp
 ```
+
+### `ORDER BY (timestamp, id)`
+The ORDER BY clause determines the physical sort order of the data as it's written to disk. In this example:
+- The data is sorted first by timestamp, then by id within each timestamp.
+- Sorting in this way enables efficient range queries over time and improves locality of data, particularly useful for time-series use cases.
+- This sort order enables data skipping during queries, where ClickHouse can avoid reading entire parts of data that fall outside the query’s time range.
+
+### `PRIMARY KEY (timestamp)`
+- The PRIMARY KEY in ClickHouse is not a constraint—it doesn't enforce uniqueness. Instead, it defines the primary index used for query acceleration.
+- In this case, the primary key is timestamp, which is a subset of the ORDER BY expression—this is valid and common in ClickHouse.
+- The index stores granules (index entries) based on timestamp values, enabling fast filtering on time-based conditions, such as WHERE timestamp >= now() - INTERVAL 1 DAY.
+
+### Interaction Between ORDER BY and PRIMARY KEY
+- The PRIMARY KEY must always be a prefix of the ORDER BY expression.
+- In this example:
+    - ORDER BY (timestamp, id)
+    - PRIMARY KEY timestamp (valid: prefix of the ORDER BY)
+- The data is sorted on disk by both timestamp and id, but the primary index is built only on timestamp, resulting in a smaller index size while still benefiting from range filtering.
+
+### Practical Query Performance Benefits
+A query like:
+```sql
+SELECT * FROM example WHERE timestamp BETWEEN '2025-01-01' AND '2025-01-31';
+```
+
+will be highly efficient, as ClickHouse will:
+- Use the PRIMARY KEY index to locate the relevant granules (data segments).
+- Skip reading unrelated data due to sorted ORDER BY layout.
 

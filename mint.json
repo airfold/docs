@@ -91,7 +91,6 @@
           "group": "Reference",
           "icon": "plug",
           "pages": [
-            "ingest/reference",
             "ingest/data_types",
             "ingest/table_engines",
             "ingest/orderby_primarykey",

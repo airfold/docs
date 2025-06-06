@@ -119,51 +119,24 @@ request_messages_content: String $.request.messages[0].content
 
 This schema has a combination of
 
-* Mapping nested fields in the JSON to a specific column
+* Mapping nested fields in the source JSON to a specific column in the table
 * Storing data as a JSON data type in a column
 
 <Note>
 Note: If a key in the JSON is located at the root level and you want to keep the same column name, you don’t need to specify a mapping path, Airfold will match it automatically e.g. the id key/field in the above example.
+If you want to set the column name as something different, (let's call it `user_id` instead of `user`) you can do so like this:
+
+```yaml
+user_id: String $.user
+```
 </Note>
 
+## Infer Mapping from a JSON Sippet
+
+In the UI, you can auto-generate a suggested JSON mapping by uploading a sample JSON object.
 
 
-
-Choose `Text` to create schema from a text sample.<br/>
-Paste your JSON object into the wizard.
-
-```json
-{
-  "anonymousId": "23adfd82-aa0f-45a7-a756-24f2a7a4c895",
-  "context": {
-    "library": {
-      "name": "analytics.js",
-      "version": "2.11.1"
-    },
-    "page": {
-      "path": "/academy/",
-      "referrer": "",
-      "search": "",
-      "title": "Analytics Academy",
-      "url": "https://segment.com/academy/"
-    },
-    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_0) AppleWebKit",
-    "ip": "108.0.78.21"
-  },
-  "event": "Course Clicked",
-  "integrations": {},
-  "messageId": "ajs-f8ca1e4de5024d9430b3928bd8ac6b96",
-  "properties": {
-    "title": "Intro to Analytics"
-  },
-  "receivedAt": "2015-12-12T19:11:01.266Z",
-  "sentAt": "2015-12-12T19:11:01.169Z",
-  "timestamp": "2015-12-12T19:11:01.249Z",
-  "type": "track",
-  "userId": "AiUGstSDIg",
-  "originalTimestamp": "2015-12-12T19:11:01.152Z"
-}
-```
+Create a new Source and C=choose `Text` to create schema from a text sample.
 
 ![segment json](/images/segment_json.png)
 
@@ -175,54 +148,8 @@ Rename columns if needed. <br/>
 Add name to the source and click `Create` to create the source.
 
 <Note>
-    You can remove lines from YAML to remove field mappings you are not interested in.<br/>
-    You can add new mappings too. <br/>
-    Or store the JSON object as it is, with JSON data type.
+    You can remove lines from the schema to remove field mappings that you do not want to populate your table with.
+    You can add new mappings too.
+    Or store the JSON object as it is, with a JSON data type column.
 </Note>
 
-## CLI
-### Example
-Given the following data structure:
-```JSON
-{
-  "date": "2015-12-17 17:30:32",
-  "product_id": "632756e2-1aaa-11eb-8aeb-acde48001122",
-  "user_id": "897297",
-  "event": "search",
-  "extra_data": {
-    "city": "Columbia",
-    "country": "USA",
-    "special_note": "Limited edition & exclusive",
-    "discount": {
-      "amount": 5.0,
-      "currency": "USD"
-    }
-  }
-}
-```
-
-This is the corresponding YAML configuration:
-```yaml
-name: shopping_data_with_json_path
-cols:
-    date: DateTime
-    product_id: String
-    user_id: Int64
-    event: String
-    price: Nullable(Float32) $.extra_data.price
-    city: String $.extra_data.city
-    country: String $.extra_data.country
-    special_note: Nullable(String) $.extra_data.special_note
-    tags: Array(String) $.extra_data.tags
-    discount_amount: Nullable(Float32) $.extra_data.discount.amount
-    discount_currency: Nullable(String) $.extra_data.discount.currency
-    promo_code: Nullable(String) $.extra_data.promo_code
-    gift_wrap: Nullable(Bool) $.extra_data.gift_wrap
-    session_id: Nullable(String) $.extra_data.session_id
-```
-
-**Top-Level Fields**: Fields like `product_id` and `event` are mapped directly since they are at the root of the JSON structure
-
-**Nested Fields**: JSONPath is used to extract data from deeper levels of the JSON object:
-- `$.extra_data.city` maps to the `city` column.
-- `$.extra_data.discount.amount` maps to the `discount_amount` column.

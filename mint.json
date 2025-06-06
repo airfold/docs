@@ -20,12 +20,6 @@
     "isHidden": true
   },
   "feedback.thumbsRating": true,
-  "topbarLinks": [
-    {
-      "name": "Join our Community!",
-      "url": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw"
-    }
-  ],
   "topbarCtaButton": {
     "name": "Try for free",
     "url": "https://cal.com/julianofficial/call"
@@ -46,11 +40,6 @@
       "name": "Blog",
       "icon": "newspaper",
       "url": "https://blog.airfold.co/"
-    },
-    {
-      "name": "Join our Community",
-      "icon": "slack",
-      "url": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw"
     }
   ],
   "navigation": [
@@ -197,7 +186,6 @@
     }
   ],
   "footerSocials": {
-    "slack": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw",
     "twitter": "https://twitter.com/airfoldco",
     "linkedin": "https://www.linkedin.com/company/airfold",
     "github": "https://github.com/airfold",

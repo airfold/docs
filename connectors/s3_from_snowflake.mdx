@@ -8,10 +8,10 @@ icon: 'shuffle'
 
 This connector is similar to the S3 Airfold Connector but includes the additional, precursor stage of piping data from your Snowflake warehouse through to an S3 bucket.
 If the data that you wish to sync into Airfold is already in an S3 bucket or you already have pipelines built to batch data to S3 on a set cadence, the standard S3 connector is probably the right choice for your project.
-This connector helps walk you through the process of [unloading snowflake data](https://docs.snowflake.com/en/user-guide/data-unload-s3) into S3 by using a Snowflake external stage.  
+This connector helps walk you through the process of [unloading Snowflake data](https://docs.snowflake.com/en/user-guide/data-unload-s3) into S3 by using a Snowflake external stage.  
 
 
-## Why you might want to use this option?
+## When to Use This Connector
 
 The standard Snowflake connector is a great way to sync small amounts of data from Snowflake to Airfold. If however, you are moving lots of data (hundreds of millions of rows), the Snowflake connector can become expensive to run,
 especially at high frequency cadences. Under the hood, when the Snowflake connector updates data into your Airfold Source, it is essentially running a query like this:
@@ -64,7 +64,7 @@ In the pop-up window, click on `S3 from Snowflake`
 
 ## Unload Table to S3
 
-Follow the steps in the pop-up window. These are all very self explanatory and by the end of step 11. you will have:
+Follow the steps in the setup wizard. By the end of step 11. you will have:
 
 * Created a new AWS `User` and assigned it the necessary permissions.
 * Generated an `Access Key` and a `Secret Access Key` for the new User.

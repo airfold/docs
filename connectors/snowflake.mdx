@@ -1,17 +1,17 @@
 ---
 title: 'Snowflake'
-description: "Seamlessly integrate your Snowflake data with Airfold"
+description: "How to connect and sync Snowflake tables to Airfold"
 icon: 'snowflake'
 ---
 
 Airfold makes it easy to connect with data that you have stored in Snowflake. It also enables you to automate data updates using scheduled cron jobs.
 
-We’ll walk through an example of using a Snowflake connector for your workspace.
+This guide walks through an example of configuring a Snowflake connector in your workspace.
 
 ## Creation
 
 ### Create Source
-Navigate to `Sources` and click on `Create new Source`. Alternatively, click on the `+` next to `Sources` in the lefthand tool bar. 
+Navigate to `Sources` and click on `Create new Source`. Alternatively, click on the `+` next to `Sources` in the left-hand tool bar. 
 
 ![snowflake](/images/create_source.png)
 
@@ -29,14 +29,13 @@ The next window in the pop up will ask you for some information from your Snowfl
 
 **Account**
 
-`Account` requires several pieces of information:
+The `Account` field requires the following format:
 
 `<your_account_id>.<your-snowflake-region>.<your_cloud_provider>` 
 
 (e.g., lh10221.us-central1.gcp)
 
-To generate this value, navigate to your Snowflake account, open a SQL worksheet, and run the following query:
-
+Run the following query in a Snowflake SQL worksheet to generate the correct account string:
 
 ```
 SELECT
@@ -55,7 +54,7 @@ SELECT
     END AS airfold_connector_account_field
 ```
 
-Copy the result of this query and paste into the Airfold UI where needed. If this query fails to generate the `Account` value as needed, you can piece together the correct value from the query below:
+Copy the result of this query and paste into the Airfold UI where needed. If this query does not return the expected value, you can manually construct the string using the following:
 
 ```
 SELECT
@@ -72,7 +71,7 @@ Then the correct value for `Account` would be `gu81828.us-east-2.aws'
 
 **Username**
 
-This is the username that you use to login to your Snowflake account. You can obtain this by running the following query:
+This is the username that you use to log in to your Snowflake account. You can obtain this by running the following query:
 
 ```
 SELECT CURRENT_USER();
@@ -80,11 +79,11 @@ SELECT CURRENT_USER();
 
 **Password**
 
-The password that you use to login to your Snowflake Account. If this is unknown, contact your Snowflake administrator.
+The password that you use to log in to your Snowflake Account. If unknown, contact your Snowflake administrator.
 
 **Database**
 
-Name of that database that you wish to access.
+Name of the database that you wish to access.
 
 ```
 SELECT CURRENT_DATABASE();
@@ -150,10 +149,10 @@ Set up automated data updates with a cron expression:
 
 ### Confirm Schema
 
-Airfold will automatically infer a schema from Snowflake, but you have the opportunity to make any changes. Remember - once a source is created, the table settings cannot be altered. If you wish to alter the table at a later stage, all the data will have to be dropped which could cause issues in your downstream, production APIs. Source settings, such as the `Engine` type and the `Primary Key`, are critical for optimal query performance - it's a great idea to slow down at this stage and make sure your Source settings are configured optimally!
+Airfold will automatically infer a schema from Snowflake, but you have the opportunity to make any changes. Remember - once a source is created, the table settings cannot be altered. If you wish to alter the table at a later stage, all the data will have to be dropped which could cause issues in your downstream, production APIs. Source settings, such as the `Engine` type and the `Primary Key`, are critical for optimal query performance - Take care at this stage to ensure your Source is optimally configured.
 
 <p align="center">
   <img src="/images/snowflake6.png" alt="snowflake" width="500"/>
 </p>
 
-Click on `Confirm Schema` and that's it, you have successfuly connected your Snowflake table with Airfold. The data should populate into Airfold as per your cron schedule and you should now see your new connection under `Sources`.
+Click Confirm Schema to finalize the connection. Your Snowflake table will now sync into Airfold based on your cron schedule, and the Source will appear in your workspace.

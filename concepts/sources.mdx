@@ -37,16 +37,16 @@ To ingest your data into a source, you have two options:
   </Card>
 </CardGroup>
 
-Whether you ingest data with a connector or through the Airfold API, once your data lands in a source, it is instanly queryable and ready to power your analytics pipelines.
+Whether you ingest data with a connector or through the Airfold API, once your data lands in a source, it is instantly queryable and ready to power your analytics pipelines.
 
 ## Schema
 
-Each Source has its own [schema](/ingest/inference) that defines the table's columns, data-types, and table settings.
+Each Source has its own [schema](/ingest/inference) that defines the table's columns, data types, and table settings.
 
 ![catalog schema](/images/file_upload_schema.png)
 
 Defining a clear, well-structured schema for your Source is key to ensuring fast, efficient queries with minimal latency and resource usage.
-There are several Airfold specific things that you need to take into consideration when finalizing your schema such as:
+There are several Airfold specific things that you need to consider when finalizing your schema such as:
 
 * Table settings
   * Each Source must have an `engine type` (required)
@@ -74,10 +74,10 @@ Navigate to "Sources" on the left menu bar, and click on "+":
 From this window, you can either choose to create a Source that uses a [connector](/concepts/connectors) or to create a Source that will infer a schema from a text snippet, a file upload, or an external URL.
 
 > 💡 **Tip:**
-> If you plan on ingesting data using the Airfold API, you need to create a source *without* a connector. Selecting the `Text` option in this window will allow you to create a *unconnected* Source, but still define its schema - ready for data to be ingested into.
+> If you plan on ingesting data using the Airfold API, you need to create a source *without* a connector. Selecting the `Text` option in this window will allow you to create an *unconnected* Source, but still define its schema - ready for data to be ingested into.
 
 
-Below is an example of creating a Source using a `file upload`. This will create an *unconnected* Source that will infer its schema from the file uploaded. You can choose whether or not to actually ingest the data from the file OR to just use the file as a means of infering a schema.
+Below is an example of creating a Source using a `file upload`. This will create an *unconnected* Source that will infer its schema from the file uploaded. You can choose whether or not to actually ingest the data from the file OR to just use the file as a means of inferring a schema.
 
 #### Upload a File
 
@@ -88,7 +88,7 @@ After clicking `File Upload`, you will be asked to specify the file.
 
 #### Confirm Schema
 
-on the next page, you can confirm the `Name`of your Source. The Source name is how you will reference your data in your SQL queries - so make sure to select a SQL friendly name!
+On the next page, you can confirm the `Name` of your Source. The Source name is how you will reference your data in your SQL queries - so make sure to select a SQL-friendly name!
 
 You can also choose whether or not to actually ingest the data from the file (or just infer its schema). Check the box if you want to ingest the data from the uploaded file into your Source.
 
@@ -110,7 +110,7 @@ The graphs at the top of the page show your `Usage metrics` so that you can moni
 
 Gives you a preview of your data. You can explore the data by using:
 
-- `Filters` allows you to filter out certain rows based on a condition
+- `Filters` allow you to filter out certain rows based on a condition
 - `Sort` can be used to order your rows in ascending/descending order based on a specified column
 - `Group by` is for organizing your rows by a specified column, grouping related rows together based on a shared value in that column
 
@@ -120,7 +120,7 @@ Gives you a preview of your data. You can explore the data by using:
 `Schema` provides the table schema and ClickHouse settings.
 ![metrics](/images/source_schema.png)
 
-`Data Graph` shows all the dependencies for the Source. As you build downstream analytics from the Source, using [Pipes](/concepts/pipes), the dependancy chart will populate showing all nodes that reference this source.
+`Data Graph` shows all the dependencies for the Source. As you build downstream analytics from the Source, using [Pipes](/concepts/pipes), the dependency chart will populate showing all nodes that reference this source.
 
 ![graph](/images/source_graph.png)
 
@@ -187,6 +187,6 @@ For example, to push `web_events.yaml`, run:
 af push web_events.yaml
 ```
 
-Once you have succesfully pushed your new Source, it should be visible in the UI and ready to ingest data!
+Once you have successfully pushed your new Source, it should be visible in the UI and ready to ingest data!
 
 For your next steps, try writing some SQL queries against your new Source in a [Pipe](/concepts/pipes).

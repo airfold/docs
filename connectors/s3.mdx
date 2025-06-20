@@ -12,7 +12,7 @@ The following walkthrough demonstrates how to set up an S3 connector within your
 
 
 ### Create Source
-Navigate to `Sources` and click on `Create new Source`. Alternatively, click on the `+` next to `Sources` in the lefthand tool bar. 
+Navigate to `Sources` and click on `Create new Source`. Alternatively, click on the `+` next to `Sources` in the left-hand tool bar. 
 
 ![snowflake](/images/create_source.png)
 
@@ -22,7 +22,7 @@ In the pop-up window, click on `Amazon S3`
 
 ### Bucket
 
-This will take you to the first page of the setup wizard. Here you can either select a previously connected bucket or connect a new one. if this is your first time connecting Airfold to S3, you will need to select "Add New" and then enter the name of the S3 `bucket` that you need to sync data from. Enter the name of the bucket exactly how it appears on your AWS account. 
+This will take you to the first page of the setup wizard. Here you can either select a previously connected bucket or connect a new one. If this is your first time connecting Airfold to S3, you will need to select "Add New" and then enter the name of the S3 `bucket` that you need to sync data from. Enter the name of the bucket exactly how it appears on your AWS account. 
 
 ![snowflake](/images/S3_connector_p1.png)
 
@@ -32,13 +32,13 @@ This will take you to the first page of the setup wizard. Here you can either se
 In this section of the setup wizard, we will need to create a `role` and a `policy` in your AWS account for Airfold to use and access your bucket. To complete this step, you may need administrative privileges on your AWS account.
 \
 \
-A `role` is is a user of your AWS account.\
+A `role` is a user of your AWS account.\
 A `policy` is like a set of rules and permissions that can be assigned onto a role.\
 \
 The following steps will create a role for Airfold within your AWS account and will assign a policy to that new role with read permissions on the S3 bucket that you have specified.
 \
 \
-First, lets create the policy. Follow the instructions on the setup wizard to navigate to the correct section on the IAM page of your AWS account.
+First, let's create the policy. Follow the instructions on the setup wizard to navigate to the correct section on the IAM page of your AWS account.
 
 ![snowflake](/images/S3_connector_p2p1.png)
 
@@ -50,7 +50,7 @@ Click next and then on the following page, give the policy a name. Remember what
 \
 Once you have successfully created the policy, click on the `Mark as Created` checkbox.
 \
-Next lets create the role. Again, follow the steps of the setup wizard to navigate to the Roles section of the IAM page. Paste the full JSON into the policy editor, it should look something like this:
+Next let's create the role. Again, follow the steps of the setup wizard to navigate to the Roles section of the IAM page. Paste the full JSON into the policy editor, it should look something like this:
 
 ![snowflake](/images/S3_connector_create_role.png)
 
@@ -80,7 +80,7 @@ raw-data/**/*.json    # Recursively ingest all JSON files in 'raw-data' and its 
 
 ### Configure Schedule
 
-In this section of the set up wizard, you will specify the frequency in which Airfold will pull data from S3 and the `Strategy` for how the data will populate in your Source.
+In this section of the setup wizard, you will specify the frequency in which Airfold will pull data from S3 and the `Strategy` for how the data will populate in your Source.
 
 ![snowflake](/images/S3_connector_configure_schedule.png)
 
@@ -98,13 +98,13 @@ The `Strategy` selection gives you two options: `append` or `replace`. Append wi
 
 ### Finalize
 
-Last step! On this final page you need to set the name for your new Source and to specify the schema.
+On the final step, you’ll name your new Source and define its schema.
 
 ![snowflake](/images/S3_connector_finalize.png)
 
 > 💡 **Tip:**  
 > It's worth spending some time on this section as both the schema and table settings cannot be changed once the table is created. Choosing optimal data types and table settings (like the `primary key`, `order by`, and `engine`)
 > are crucial steps in Airfold for ensuring that your queries run with low latency. If you wish to change data types or table settings, you will have to drop the source, recreate the table with the new settings, and ingest your data again.
-> This could be a potentially costly backfill, especially if you have a large dataset, so this is a great opportunity to slow down and get it right the first time!
+> This could be a potentially costly backfill, especially if you have a large dataset, so it’s important to ensure correctness before proceeding.
 
-That's it! Your new table will now update from S3 according to the schedule you set.
+Your new Source will now update on the schedule you defined, and will appear under the Sources tab in your workspace.

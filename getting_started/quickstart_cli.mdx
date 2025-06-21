@@ -1,19 +1,19 @@
 ---
 title: "Quickstart (CLI)"
-description: "This section covers ingesting, querying and publishing data using the Airfold CLI."
+description: "This section covers ingesting, querying, and publishing data using the Airfold CLI."
 icon: "code"
 ---
 
 ## Overview
 
-In this guide, we'll develop an API to identify the top mentioned features in sales calls.
+In this guide, we'll develop an API to identify the top-mentioned features in sales calls.
 
-We'll process web events data to extract top referrers using the sample web events csv file.
+We'll process web events data to extract top referrers using the sample web events CSV file.
 
 Our steps include:
 
 - Ingesting the dataset
-- Executing queries to get top 3 referrers
+- Executing queries to get the top 3 referrers
 - Exposing the features through an API
 
 ## Create a [Workspace](/concepts/workspaces)
@@ -21,12 +21,12 @@ Our steps include:
 Before we begin, we need to create a workspace to store our data and resources, as well as a token to authenticate our CLI.
 
 1. Go to [Airfold](https://app.us.airfold.co) and create a new workspace.
-2. Copy an Admin token from the workspace's **Keys** page.
+2. Copy an admin token from the workspace's **Keys** page.
    ![Keys](/images/keys.png)
 
 The token should look like this: `aft_6eab8fcd902e4cbfb63ba174469989cd.Ds1PME5dQsJKosKQWVcZiBSlRFBbmhzIocvHg8KQddV`.
 
-## Set up the [CLI](/cli/cli_reference)
+## Set up the [CLI.](/cli/cli_reference)
 
 <Note>The CLI requires Python 3.10 or higher.</Note>
 
@@ -45,7 +45,7 @@ First, **<a href="/public/web_events_sample.csv" download="web_events_sample.csv
 To create a source, a YAML file defining the source is required.<br />
 
 Let's generate a source by inferring the schema from a CSV file. <br />
-(replace `/path/to/web_events_sample.csv` with actual filepath):
+(Replace `/path/to/web_events_sample.csv` with the actual path):
 
 ```bash
 af source create path/to/web_events_sample.csv .
@@ -74,7 +74,7 @@ Push the source definition to your workspace:
 af push path/to/web_events_sample.yaml
 ```
 
-At this point, our source has been created but no data has been ingested yet.
+At this point, our source has been created, but no data has been ingested yet.
 
 Verify creation by listing sources:
 

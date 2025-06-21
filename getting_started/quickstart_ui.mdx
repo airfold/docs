@@ -1,12 +1,12 @@
 ---
 title: "Quickstart (UI)"
-description: "This section covers creating a workspace, uploading data and publishing API endpoints."
+description: "This section covers creating a workspace, uploading data, and publishing API endpoints."
 icon: "laptop"
 ---
 
-In this guide, we will use the Airfold's three core concepts **Ingest**, **Transform** and **Publish**.
+In this guide, we will use Airfold's three core concepts: **Ingest**, **Transform**, and **Publish**.
 
-We'll process web events data to extract top referrers using the sample web events csv file.
+We'll process web events data to extract top referrers using the sample web events CSV file.
 
 Our steps include:
 
@@ -24,12 +24,12 @@ If this is your first time using Airfold, you will be directed to our welcome pa
 
 Otherwise, you can create a new workspace by clicking on the top-left corner, then
 
-"+ New Workspace" :
+"+ New Workspace":
 ![creating a workspace](/images/create_workspace_zoomed.png)
 
 ## Uploading a CSV file
 
-We will be using web events data for this guide, which you can **<a href="https://github.com/airfold/docs/public/web_events_sample.csv" download="web_events_sample.csv">download here</a>**
+We will be using web events data for this guide, which you can **<a href="https://github.com/airfold/docs/public/web_events_sample.csv" download="web_events_sample.csv">download here.</a>**
 
 Click on "Sources" on the left column, then select "File upload":
 
@@ -37,20 +37,20 @@ Click on "Sources" on the left column, then select "File upload":
 
 From here, upload the `web_events_sample.csv` file we just downloaded.
 
-Then, name it `web_events_sample_csv`, and make sure to select the checkbox `ingest data` before clicking on "Create source".
+Then, name it `web_events_sample_csv`, and make sure to select the checkbox `ingest data` before clicking on "Create source."
 
 ![upload and ingest data](/images/create_ingest_data.png)
 
-Within a few seconds, all of the data should be ingested:
+Within a few seconds, all of the data should be ingested.
 ![ingested data](/images/ingested_data.png)
 
 ## Writing queries as features
 
-Now, we can start querying the data to filter, transform or aggregate data and do analytics, simple as that.
+Now, we can start querying the data to filter, transform, or aggregate data and do analytics, simple as that.
 
 Start by creating a pipe by clicking on "Pipes", then typing in name `topreferrers`.
 
-Once created, add the below query inside the node, and run to get the results.
+Once created, add the below query inside the node and run to get the results.
 
 ```sql
 SELECT
@@ -66,7 +66,7 @@ LIMIT 3
 
 ## Exposing the features through an API
 
-Once completed you can click on publish to publish the query as an endpoint.
+Once completed, you can click on `Publish` to publish the query as an endpoint.
 You can view the endpoint once it's published.
 
 ![top referrers endpoint](/images/top_referrers_endpoints.png)

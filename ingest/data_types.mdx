@@ -9,14 +9,14 @@ Airfold uses [ClickHouse data types](https://clickhouse.com/docs/sql-reference/d
 From specialized aggregate states to low-level numeric optimizations, these data types are designed for performance at scale.
 Understanding how each type behaves is essential for getting the most out of Airfold.
 
-## Data types you should know (but may not have used before!)
+## Key Data Types You'll Encounter in Airfold
 
 ClickHouse has many unique data types, combinations of types, and specialized wrappers. We recommend exploring the official [ClickHouse documentation](https://clickhouse.com/docs/sql-reference/data-types) for a full reference.
 This page highlights a few data types you might not have used before but will likely encounter when working with Airfold.
 
 ### AggregateFunction Type
 
-`AggregateFunction` might sound like a function but it is actually a data type, most likely used in an [incramental materilized view](/production/optimize_queries). This type doesn't store a final value like a number or string. Instead, it stores the intermediate state of an aggregation—something that can be merged later.
+`AggregateFunction` might sound like a function but it is actually a data type, most likely used in an [incremental materilized view](/production/optimize_queries). This type doesn't store a final value like a number or string. Instead, it stores the intermediate state of an aggregation—something that can be merged later.
 \
 For example, say you have an incrmental view with a function like:
 
@@ -141,7 +141,7 @@ columns:
     type: UUID
 ```
 
-Where UUID types offer performance and storage benefits, there are a few pitfalls thta must be accounted for. For example, when joining or filtering you must always ensure a type match of `UUID = UUID`, not `UUID = String`.
+Where UUID types offer performance and storage benefits, there are a few pitfalls that must be accounted for. For example, when joining or filtering you must always ensure a type match of `UUID = UUID`, not `UUID = String`.
 
 ```sql
 -- Cast string to UUID
@@ -174,7 +174,7 @@ columns:
     type: Array(Int64)
 ```
 
-There are many [array functions](https://clickhouse.com/docs/sql-reference/functions/array-functions) that can be used in conjunction with array type columns. For example, a common requirement is to explode an array into indivual rows (from wide to tall data):
+There are many [array functions](https://clickhouse.com/docs/sql-reference/functions/array-functions) that can be used in conjunction with array type columns. For example, a common requirement is to explode an array into individual rows (from wide to tall data):
 
 ```sql
 -- Original table: one row per user, with an array of message_ids

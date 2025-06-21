@@ -1,5 +1,5 @@
 ---
-title: "Postgres"
+title: "PostgreSQL"
 description: "Seamlessly integrate your postgres data with Airfold"
 icon: "database"
 ---
@@ -7,7 +7,7 @@ icon: "database"
 Airfold makes it easy to sync data from your Postgres database in real time. It uses `Change Data Capture` (CDC), powered by PostgreSQL’s `Logical Replication`, to track row-level inserts and updates as they happen. This means that you don’t need to configure a refresh schedule for your source. As data is inserted or updated in Postgres, it’s automatically ingested by Airfold on the fly.
 \
 \
-Before you can use the Airfold Postgres connector, you’ll need to complete a few setup steps to ensure your server is configured for Logical Replication. In this page we will walk you through the prerequisites steps on the Postgres server side as well as using the connector to sync data. 
+Before you can use the Airfold Postgres connector, you’ll need to complete a few setup steps to ensure your server is configured for Logical Replication. This guide walks through the prerequisites steps on the Postgres server side as well as using the connector to sync data. 
 
 
 ## Server Side Prerequisites
@@ -85,7 +85,7 @@ SELECT * FROM pg_create_logical_replication_slot('<slot_name>', 'pgoutput');
 
 ### Gather Your Connection Details
 
-If you have completed all of the steps so far, you are almost ready to connec to to Airfold! The last steps are to collect some important values from your server. You will need:
+If you have completed all of the steps so far, you are almost ready to connect to to Airfold! The last steps are to collect some important values from your server. You will need:
 
 * `Host` - The hostname of your Postgres server (e.g., `db.mycompany.com`)
 * `Port` - The port your server is listening on (default is `5432`)
@@ -101,7 +101,7 @@ Once you have completed these steps, you can move on to creating the Connector i
 
 ### Create Source
 
-Next lets create the source in Airfold. In your Airfold workspace, find `Sources` on the left side tool bar and Click the `+` button.
+Next let's create the source in Airfold. In your Airfold workspace, find `Sources` on the left side tool bar and Click the `+` button.
 
 In the popup window, click on `Postgres`
 

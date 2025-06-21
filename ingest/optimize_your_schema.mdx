@@ -23,8 +23,8 @@ ClickHouse supports all the familiar data types you'd expect—like `String`, `I
 
 ### Engine
 
-In ClickHouse, you can specify a Table Engine that determines several key behaviors of the table, such as how data is stored on disk, how it is indexed, and potentialy how data can be deduplicated.
-Some of the common engine types you will use in your Airfold project: `MergeTree` is the most frequently used table that merges table parts in the background, `ReplicatingMergeTree` deduplicate rows (based on a `version` column) ensuring your query includes the most up to date data, and `AggregatingMergeTree` for Magterialized Incrmental Views that aggregate data on ingestion.
+In ClickHouse, you can specify a Table Engine that determines several key behaviors of the table, such as how data is stored on disk, how it is indexed, and potentially how data can be deduplicated.
+Some of the common engine types you will use in your Airfold project: `MergeTree` is the most frequently used table that merges table parts in the background, `ReplicatingMergeTree` deduplicate rows (based on a `version` column) ensuring your query includes the most up to date data, and `AggregatingMergeTree` for Materialized Incremental Views that aggregate data on ingestion.
 Choosing the right engine is critical for optimizing performance and ensuring the table aligns with your use case, whether it's high-speed inserts, deduplication, or aggregations.
 Check out our [reference page]() to learn more about ClickHouse Engines.
 

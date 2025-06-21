@@ -4,37 +4,30 @@ description: 'Convert pipelines into fast, scalable endpoints'
 icon: "brackets-curly"
 ---
 
-Transform any pipeline into a high-performance API endpoint that supports low latency and high concurrency, ready for integration.
+Once the pipe is published, you can use Airfold APIs to call the published pipe and get results, 
+these endpoints can be integrated directly into your dashboard or application's logic to display desired results.
 
 Each API comes with Swagger documentation for standardized usage and can be accessed as a shareable REST endpoint.
 
-## UI
-
-### Create an Endpoint
+## Create an Endpoint
 
 To publish a query as an endpoint:
 
 1. Click the publish button:
-<p align="center">
-    <img src="/images/ui_endpoint1.png" alt="ai table creation" width="150"/>
-</p>
+![publish button](/images/ui_query4.png)
 
 2. Select "View endpoint":
 ![full page](/images/ui_endpoint2.png)
 
 The dashboard displays key metrics including request count, data processed, latency, and error rate.
 
-### Use the Endpoint
+## Use the Endpoint
 
 Copy the API endpoint directly from the code block to use in your application:
-<p align="center">
-    <img src="/images/ui_endpoint4.png" alt="ai table creation" width="550"/>
-</p>
+![endpoint code](/images/ui_endpoint4.png)
 
 Access additional options through the three-dot menu in the top right corner:
-<p align="center">
-    <img src="/images/ui_endpoint3.png" alt="ai table creation" width="450"/>
-</p>
+![endpoint three dots](/images/ui_endpoint3.png)
 
 - **Share Swagger**: Opens the Swagger documentation page for API exploration and testing
 - **Add Parameter**: Define custom parameters for your API calls
@@ -42,107 +35,3 @@ Access additional options through the three-dot menu in the top right corner:
 - **Discard changes**: Revert parameter modifications
 - **Delete**: Remove the endpoint
 
-### Parameters
-
-Endpoints support [Jinja2](https://jinja.palletsprojects.com/en/stable/templates/) syntax for parameter templating.
-
-Example of a parameterized endpoint:
-<p align="center">
-    <img src="/images/ui_endpoint5.png" alt="endpoint with params" width="450"/>
-</p>
-
-#### Expressions
-
-Use `{{ param_name }}` syntax for expressions.
-
-Example: `SELECT * FROM t LIMIT {{ limit }}`
-
-The internal Jinja engine handles parameter substitution automatically. No need to escape parameters - `WHERE name = {{ name }}` works correctly for string values.
-
-Supported data types:
-- String
-- Int
-- Float
-- Boolean
-- Date
-- Datetime
-
-For other data types, use String and parse within your SQL. For example, create an array from a comma-separated string:
-```sql
-SELECT * FROM t WHERE group IN splitByChar(',', {{ groups }})
-```
-
-All parameters are passed as query strings in the HTTP API:
-```
-https://api.us.airfold.co/v1/pipes/endpoint1?param1=10&param2=foo&param3=c1,c2
-```
-For additional syntax options, refer to the [Jinja2 documentation](https://jinja.palletsprojects.com/en/stable/templates/).
-
-#### Statements
-
-Use `{% if condition %}...{% endif %}` syntax for conditional statements.
-
-Example:
-```
-SELECT
-{% if start_time is defined %}
-    toStartOfInterval({{ start_time }}:: DateTime, INTERVAL {{ interval }} SECONDS)
-{% else %}
-    toStartOfInterval(now() - INTERVAL 1 DAY, INTERVAL {{ interval }} SECONDS)
-{% endif %}
-```
-
-For additional statement options, refer to the  [Jinja2 documentation](https://jinja.palletsprojects.com/en/stable/templates/).
-
-
-## CLI
-
-### Edit YAML file
-
-Simply add a name to the `publish` parameter:
-
-```yaml insights.yaml
-nodes:
-  - node1:
-      sql: |
-        WITH
-          arrayJoin(features_mentioned) AS feature
-        SELECT
-          count() AS num_successful_calls,
-          topK(2)(feature) AS top_features
-        FROM
-          analysis
-        WHERE
-          successful = true
-publish: insights
-
-```
-
-### Push
-Push this update by running:
-```
-af push insights.yaml
-```
-
-### Params
-
-In YAML params are placed in the `params` property:
-
-```yaml
-params:
-  - name: start_time
-    type: datetime
-  - name: end_time
-    type: datetime
-  - name: groups
-    type: string
-  - name: models
-    type: string
-  - name: interval
-    type: int
-    default: 300
-```
-
-Params can be used in endpoints and [draft pipes](/concepts/pipes#draft-pipes).
-
-Params cannot be used in [materialized pipes](/concepts/pipes#materialized-pipes).

@@ -1,0 +1,146 @@
+---
+title: "PostgreSQL"
+description: "Seamlessly integrate your postgres data with Airfold"
+icon: "database"
+---
+
+Airfold makes it easy to sync data from your Postgres database in real time. It uses `Change Data Capture` (CDC), powered by PostgreSQL’s `Logical Replication`, to track row-level inserts and updates as they happen. This means that you don’t need to configure a refresh schedule for your source. As data is inserted or updated in Postgres, it’s automatically ingested by Airfold on the fly.
+\
+\
+Before you can use the Airfold Postgres connector, you’ll need to complete a few setup steps to ensure your server is configured for Logical Replication. This guide walks through the prerequisites steps on the Postgres server side as well as using the connector to sync data. 
+
+
+## Server Side Prerequisites
+
+### WAL Settings
+
+Before setting up the connector in Airfold, we first need to correctly configure the `wal_level` in your postgres server. In order for CDC to function, the `wal_level` (Write-Ahead Logging) setting on your Postgres server must be set to `logical`.
+
+To check your current setting, run this query:
+```
+SHOW wal_level;
+```
+
+This will return one of the following values: `minimal`, `replica`, or `logical`.
+
+Most servers default to `replica`, but many modern managed Postgres providers (like Neon or Supabase) default to `logical`.
+
+If you need to change this setting, you’ll typically do so in the `postgresql.conf` file, or via your provider’s UI, depending on how your Postgres instance is hosted.
+
+<Note>
+Once the wal_level setting has been changed, the server will need to be restarted. This can be problematic for production databases, so we recommend checking the current setting before making any changes. If your database is already set to logical, no restart is needed and you can proceed safely. Otherwise, consider scheduling the restart during a planned maintenance window to minimize disruption. 
+</Note>
+
+### Create a Role and Assign Permissions
+
+Airfold requires a dedicated `role` to connect to your server. Run the following SQL to get set up:
+
+```sql
+CREATE ROLE <role_name> WITH PASSWORD <password>;
+```
+
+Save these values in a safe place, you will need them soon to set up the connector.
+\
+Next, grant the role permission to use Logical Replication:
+
+```sql
+ALTER ROLE <role_name> WITH REPLICATION;
+```
+
+Depending on your hosting provider, you may not have permission to run this command directly in the UI or via psql.
+For example, in [Supabase](https://supabase.com/), this setting must be enabled manually in the project settings:
+
+![catalog schema](/images/postgres_connector_supabase_permissions.png)
+
+Finally, grant the role access to the schema and tables you want Airfold to sync:
+
+```
+GRANT USAGE ON SCHEMA <your_schema> TO <role_name>;
+GRANT SELECT ON <table_name> TO <role_name>;
+```
+
+### Create a Publication and a Slot
+
+Next, we need to create a `publication` and a replication `slot`.
+
+The publication is a Postgres object that defines which tables to stream changes from. You can choose to publish specific tables or all tables in the database.
+
+The replication slot is a mechanism that ensures Postgres retains the change data (WAL logs) until Airfold has consumed it. This guarantees that no changes are lost, even if there's a temporary interruption in the connection.
+
+To create the `Publication`, run this SQL:
+
+```sql
+CREATE PUBLICATION <publication_name> FOR TABLE
+    <table_name_1>,
+    <table_name_2>,
+    <...>;
+```
+In this command, `<publication_name>` is the name you want to give your new publication, and it should be followed by a comma-separated list of the tables you want to include in the sync.
+
+Finally we can create the Slot:
+
+```sql
+SELECT * FROM pg_create_logical_replication_slot('<slot_name>', 'pgoutput');
+```
+
+### Gather Your Connection Details
+
+If you have completed all of the steps so far, you are almost ready to connect to to Airfold! The last steps are to collect some important values from your server. You will need:
+
+* `Host` - The hostname of your Postgres server (e.g., `db.mycompany.com`)
+* `Port` - The port your server is listening on (default is `5432`)
+* `User` - The name of the role created in previous steps
+* `Password` - Of the above role
+* `Database` - The name of the database you are connecting to
+* `Publication` - The name of the publication created in previous steps
+* `Slot` - The name of the Slot created in previous steps
+
+Once you have completed these steps, you can move on to creating the Connector in the Airfold UI!
+
+## Create the airfold Postgres Connector
+
+### Create Source
+
+Next let's create the source in Airfold. In your Airfold workspace, find `Sources` on the left side tool bar and Click the `+` button.
+
+In the popup window, click on `Postgres`
+
+![data format options](/images/ui_integration_options.png)
+
+### Connection Details
+
+In the next window, you'll be prompted to provide connection details for your Postgres database.
+Fill in the fields and click **Test Connection** to validate if you have successfully connected to your postgres server.
+
+![postgres](/images/postgres_connection_details.png)
+
+`Use SSL` **(optional)**: This setting enables SSL encryption for the connection between Airfold and your PostgreSQL server. When SSL is enabled, all data transmitted between Airfold and the server is encrypted, protecting sensitive information, protecting all of your data. SSL is strongly recommended for production environments!
+
+
+<Note>
+To use the CDC feature, your Postgres server must have a Publication and a Slot configured. These allow Airfold to ingest new and updated rows automatically.
+If you haven’t already done so, follow the steps in the [Prerequisites](#server-side-prerequisites) section and gather the necessary values from that setup.
+</Note>
+
+### Select table
+
+Once connected, you'll see a list of available tables in the database.
+Select the desired table and click **Next**.
+
+![postgres](/images/postgres_select_table.png)
+
+### Finalize
+
+Review the schema that Airfold has generated for the selected table.
+You can make changes if needed. Click **Create** to connect Airfold to the Postgres database.
+As new data is ingested into Postgres, Airfold will automatically receive the updates.
+
+![postgres](/images/postgres_finalize.png)
+
+> 💡 **Tip:**  
+> It's worth spending some time on this section as both the schema and table settings cannot be changed once the table is created. Choosing optimal data types and table settings (like the `primary key`, `order by`, and `engine`)
+> are crucial steps in Airfold for ensuring that your queries run with low latency. If you wish to change data types or table settings, you will have to drop the source, recreate the table with the new settings, and ingest your data again.
+> This could be a potentially costly backfill, especially if you have a large dataset, so this is a great opportunity to slow down and get these settings right the first time! Check out the page on [optimizing your schema](/ingest/optimize_your_schema)
+
+After finalizing your schema and settings, click `Create`. Your new source should now be available and data ingestion will begin momentarily! 
+

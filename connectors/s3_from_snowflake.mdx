@@ -1,0 +1,152 @@
+---
+title: 'S3 From Snowflake'
+description: "Pipe Data from Snowflake, to an S3 bucket, and then to Airfold"
+icon: 'shuffle'
+---
+
+## What this connector is
+
+This connector is similar to the S3 Airfold Connector but includes the additional, precursor stage of piping data from your Snowflake warehouse through to an S3 bucket.
+If the data that you wish to sync into Airfold is already in an S3 bucket or you already have pipelines built to batch data to S3 on a set cadence, the standard S3 connector is probably the right choice for your project.
+This connector helps walk you through the process of [unloading Snowflake data](https://docs.snowflake.com/en/user-guide/data-unload-s3) into S3 by using a Snowflake external stage.  
+
+
+## When to Use This Connector
+
+The standard Snowflake connector is a great way to sync small amounts of data from Snowflake to Airfold. If however, you are moving lots of data (hundreds of millions of rows), the Snowflake connector can become expensive to run,
+especially at high frequency cadences. Under the hood, when the Snowflake connector updates data into your Airfold Source, it is essentially running a query like this:
+
+```
+SELECT
+    *
+FROM
+    <your-snowflake-table>;
+```
+
+Snowflake charges your account based on the amount of time the warehouse is running; if the table you are querying from is very large, this could potentially be expensive.
+However, when you use a [Snowflake External Stage](https://docs.snowflake.com/en/sql-reference/sql/create-stage) the command that is run under the hood is:
+
+```
+COPY INTO <location>
+```
+
+This command can be much more performant and cost-effective because it’s optimized for bulk data export. Unlike ad hoc queries, COPY INTO operations are parallelized and can write large volumes of data directly to S3 with minimal overhead.
+
+Additionally, by using COPY INTO, you gain full control over:
+
+* What data gets exported (e.g., filtering for recent rows)
+
+* How it’s structured (e.g., partitioning by date)
+
+* When it runs (e.g., daily or hourly via scheduled Snowflake Tasks)
+
+Once the data is written to S3, Airfold ingests it just like with the standard S3 connector — without re-querying Snowflake, which keeps compute usage low and predictable.
+
+This makes the "S3 from Snowflake" connector a great choice when:
+
+* You're syncing large datasets regularly
+
+* You want to minimize Snowflake warehouse usage
+
+In short, this connector decouples compute-heavy Snowflake queries from your Airfold sync cadence — letting you scale up your data pipeline without scaling up your costs.
+
+
+## Create Source
+
+To get started with this connector, navigate to `Sources` and click on `Create new Source`. Alternatively, click on the `+` next to `Sources` in the left-hand tool bar.
+
+![snowflake](/images/create_source.png)
+
+In the pop-up window, click on `S3 from Snowflake`
+
+![snowflake](/images/ui_integration_options.png)
+
+
+## Unload Table to S3
+
+Follow the steps in the setup wizard. By the end of step 11. you will have:
+
+* Created a new AWS `User` and assigned it the necessary permissions.
+* Generated an `Access Key` and a `Secret Access Key` for the new User.
+* Created a new S3 bucket for your Snowflake data to land into.
+
+Once these steps have been completed, we will switch over to the Snowflake side. First we will create a Snowflake External Stage which is like a predefined pathway that you can send data to.
+The stage will contain all of the details of your new S3 bucket and will use the role that you just created in your AWS account.
+\
+To create the stage, you will need to open a worksheet in your Snowflake account, select the database that you want to sync data from, then run the following SQL query:
+
+```
+CREATE STAGE <stage_name>
+  URL = 's3://<bucket-name>/<path>'
+  CREDENTIALS = (
+    AWS_KEY_ID = <key-id>
+    AWS_SECRET_KEY = <secret-id>
+  );
+```
+
+Make sure to enter your specific values in place of the placeholders shown in angle brackets `< >`
+
+* `<stage_name>` is what you will name your stage.
+* `<bucket-name>` is the name that you gave the bucket that you just created in AWS.
+* `<path>` is the directory (also called a prefix) in your bucket where you want the data to land. If you don’t specify a path, Snowflake will write to the root of the bucket by default.
+* `<key-id>` and `<secret-id>` are the values for the keys that you generated in steps 7 - 10.
+
+
+Once you execute the query and your stage is created, now you can copy data into it:
+
+```
+COPY INTO @stage_name/
+  FROM <table_Name>
+  FILE_FORMAT = (TYPE = 'PARQUET')
+  HEADER = true
+  OVERWRITE = TRUE;
+```
+
+Running this query will copy all of the data in your table to the stage, and the stage will send all of the copied data to your S3 bucket!
+
+
+## Automating Daily Batches with a Snowflake Task
+
+If you have completed all the steps so far, you will have successfully backfilled your entire table into S3.
+Next you can automate this process by creating a Snowflake Task. This will allow you to batch and export data to your S3 bucket at a desired cadence — without any manual intervention.
+The example below sets up a task that runs once a day and copies only the previous day’s records into your stage. It assumes your table has a timestamp column (like created_at) that you can use to filter new data.
+
+```
+CREATE OR REPLACE TASK daily_export_to_s3
+  WAREHOUSE = your_warehouse_name
+  SCHEDULE = 'USING CRON 0 1 * * * UTC'  -- runs daily at 1:00 AM UTC
+AS
+COPY INTO @<stage_name>/export_date_='${CURRENT_DATE}/'
+  FROM (
+    SELECT *
+    FROM <table_name>
+    WHERE created_at >= CURRENT_DATE - INTERVAL '1 day'
+        AND created_at < CURRENT_DATE
+  )
+  FILE_FORMAT = (TYPE = 'PARQUET')
+  HEADER = TRUE;
+```
+
+This task will create a new folder each day in your S3 bucket like:
+\
+`s3://<bucket-name>/<path>/export_date_=2025-05-29/`
+\
+Once created, you’ll need to activate the task:
+
+```
+ALTER TASK daily_export_to_s3 RESUME;
+```
+
+<Note>
+The `WHERE` clause uses:
+```
+WHERE created_at >= CURRENT_DATE - INTERVAL '1 day'
+  AND created_at < CURRENT_DATE
+```
+This ensures you capture all rows from the previous calendar day in UTC (from 00:00 to 23:59:59.999).
+Using this pattern helps avoid accidentally missing rows due to time zone differences or late-arriving records — and gives you a consistent, repeatable window for daily exports.
+</Note>
+
+## Setting up the S3 Connector
+
+If you have followed these steps, you now have data syncing in batches to your S3 bucket! From this point onwards, you can follow the [S3 Connector docs](docs/connectors/s3.mdx) to complete the sync from S3 to Airfold!

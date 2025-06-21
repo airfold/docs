@@ -20,12 +20,6 @@
     "isHidden": true
   },
   "feedback.thumbsRating": true,
-  "topbarLinks": [
-    {
-      "name": "Join our Community!",
-      "url": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw"
-    }
-  ],
   "topbarCtaButton": {
     "name": "Try for free",
     "url": "https://cal.com/julianofficial/call"
@@ -36,7 +30,6 @@
       "url": "api-reference"
     }
   ],
-
   "anchors": [
     {
       "name": "Home",
@@ -47,11 +40,6 @@
       "name": "Blog",
       "icon": "newspaper",
       "url": "https://blog.airfold.co/"
-    },
-    {
-      "name": "Join our Community",
-      "icon": "slack",
-      "url": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw"
     }
   ],
   "navigation": [
@@ -64,74 +52,83 @@
       ]
     },
     {
-      "group": "Concepts",
+      "group": "Manage your Workspace",
       "pages": [
         "concepts/workspaces",
-        "concepts/sources",
-        "concepts/connectors",
-        "concepts/pipes",
-        "concepts/endpoints",
-        "concepts/ai_tables",
         "concepts/keys",
-        "concepts/data_graph",
-        "concepts/charts"
+        "management/members"
       ]
     },
     {
-      "group": "Ingest",
+      "group": "Ingest your data",
       "pages": [
+        "concepts/sources",
         "ingest/ingest_api",
-        "ingest/jsonpath",
-        "ingest/errors",
-        "ingest/schema"
+        {
+          "group": "Connectors",
+          "icon": "plug",
+          "pages": [
+            "concepts/connectorsoverview",
+            "connectors/snowflake",
+            "connectors/s3",
+            "connectors/s3_from_snowflake",
+            "connectors/postgres"
+          ]
+        },
+        "ingest/optimize_your_schema",
+        {
+          "group": "Reference",
+          "icon": "plug",
+          "pages": [
+            "ingest/data_types",
+            "ingest/table_engines",
+            "ingest/orderby_primarykey",
+            "ingest/partitionby",
+            "ingest/jsonpath",
+            "ingest/errors"
+          ]
+        }
       ]
     },
     {
-      "group": "Query",
+      "group": "Transform your data",
       "pages": [
-        "query/pipelines"
+        "query/query_your_data",
+        "production/optimize_queries",
+        "concepts/endpoints",
+        "concepts/parameters",
+        "concepts/data_graph"
       ]
     },
     {
-      "group": "Workspace Files",
+      "group": "Production Best Practices",
       "pages": [
-        "workspace_files/install_cli",
-        "workspace_files/pipe_yaml",
-        "workspace_files/source_yaml",
+        "production/staging_prod",
+        "production/version_control",
+        "production/cicd",
+        "workspace_files/install_cli"
+      ]
+    },
+    {
+      "group": "CLI Config Reference",
+      "pages": [
         "workspace_files/push",
         "workspace_files/pull",
         "cli/cli_reference"
       ]
     },
     {
-      "group": "Management",
-      "pages": [
-        "management/members"
-      ]
-    },
-    {
-      "group": "Production",
-      "pages": [
-        "production/staging_prod",
-        "production/version_control",
-        "production/optimize_queries",
-        "production/cicd"
-      ]
-    },
-    {
-      "group": "Connectors",
-      "pages": [
-        "connectors/snowflake",
-        "connectors/s3"
-      ]
-    },
-    {
       "group": "Get Started",
-      "pages": ["api-reference/authentication"]
+      "pages": [
+        "api-reference/authentication"
+      ]
     },
     {
       "group": "Ingest",
-      "pages": ["api-reference/ingest/ingest", "api-reference/ingest/schema"]
+      "pages": [
+        "api-reference/ingest/ingest",
+        "api-reference/ingest/schema"
+      ]
     },
     {
       "group": "Workspace",
@@ -163,7 +160,10 @@
     },
     {
       "group": "Diagnostic",
-      "pages": ["api-reference/diagnostic/list", "api-reference/diagnostic/run"]
+      "pages": [
+        "api-reference/diagnostic/list",
+        "api-reference/diagnostic/run"
+      ]
     },
     {
       "group": "Legal",
@@ -180,7 +180,6 @@
     }
   ],
   "footerSocials": {
-    "slack": "https://join.slack.com/t/airfold/shared_invite/zt-2dgfuhgsg-qybs1wwb2vwW4fdxw0K0Nw",
     "twitter": "https://twitter.com/airfoldco",
     "linkedin": "https://www.linkedin.com/company/airfold",
     "github": "https://github.com/airfold",

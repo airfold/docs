@@ -1,0 +1,73 @@
+---
+title: Table Engines
+description: Overview of MergeTree-based engines and their use cases in ClickHouse
+icon: 'engine'
+---
+
+ClickHouse provides a variety of table engines that define how data is physically stored, merged, deduplicated, and aggregated. Choosing the appropriate engine is crucial for designing scalable, performant data pipelines — especially in analytics platforms where raw event ingestion and pre-aggregation coexist. Airfold runs Clickhouse in the backend, for more deep dive details make sure to check Clickhouse documentation on [Table Engines](https://clickhouse.com/docs/engines/table-engines). In Airfold, the following are the most commonly used engines:
+
+## `MergeTree`
+
+`MergeTree` is the foundational engine in ClickHouse, optimized for high-volume data ingestion and fast analytical queries. It supports background merging of data parts, primary key indexing, and partitioning.
+
+**Key Features:**
+
+- Stores data **sorted by a primary key**, enabling fast range scans
+- Breaks data into **granules** (~8192 rows) for efficient index pruning
+- Supports **partitioning** (e.g., by day/month) for retention and query optimization
+- **Merges** data parts in the background to reduce small parts and reclaim space
+- Ideal for **append-only** data like web events, logs, and telemetry
+
+**Common Use Cases:**
+
+- Event tracking (e.g., `web_events`, `page_views`)
+- Session reconstruction from time-series data
+- Time-partitioned storage with retention logic
+
+## `ReplacingMergeTree`
+
+`ReplacingMergeTree` extends `MergeTree` by adding **deduplication capabilities** during background merges. It is useful when duplicate or outdated rows are expected, such as from retries or updates.
+
+**Key Features:**
+
+- Removes duplicates based on the `ORDER BY` key during merges
+- If a `version` column is specified, retains only the most recent version
+- Deduplication happens **only during background merges**, not on insert
+
+**Common Use Cases:**
+
+- Cleaning up duplicates from **at-least-once ingestion**
+- Storing **dimension tables** that receive frequent corrections
+- Handling data updates with **soft upserts**
+
+> Deduplication works on the **sorting key**, not the primary key. Requires correct ordering and optional versioning to work effectively.
+
+## `AggregatingMergeTree`
+
+`AggregatingMergeTree` is designed to store **pre-aggregated data** using aggregate function states. It is tailored for analytics workloads where aggregation results are computed once and queried frequently.
+
+**Key Features:**
+
+- Stores **aggregate function states** like `sumState()`, `uniqState()`, etc.
+- Merges rows with the same key using **merge functions** (e.g., `sumMerge()`)
+- Reduces query latency and compute cost for recurring aggregations
+
+**Common Use Cases:**
+
+- Materialized views with pre-aggregated metrics (e.g., DAU, conversions)
+- Storing **rollup tables** for dashboards or reports
+- Efficient support for **time-bucketed aggregations**
+
+> ️ Not suitable for raw event storage. Must use aggregate functions when inserting data.
+
+## Choosing the Right Engine
+
+
+| Use Case                         | Recommended Engine       | Rationale                                                             |
+|----------------------------------|--------------------------|----------------------------------------------------------------------|
+| Raw event ingestion              | `MergeTree`              | Fast inserts, no deduplication, full event fidelity                  |
+| Deduplicated or updated records | `ReplacingMergeTree`     | Handles retries and corrections via background deduplication         |
+| Pre-aggregated summaries         | `AggregatingMergeTree`   | Efficient storage and querying of aggregate function states          |
+
+
+By selecting the correct engine per use case, your queries will run much more faster utilizing the mechanics behind each of the engine type, there are many more engine types which you can see at [clickhouse docs](https://clickhouse.com/docs/engines/table-engines) but these are the main ones you will usually use.

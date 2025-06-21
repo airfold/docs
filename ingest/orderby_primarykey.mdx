@@ -1,0 +1,74 @@
+---
+title: 'ORDER BY and PRIMARY KEY'
+sidebarTitle: 'Order by & Primary key'
+icon: 'key'
+---
+
+## Selecting `ORDER BY` and `PRIMARY KEY`
+Selecting an appropriate `ORDER BY` and `PRIMARY KEY` during table creation in Clickhouse is critical, as it directly influences how data is physically stored on disk and significantly impacts query performance. These definitions are not just structural choices, they are foundational to how efficiently Clickhouse can filter, aggregate, and retrieve data at scale.
+
+In ClickHouse, the `PRIMARY KEY` is primarily used for query optimization, enabling fast range scans and index-based filtering. However, unlike traditional relational databases, the `PRIMARY KEY` in ClickHouse does not enforce uniqueness. Instead, it serves as an index built over the `ORDER BY` expression. The `ORDER BY` clause defines the actual sort order of data within each data part on disk, which is essential for data skipping and reducing the amount of data read during query execution.
+
+Because ClickHouse is a columnar, append-only database optimized for high-performance analytical queries, both `ORDER BY` and `PRIMARY KEY` are immutable once the table is created and data is ingested. Modifying either requires creating a new table with the desired configuration and reingesting the data, a process that can be resource-intensive and time-consuming. Therefore, it is crucial to plan ahead, understand your data access patterns, and choose these keys thoughtfully from the outset.
+
+## Practical Considerations
+- Using only `ORDER BY`: When defined without an explicit `PRIMARY KEY`, the `ORDER BY` expression implicitly becomes the `PRIMARY KEY`. This is the most common case and works well for many analytical workloads.
+
+- Using both `ORDER BY` and `PRIMARY KEY`: Offers the flexibility to sort data in a way that optimizes both performance and query semantics. For example, you might choose to order data by (event_date, user_id) but define a `PRIMARY KEY` on just event_date to optimize date-range filtering.
+
+## Key Takeaways
+Choosing the right combination of `ORDER BY` and `PRIMARY KEY` is not just a best practice, it's a critical architectural decision. A well-chosen configuration leads to smaller data reads, lower resource usage, and faster query response times. Conversely, a poor configuration can lead to performance bottlenecks and operational overhead when data needs to be migrated to a newly designed table.
+
+### ORDER BY
+- Defines the sorting order of data within each data part
+- Required for all MergeTree family engines
+- Used for data organization and query optimization
+- Determines deduplication logic in ReplacingMergeTree
+
+### PRIMARY KEY
+- Creates a sparse index for faster data access
+- If not specified, defaults to ORDER BY expression
+- Should be a prefix of ORDER BY columns
+- Used for data skipping and query pruning
+
+## Understanding `ORDER BY` and `PRIMARY KEY`
+
+### Example
+```sql
+CREATE TABLE example (
+    id UInt64,
+    timestamp DateTime,
+    value String
+) ENGINE = MergeTree()
+ORDER BY (timestamp, id)
+PRIMARY KEY timestamp
+```
+
+#### `ORDER BY (timestamp, id)`
+The ORDER BY clause determines the physical sort order of the data as it's written to disk. In this example:
+- The data is sorted first by timestamp, then by id within each timestamp.
+- Sorting in this way enables efficient range queries over time and improves locality of data, particularly useful for time-series use cases.
+- This sort order enables data skipping during queries, where ClickHouse can avoid reading entire parts of data that fall outside the query’s time range.
+
+#### `PRIMARY KEY (timestamp)`
+- The PRIMARY KEY in ClickHouse is not a constraint—it doesn't enforce uniqueness. Instead, it defines the primary index used for query acceleration.
+- In this case, the primary key is timestamp, which is a subset of the ORDER BY expression—this is valid and common in ClickHouse.
+- The index stores granules (index entries) based on timestamp values, enabling fast filtering on time-based conditions, such as WHERE timestamp >= now() - INTERVAL 1 DAY.
+
+#### Interaction Between ORDER BY and PRIMARY KEY
+- The PRIMARY KEY must always be a prefix of the ORDER BY expression.
+- In this example:
+    - ORDER BY (timestamp, id)
+    - PRIMARY KEY timestamp (valid: prefix of the ORDER BY)
+- The data is sorted on disk by both timestamp and id, but the primary index is built only on timestamp, resulting in a smaller index size while still benefiting from range filtering.
+
+### Practical Query Performance Benefits
+A query like:
+```sql
+SELECT * FROM example WHERE timestamp BETWEEN '2025-01-01' AND '2025-01-31';
+```
+
+will be highly efficient, as ClickHouse will:
+- Use the PRIMARY KEY index to locate the relevant granules (data segments).
+- Skip reading unrelated data due to sorted ORDER BY layout.
+

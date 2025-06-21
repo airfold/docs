@@ -1,0 +1,80 @@
+---
+title: 'Partition By'
+sidebarTitle: 'Partition By'
+description: 'Partitioning for Data Management'
+icon: 'server'
+---
+
+
+Partitioning in ClickHouse is a way to organize your data into logical chunks, often by a `timestamp` column, so that it's easier to manage. In ClickHouse this is done using the PARTITION BY clause when defining a table schema.
+
+## How to Partition your data
+
+The Partition for your data is defined in the table schema:
+
+```yaml
+cols:
+  id: uuid
+  value: UInt64
+  date: timestamp
+settings:
+  engine: MergeTree()
+  order_by: "`id`"
+  partition_by: toStartOfMonth(date)
+```
+
+Notice that the Partition By clause in the schema can contain a SQL expression (e.g. toStartOfMonth()), the results of which will define which partition a row belongs to.
+The example above groups data by month on disk, making it easier to:
+
+* Automatically delete or archive old data (e.g., using TTL rules)
+
+* Keep data merges fast and efficient
+
+* Avoid bloated tables with too many parts
+
+## When Partitioning Helps
+
+While partitioning doesn’t directly speed up most queries, it can have a major impact on long-term performance, cost, and maintainability. By physically grouping data on disk based on a key like time, partitioning makes it easier to enforce retention policies (e.g., keeping only the last 12 months), perform fast bulk deletes (by dropping entire partitions instead of filtering row-by-row), and logically organize your data (by time, region, customer, or project). It also improves the efficiency of background merges, since ClickHouse only merges data within a partition. A well-designed partitioning strategy helps prevent table bloat, avoids "too many parts" errors, and gives you a more intuitive model for managing large datasets over time. While it may not boost query speed directly, partitioning is essential for long-term scalability and operational sanity, especially in high-volume tables that grow continuously.
+
+## Where Partitioning Doesn’t Help
+
+Partitioning in ClickHouse is a powerful data management feature, but it’s not designed to improve general query performance.
+
+### Not Like Partitions in Other Databases
+In systems like Postgres, Redshift, or BigQuery, partitioning is often used to speed up queries, acting almost like an index to skip irrelevant chunks of data.
+
+The equivalent in ClickHouse is more akin to a [Primary Key](/ingest/orderby_primarykey)
+
+In fact, a poorly designed Partition strategy can actually slow down performance. For example, Partitioning by high-cardinality fields (e.g., user_id, event_id) creates too many partitions which will increase memory usage, slows merges, and can lead to “Too many parts” errors.
+Queries that don’t filter on the partition key may scan all partitions, often making them slower than querying a non-partitioned table.
+
+### When to Avoid Partitioning
+* Small tables that don’t grow quickly
+
+* Tables where queries never filter by the partition key
+
+* Situations where you don’t need TTL or bulk delete logic
+
+## Setting a Good Partitioning Strategy
+
+A good partitioning strategy is all about balance. You want enough partitions to manage your data effectively, but not so many that you overwhelm ClickHouse’s merge engine.
+
+Partition by column(s) that are:
+* Low-cardinality (not too many unique values)
+
+* Stable (values don’t change drastically over time)
+
+* Aligned with time or lifecycle (e.g., toStartOfMonth(timestamp))
+
+Avoid partitioning by column(s) that:
+* Have a high-cardinality, such as `id` columns
+
+* Are changing frequently or unpredictably
+
+* Would result in thousands of unique partition values
+
+For time-series or event data, partitioning by month is a solid default:
+
+```yaml
+PARTITION BY: toStartOfMonth(timestamp)
+```

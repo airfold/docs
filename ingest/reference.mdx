@@ -1,0 +1,85 @@
+---
+title: 'Schema Reference'
+sidebarTitle: 'Reference'
+icon: 'file'
+---
+
+Airfold uses ClickHouse data types and table engines as its foundation. This page covers the most commonly used types and engines.
+
+## Data Types
+
+### Basic Types
+
+| Type | Description |
+|------|-------------|
+| `Int` | Integer numbers (Int8, Int16, Int32, Int64) |
+| `Float` | Floating-point numbers (Float32, Float64) |
+| `Decimal` | Fixed-point numbers with configurable precision |
+| `String` | Variable-length strings |
+| `JSON` | Semi-structured JSON data with efficient storage |
+
+### Date and Time
+
+| Type | Description |
+|------|-------------|
+| `Date` | Date values (YYYY-MM-DD) |
+| `DateTime` | Date and time with timezone support |
+| `Time` | Time values without date |
+
+### Special Types
+
+| Type | Description |
+|------|-------------|
+| `Enum` | Enumerated values with named constants |
+| `UUID` | Universally unique identifier |
+
+### Composite Types
+
+| Type | Description |
+|------|-------------|
+| `Array(T)` | Array of elements of type T |
+| `LowCardinality(T)` | Memory-optimized wrapper for low-cardinality data |
+| `Nullable(T)` | Allows NULL values for type T |
+
+### Aggregate Function Types
+
+| Type | Description |
+|------|-------------|
+| `AggregateFunction` | Stores intermediate state of aggregate functions |
+| `SimpleAggregateFunction` | Simplified version for basic aggregations |
+
+
+
+
+## Key Concepts
+
+### PARTITION BY
+
+**Partitioning**
+- Divides data into logical parts based on partition expression
+- Enables efficient data management and query performance
+- Common patterns: partition by date, month, or other logical groupings
+- Allows for efficient data pruning and deletion
+
+```sql
+CREATE TABLE events (
+    event_date Date,
+    user_id UInt64,
+    event_type String
+) ENGINE = MergeTree()
+PARTITION BY toYYYYMM(event_date)
+ORDER BY (event_date, user_id)
+```
+
+**Benefits of Partitioning:**
+- Faster queries when filtering by partition key
+- Efficient data lifecycle management
+- Parallel processing of partitions
+- Simplified data maintenance operations
+
+## Reference
+
+For detailed documentation on data types and table engines, refer to the official ClickHouse documentation:
+
+- [ClickHouse Data Types](https://clickhouse.com/docs/en/sql-reference/data-types)
+- [ClickHouse Table Engines](https://clickhouse.com/docs/en/engines/table-engines)

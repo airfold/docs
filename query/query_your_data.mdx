@@ -1,0 +1,250 @@
+---
+title: 'Query Your Data'
+sidebarTitle: 'Query Your Data'
+icon: 'diagram-sankey'
+---
+
+
+Once you have ingested your data, the next step is to **query, analyze, and derive insights** from it. This is where **Airfold Pipes** come into play.
+
+Airfold Pipes are the go-to component for interacting with your data. They provide an SQL interface that allows you to write powerful, modular queries to explore and transform your datasets.
+
+# What Are Pipes?
+
+A **Pipe** is a data processing workflow that takes your data, processes it through one or more steps, and returns a meaningful output. Pipes are designed to be:
+
+- **Flexible** – Transform, and aggregate data with ease  
+- **Powerful** – Build complex analytics workflows 
+- **Modular** – Break down logic into manageable, testable units  
+
+Each Pipe is made up of one or more **Nodes** 
+
+### Nodes: The Building Blocks
+
+![postgres](/images/query_your_data_nodes.png)
+
+**Nodes** are the fundamental units within a Pipe. Each Node contains a single **SELECT** query representing a specific step in the data processing workflow.
+Nodes are:
+
+- **Standalone or Connected**: Nodes can operate independently or as part of a chain
+- **Like CTEs, but Better**: They resemble Common Table Expressions, but can be executed and debugged individually
+- **Composable**: Output from one Node can be referenced by another downstream Node
+
+Nodes can reference data **FROM** 
+  - Airfold Sources 
+  - Previous nodes
+  - Other Published Pipes
+
+When a Pipe is triggered, the order in which the Nodes execute is determined by the lineage defined in your **FROM** statements—Nodes are executed only after all their dependencies have been resolved, ensuring a logical and efficient flow of data through the pipeline.
+# Types of Pipes
+
+Pipes can be created and managed using either the UI or the CLI. This page outlines how to work with each type of Pipe through both interfaces.
+
+
+## Draft Pipes
+
+Draft pipes are temporary pipelines used for development and testing:
+- They do not persist results
+- Cannot be referenced by other pipes using FROM
+- Serve as the foundation for published or materialized pipes
+
+**Use Case**: Iterative development and testing of SQL queries
+
+### UI
+Navigate to "Pipes" on the left menu column, and click on "+":
+![create pipe](/images/pipes_creation.gif)
+Enter a name for this query, then press "Create".
+
+Here, you have a node where you can enter a single SQL `SELECT` statement to query your tables directly. 
+
+These SQL statements can interact with your sources/tables in the same way as standard SQL tables.
+
+For example, to get the top referrers as in our quickstart example we can run the following command.
+
+```sql
+SELECT
+  referrer,
+  COUNT() AS num_referrers
+FROM web_events
+GROUP BY referrer
+ORDER BY num_referrers DESC
+LIMIT 3
+```
+
+We can run this by clicking on "Run":
+
+This is your Draft pipe, you can test SQL queries against your database using this pipe.
+
+### CLI
+
+Pipes are created and managed through YAML files. To create a draft pipe by using the CLI, create a YAML file as below: 
+
+
+```yaml draft_pipe.yaml
+name: draft_top_referrers_pipe
+description: 'Loads top referrers'
+nodes:
+    - top_referrers:
+        description: 'Gets the top referrers'
+        sql: |
+            SELECT
+              referrer,
+              COUNT() AS num_referrers
+            FROM web_events
+            GROUP BY referrer
+            ORDER BY num_referrers DESC
+            LIMIT 3
+  ```
+
+<ResponseField name="name" type="string">
+  The name of the pipe. *Optional*
+</ResponseField>
+<ResponseField name="description" type="string">
+  A brief description of the pipe's purpose or functionality. *Optional*
+</ResponseField>
+<ResponseField name="nodes" type="Node[]" required>
+  The sequence of nodes within the pipe. Each node represents a stage in data processing.
+  <Expandable title="Node">
+    <ResponseField name="[name]" type="Node" required>
+      An identifier for the node.
+      <Expandable title="Properties">
+        <ResponseField name="description" type="string">
+          A brief description of the node's role or function. *Optional*
+        </ResponseField>
+        <ResponseField name="sql" type="string" required>
+          The SQL query associated with the node. It can only retrieve data (via `FROM`) from [sources](/concepts/sources), published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe. It supports Jinja2 templating for dynamic SQL parameterization via the `params` field e.g. `{{ param }}`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+Once you have created your YAML file, push to your workspace by running:
+
+```bash
+af push <your_yaml_path>
+```
+
+Check out the [CLI Quickstart](/getting_started/quickstart_cli) page for more info on using the Airfold CLI tool.
+
+## Published Pipes
+Published pipes create API endpoints that expose query results in multiple formats like JSON and CSV
+- Accessible via endpoints and usable in other pipes
+- Supports parameterized SQL using Jinja2 templates
+- Results are computed on read
+
+**Use Case**: Serve your transformed analytics data to dashboards, reports, or downstream tools.
+
+### UI
+
+Click on "Save" to save the SQL in your pipe, then click "Publish" to publish it as an [endpoint](/concepts/endpoints):
+
+That's it, your draft pipe just became a publihsed pipe, you can go to view endpoints and use any of the Javascript, Python or curl command to ping the endpoint.
+
+![publish pipe](/images/publish_endpoints.gif)
+
+### CLI
+
+This creates an API endpoint that serves the result of your pipe, the result is accessible in JSON, NDJSON, CSV, and Parquet formats.
+
+To publish a draft pipe, assign an endpoint name to the `publish` field.
+
+Published pipes can parameterize their SQL using Jinja2 via the `params` field.
+
+Unlike draft pipes, published pipes can be accessed (via `FROM`) by other pipes.
+
+```yaml published_pipe.yaml
+name: 
+description: 'Get errors based on level'
+nodes:
+    - load:
+        description: Loading logs
+        sql: select timestamp, level, file, message from logs
+    - error:
+        description: Getting errors
+        sql: select message from load where level = {{ level }}
+publish: level
+params:
+    - name: level
+      type: string
+      default: error
+```
+
+<ResponseField name="name" type="string">
+  The name of the pipe. *Optional*
+</ResponseField>
+<ResponseField name="description" type="string">
+  A brief description of the pipe's purpose or functionality. *Optional*
+</ResponseField>
+<ResponseField name="nodes" type="Node[]" required>
+  The sequence of nodes within the pipe. Each node represents a stage in data processing.
+  <Expandable title="Node">
+    <ResponseField name="[name]" type="Node" required>
+      An identifier for the node.
+      <Expandable title="Properties">
+        <ResponseField name="description" type="string">
+          A brief description of the node's role or function. *Optional*
+        </ResponseField>
+        <ResponseField name="sql" type="string" required>
+          The SQL query associated with the node. It can only retrieve data (via `FROM`) from [sources](/concepts/sources), published pipes, or preceding nodes in the same pipe. It cannot read data from draft pipes or nodes defined later in the pipe. It supports Jinja2 templating for dynamic SQL parameterization via the `params` field e.g. `{{ param }}`.
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="publish" type="string">
+  The endpoint name where the results are published, turning the pipe into a published pipe. This option **cannot** be used with to. *Optional*
+</ResponseField>
+<ResponseField name="params" type="Param[]">
+  A list of parameters for parameterizing node SQL queries through Jinja2 templating e.g. `{{ param }}`. These parameters are passed via the API and can be used to dynamically alter the pipe's behavior. *Optional*
+  <Expandable title="Param">
+    <ResponseField name="name" type="string" required>
+      The name of the parameter.
+    </ResponseField>
+    <ResponseField name="type" type="string" required>
+      The ClickHouse data type of the parameter (e.g., UInt8, String). See [ClickHouse types](https://clickhouse.com/docs/en/sql-reference/data-types).
+    </ResponseField>
+    <ResponseField name="default" type="string">
+      The default value of the parameter. Parameters with defaults are optional in the API. *Optional*
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Materialized Pipes
+Materialized pipes transform and store results in a target source:
+- Results are appended to a designated source for faster access
+- Designed for incremental updates
+- Results persist, unlike published pipes
+
+**Use Case**: Real-time pipelines that write pre-aggregated results to a source
+
+### Incremental Materialization
+
+Airfold’s materialized pipes support incremental data transformation by automatically ingesting new data as it arrives. This model ensures your pipeline only processes fresh data ideal for time-series logs, user activity streams, or continuously growing datasets.
+
+- Enables near-real-time aggregations and rollups  
+
+**Use Case**: Building real-time dashboards or time-partitioned metrics that stay current with incoming data.
+
+<Note>
+Note: Incremental Materialized Pipes in Airfold are designed to process only newly arriving data. If historical data already exists in your target tables, you must perform a backfill to ensure completeness.
+
+Backfilling refers to the process of reprocessing or re-ingesting historical data so that it is captured by the incremental materialization logic. Without this step, pre-existing data will be excluded from downstream views and analytics.
+
+To learn how to perform a backfill, see [Backfill Your Data](/concepts/query_your_data).
+</Note>
+
+See [optimize your pipe](/production/optimize_queries) for more details on how to implement incremental materialized pipes.
+
+### Refreshable Materialization
+
+Recomputes transformations across the entire dataset
+
+- Can be scheduled refresh interval 
+- Replace existing materialized data with updated results  
+- Are suited for dimension tables, slowly changing datasets, or recalculated KPIs  
+
+**Use Case**: Perform a full recomputation of a view over the entire dataset to support complex join logic that cannot be handled incrementally.
+
+See [optimize your pipe](/production/optimize_queries) for more details on how to implement refreshable materialized pipes.
+

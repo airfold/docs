@@ -1,18 +1,72 @@
 ---
 title: 'What is Airfold?'
 sidebarTitle: 'Overview'
-description: "Airfold is a modern data platform designed to help you ship real-time analytics faster than any data stack you've used before.<br /><br />Airfold makes it easy to ingest your batch and streaming data, use SQL to aggregate and join that data, and have the results instantly available as APIs."
+description: "Airfold is the analytics platform built for engineers."
 icon: 'paper-plane'
 ---
 
-## Core Features
-<a href="https://airfold.wistia.com/medias/ykdztm2tif?wvideo=ykdztm2tif"><img src="https://embed-ssl.wistia.com/deliveries/f77807fc1ad8ee31d5ff1415fe67bd12.jpg?image_crop_resized=900x456&image_play_button=true&image_play_button_size=2x&image_play_button_color=bd2e51e0" alt="Airfold in Less Than 3 Minutes" width="450" height="228" /></a>
-- **Ingestion** - Send thousands of events per second directly to Airfold without ever worrying about batching or scheduling.
-- **Pipelines** - Build SQL and AI pipelines with declarative syntax that’s easy to maintain and collaborate on. Like `dbt` but for real-time, “pipelines as code” seamlesslly integrated with Git and PR workflows that engineers know and love.
-- **API Conversion** - Convert any pipeline into a low-latency, highly concurrent API with Swagger docs, shareable as a standard REST endpoint.
-- **Observability** - Monitor your pipelines and endpoints in real-time with latency, error, and throughput metrics.
-- **Collaboration** - Use the UI to explore team pipelines, including dependency graphs, schemas, and SQL, making collaboration and onboarding easy.
-- **Git Integration** - Use `git` to version Airfold files and automate workspace updates with each CI push to `main`, enabling familiar PR-based workflows.
+All under one roof, Airfold lets you ingest data in real time, transform it using SQL, and serve results through low-latency REST APIs.
+Whether you’re powering real-time metrics, embedding live dashboards in your app, or running fast, concurrent queries over terabytes of data—Airfold provides a high-performance, cost-efficient platform built to scale. 
+
+Unlike traditional data stacks that require stitching together multiple tools, Airfold offers an end-to-end system that excels at:
+
+**Real-Time Data Ingestion:** Stream and process thousands of events per second with minimal latency and no batching complexity.
+
+**Lightning-Fast Queries:** Use SQL to transform and aggregate huge datasets at exceptional, often sub-second latency.
+
+**Seamless API Integration:** Instantly expose your query results as REST APIs for your app to consume.
+
+Under the hood, Airfold is built on top of [ClickHouse](https://clickhouse.com/docs/about-clickhouse), the fastest open-source analytical database available. This lets your APIs query billions of rows with sub-second latency, no caching layers, and no pre-aggregation required. Just raw performance.
+
+Airfold serves as your analytics backend—simplifying your data stack and giving your systems fast, direct access to the insights they need, when they need them.
+
+
+<iframe
+  src="https://fast.wistia.net/embed/iframe/ykdztm2tif"
+  title="Airfold in Less Than 3 Minutes"
+  allow="autoplay; fullscreen"
+  allowfullscreen
+  frameborder="0"
+  width="100%"
+  height="400"
+  className="w-full aspect-video"
+></iframe>
+
+
+
+
+## How does Airfold work?
+
+Taking your project from raw data to published APIs is a simple, three-step process:
+
+
+<CardGroup cols={3}>
+  <Card
+    title="Sources"
+    icon="database"
+    href="/concepts/sources"
+  >
+    Sync your data into Airfold by using one of the built-in connectors, or send your data directly by using the Airfold API.
+  </Card>
+  <Card
+    title="Pipes"
+    icon="filter"
+    href="/query/query_your_data"
+  >
+    Transform and aggregate your data using Pipes by writing SQL select statements. Think dbt, but in real-time.
+  </Card>
+  <Card
+    title="APIs"
+    icon="link"
+    href="/concepts/endpoints"
+  >
+    Instantly expose your pipeline results as low-latency API endpoints, ready to use in your front end.
+  </Card>
+</CardGroup>
+
+## UI or CLI? Your choice.
+
+You can build and manage everything in Airfold using either our intuitive UI or our developer-friendly CLI. These docs will guide you through both approaches—whether you prefer point-and-click or pipelines-as-code, you'll find everything you need to ship real-time analytics with confidence.
 
 ## First Steps
 
@@ -61,7 +115,7 @@ Sign up for our [**free tier (no credit card required)**](https://app.us.airfold
   <Card
     title="Pipes"
     icon="magnifying-glass"
-    href="/concepts/pipes"
+    href="/query/query_your_data"
   >
     Build features over your data
   </Card>

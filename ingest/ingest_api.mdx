@@ -1,15 +1,22 @@
 ---
-title: 'Ingest From API'
-sidebarTitle: 'API'
+title: "Airfold API"
+sidebarTitle: "API"
 description: "How to ingest data using the API"
-icon: 'cloud'
+icon: "cloud"
 ---
+
+Use the Airfold API to send data directly to your workspace. No intermediary database, storage, or batching layer required!
+
+## Create a Source
+
+Before you can send data to your workspace, you first need to create a Source and define its schema. Follow the instructions in the
+[Sources](/concepts/sources) section to create a Source using either the UI or CLI.
 
 ## Ingest
 
-You can ingest data into a source with a few lines of code.
+Now that you have your Source, you can ingest data into it with a few lines of code.
 
-Simply fill in the `<>` with your specific entries:
+Replace <source_name> and <api_key> with your actual Source name and API key. Define the data to ingest using the data variable:
 
 <CodeGroup>
 ```JavaScript JavaScript
@@ -17,15 +24,16 @@ const data = [
   {<key>:<value>}
 ];
 
-fetch('https://api.airfold.co/v1/events/<source_name>', {
-  method: 'POST',
-  headers: {
-    Authorization: <token>,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(data)
+fetch('https://api.us.airfold.co/v1/events/<source_name>', {
+method: 'POST',
+headers: {
+Authorization: 'Bearer <api_key>',
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(data)
 });
-```
+
+````
 
 ```Python Python
 import requests
@@ -35,120 +43,136 @@ data = [
 ]
 
 requests.post(
-  'https://api.airfold.co/v1/events/<source_name>',
+  'https://api.us.airfold.co/v1/events/<source_name>',
   headers={
-    'Authorization': <token>,
+    'Authorization': 'Bearer <api_key>',
     'Content-Type': 'application/json'
   },
   json=data
 )
-```
+````
 
 ```cUrl cUrl
 curl --request POST \
-  --url https://api.airfold.co/v1/events/<source_name> \
-  --header <token> \
+  --url https://api.us.airfold.co/v1/events/<source_name> \
+  --header 'Authorization: Bearer <api_key>' \
   --header 'Content-Type: application/json' \
   --data '[
   {<key>:<value>}
 ]'
 ```
+
 </CodeGroup>
 
+
+<Note>
+Sources can ingest data in JSON format easily! Check out the page on [JSON mapping](/ingest/jsonpath) to see how you can configure your Source schema to be able to ingest nested JSON.
+</Note>
+
+
 Here are some examples in practice:
+
 <CodeGroup>
 ```JavaScript JavaScript
 const data = [
-    {
-        "ID":"ed9f19aa-8986-4d9a-8261-3d65bb331944",
-        "Transcript":"Sales Rep: Hi there! Thank you for taking the time to speak with me today. This is Jake from QuickCart. How are you doing? Client: Hi Jake, I'm doing well, thanks! Just busy with the online shop."
-    },
-    {
-        "ID":"bf9d1771-30b1-4817-8385-c13711342405",
-        "Transcript":"ales Rep: Good morning! Thank you for taking the time to speak with me today. My name is Alex from QuickCart. How are you doing? Client: Hi Alex, I’m doing well, thanks. Just busy trying to figure out the best way to improve my online store."
-    }
+  {
+    "event_id": 1, "user_id": 117, "event_type": "purchase", "page_url": "/home", "timestamp": "2025-05-22 10:46:29Z", "referrer": "facebook.com"
+  },
+  {
+    "event_id": 2, "user_id": 114, "event_type": "signup", "page_url": "/product/456", "timestamp": "2025-05-22 10:08:01Z", "referrer": "facebook.com"
+  },
+  {
+    "event_id": 3, "user_id": 118, "event_type": "page_view", "page_url": "/product/123", "timestamp": "2025-05-22 10:43:25Z", "referrer": "/product/123"
+  },
+  {
+    "event_id": 4, "user_id": 103, "event_type": "purchase", "page_url": "/product/456", "timestamp": "2025-05-22 10:41:53Z", "referrer": "twitter.com"
+  },
 ];
 
-fetch('https://api.airfold.co/v1/events/sales_calls_csv', {
-  method: 'POST',
-  headers: {
-    Authorization: aft_3paEjG6XBXA0examplekn6auth7tokenKPHSymSP1E,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(data)
+fetch('https://api.us.airfold.co/v1/events/web_events', {
+method: 'POST',
+headers: {
+Authorization: aft_3paEjG6XBXA0examplekn6auth7tokenKPHSymSP1E,
+'Content-Type': 'application/json'
+},
+body: JSON.stringify(data)
 });
-```
+
+````
 
 ```Python Python
 import requests
 
 data = [
-    {
-        "ID":"ed9f19aa-8986-4d9a-8261-3d65bb331944",
-        "Transcript":"Sales Rep: Hi there! Thank you for taking the time to speak with me today. This is Jake from QuickCart. How are you doing? Client: Hi Jake, I'm doing well, thanks! Just busy with the online shop."
-    },
-    {
-        "ID":"bf9d1771-30b1-4817-8385-c13711342405",
-        "Transcript":"ales Rep: Good morning! Thank you for taking the time to speak with me today. My name is Alex from QuickCart. How are you doing? Client: Hi Alex, I’m doing well, thanks. Just busy trying to figure out the best way to improve my online store."
-    }
+  {
+    "event_id": 1, "user_id": 117, "event_type": "purchase", "page_url": "/home", "timestamp": "2025-05-22 10:46:29Z", "referrer": "facebook.com"
+  },
+  {
+    "event_id": 2, "user_id": 114, "event_type": "signup", "page_url": "/product/456", "timestamp": "2025-05-22 10:08:01Z", "referrer": "facebook.com"
+  },
+  {
+    "event_id": 3, "user_id": 118, "event_type": "page_view", "page_url": "/product/123", "timestamp": "2025-05-22 10:43:25Z", "referrer": "/product/123"
+  },
+  {
+    "event_id": 4, "user_id": 103, "event_type": "purchase", "page_url": "/product/456", "timestamp": "2025-05-22 10:41:53Z", "referrer": "twitter.com"
+  },
 ]
 
 requests.post(
-  'https://api.airfold.co/v1/events/sales_calls_csv',
+  'https://api.us.airfold.co/v1/events/web_events',
   headers={
     'Authorization': aft_3paEjG6XBXA0examplekn6auth7tokenKPHSymSP1E,
     'Content-Type': 'application/json'
   },
   json=data
 )
-```
+````
 
 ```cUrl cUrl
 curl --request POST \
-  --url https://api.airfold.co/v1/events/sales_calls_csv \
+  --url https://api.us.airfold.co/v1/events/web_events \
   --header aft_3paEjG6XBXA0examplekn6auth7tokenKPHSymSP1E \
   --header 'Content-Type: application/json' \
-  --data '[
-    {
-        "ID":"ed9f19aa-8986-4d9a-8261-3d65bb331944",
-        "Transcript":"Sales Rep: Hi there! Thank you for taking the time to speak with me today. This is Jake from QuickCart. How are you doing? Client: Hi Jake, I'm doing well, thanks! Just busy with the online shop."
-    },
-    {
-        "ID":"bf9d1771-30b1-4817-8385-c13711342405",
-        "Transcript":"ales Rep: Good morning! Thank you for taking the time to speak with me today. My name is Alex from QuickCart. How are you doing? Client: Hi Alex, I’m doing well, thanks. Just busy trying to figure out the best way to improve my online store."
-    }
-]'
+  --data '[{"event_id": 1, "user_id": 117, "event_type": "purchase", "page_url": "/home", "timestamp": "2025-05-22 10:46:29Z", "referrer": "facebook.com"},
+           {"event_id": 2, "user_id": 114, "event_type": "signup", "page_url": "/product/456", "timestamp": "2025-05-22 10:08:01Z", "referrer": "facebook.com"},
+           {"event_id": 3, "user_id": 118, "event_type": "page_view", "page_url": "/product/123", "timestamp": "2025-05-22 10:43:25Z", "referrer": "/product/123"},
+           {"event_id": 4, "user_id": 103, "event_type": "purchase", "page_url": "/product/456", "timestamp": "2025-05-22 10:41:53Z", "referrer": "twitter.com"}
+          ]'
 ```
+
 </CodeGroup>
 
 ## Get Data Schema
 
 You may also get the data source schema with the following API call:
+
 <CodeGroup>
 ```JavaScript JavaScript
 const options = {method: 'GET', headers: {Authorization: 'Bearer <token>'}};
 
-fetch('https://api.airfold.co/v1/events/<source_name>', options)
-  .then(response => response.json())
-  .then(response => console.log(response))
-  .catch(err => console.error(err));
-```
+fetch('https://api.us.airfold.co/v1/events/<source_name>', options)
+.then(response => response.json())
+.then(response => console.log(response))
+.catch(err => console.error(err));
+
+````
 
 ```Python Python
 import requests
 
-url = "https://api.airfold.co/v1/events/<source_name>"
+url = "https://api.us.airfold.co/v1/events/<source_name>"
 
 headers = {"Authorization": "Bearer <token>"}
 
 response = requests.request("GET", url, headers=headers)
 
 print(response.text)
-```
+````
 
 ```cUrl cUrl
 curl --request GET \
-  --url https://api.airfold.co/v1/events/<source_name> \
+  --url https://api.us.airfold.co/v1/events/<source_name> \
   --header 'Authorization: Bearer <token>'
 ```
+
 </CodeGroup>

@@ -24,7 +24,7 @@ In the pop-up window, click on `Amazon S3`
 
 This will take you to the first page of the setup wizard. Here you can either select a previously connected bucket or connect a new one. If this is your first time connecting Airfold to S3, you will need to select "Add New" and then enter the name of the S3 `bucket` that you need to sync data from. Enter the name of the bucket exactly how it appears on your AWS account. 
 
-![snowflake](/images/S3_connector_p1.png)
+![snowflake](/images/s3_connector_p1.png)
 
 
 ### Policy and Role
@@ -40,11 +40,11 @@ The following steps will create a role for Airfold within your AWS account and w
 \
 First, let's create the policy. Follow the instructions on the setup wizard to navigate to the correct section on the IAM page of your AWS account.
 
-![snowflake](/images/S3_connector_p2p1.png)
+![snowflake](/images/s3_connector_p2p1.png)
 
 Copy the entire JSON from the setup wizard and then paste it into the policy editor. It should look something like this:
 
-![snowflake](/images/S3_connector_create_policy.png)
+![snowflake](/images/s3_connector_create_policy.png)
 
 Click next and then on the following page, give the policy a name. Remember what you have called your new policy as you will need to assign it to the new role in the next step.
 \
@@ -52,7 +52,7 @@ Once you have successfully created the policy, click on the `Mark as Created` ch
 \
 Next let's create the role. Again, follow the steps of the setup wizard to navigate to the Roles section of the IAM page. Paste the full JSON into the policy editor, it should look something like this:
 
-![snowflake](/images/S3_connector_create_role.png)
+![snowflake](/images/s3_connector_create_role.png)
 
 Assign the previously created policy to this new role and then click "Create role".\
 Once you have completed these steps, click on the "Mark as created" checkbox and then move onto the next step.
@@ -61,11 +61,11 @@ Once you have completed these steps, click on the "Mark as created" checkbox and
 
 For this section you will need to retrieve two pieces of information from your AWS account: The `Role ARN` (Amazon Resource Name) of the role that you just created, and the `path` to the file(s) that you wish to sync into Airfold.
 
-![snowflake](/images/S3_connector_p3.png)
+![snowflake](/images/s3_connector_p3.png)
 
 First, lets find the `ARN`. Navigate to the `roles` section of the IAM page in AWS and search for the role that you created in the previous step. It should look something like the following:
 
-![snowflake](/images/S3_connector_arn.png)
+![snowflake](/images/s3_connector_arn.png)
 
 Copy the ARN and paste into the setup wizard.\
 \
@@ -82,7 +82,7 @@ raw-data/**/*.json    # Recursively ingest all JSON files in 'raw-data' and its 
 
 In this section of the setup wizard, you will specify the frequency in which Airfold will pull data from S3 and the `Strategy` for how the data will populate in your Source.
 
-![snowflake](/images/S3_connector_configure_schedule.png)
+![snowflake](/images/s3_connector_configure_schedule.png)
 
 Set the refresh schedule by writing a cron expression and specifying a timezone.\
 \

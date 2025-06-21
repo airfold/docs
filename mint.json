@@ -118,12 +118,6 @@
       ]
     },
     {
-      "group": "How-To Guides",
-      "pages": [
-        "connectors/snowflake"
-      ]
-    },
-    {
       "group": "Get Started",
       "pages": [
         "api-reference/authentication"
